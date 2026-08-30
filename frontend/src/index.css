@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: #FFFDF9;
+    color: #0F172A;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* 👑 Imperial Ruby Red & 24k Gold Luxury Mesh Background */
+.bg-luxury-mesh {
+  background: 
+    radial-gradient(circle at 50% -5%, #FFFFFF 0%, #FFFDF9 35%, #FEF9EE 70%, #FDF4DE 100%),
+    radial-gradient(circle at 10% 20%, rgba(220, 38, 38, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 25%, rgba(245, 158, 11, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 60%, rgba(254, 243, 199, 0.25) 0%, transparent 55%),
+    radial-gradient(circle at 15% 85%, rgba(220, 38, 38, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(217, 119, 6, 0.1) 0%, transparent 45%),
+    #FFFDF9;
+  background-attachment: fixed;
+}
+
+/* 👑 Imperial Red & 24K Gold Text Gradients */
+.text-gradient-red {
+  background: linear-gradient(135deg, #7F1D1D 0%, #991B1B 25%, #DC2626 50%, #B91C1C 75%, #7F1D1D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #92400E 0%, #B45309 20%, #D97706 40%, #F59E0B 60%, #FBBF24 80%, #78350F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-red-gold {
+  background: linear-gradient(135deg, #991B1B 0%, #DC2626 35%, #D97706 70%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 💎 Luxury Red & Gold Card Surfaces */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 4px 24px -4px rgba(180, 83, 9, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+}
+
+.glass-panel-red {
+  background: linear-gradient(145deg, rgba(255, 245, 245, 0.98) 0%, rgba(255, 253, 247, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(220, 38, 38, 0.3);
+  box-shadow: 0 8px 30px -6px rgba(220, 38, 38, 0.12), 0 2px 4px -2px rgba(245, 158, 11, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(217, 119, 6, 0.6);
+  box-shadow: 0 16px 36px -6px rgba(180, 83, 9, 0.16), 0 4px 12px -2px rgba(220, 38, 38, 0.1);
+}
+
+/* 👑 Shimmering Gold & Red Glows */
+.shadow-red-glow {
+  box-shadow: 0 6px 22px rgba(220, 38, 38, 0.28), 0 0 0 1px rgba(245, 158, 11, 0.3);
+}
+
+.shadow-gold-glow {
+  box-shadow: 0 6px 22px rgba(217, 119, 6, 0.25), 0 0 0 1px rgba(251, 191, 36, 0.4);
+}
+
+/* Custom Red & Gold Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFDF9;
+}
+::-webkit-scrollbar-thumb {
+  background: #FBBF24;
+  border-radius: 9999px;
+  border: 2px solid #FFFDF9;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #DC2626;
+}
+
+/* 📄 Strict 1-Page A4 Print Stylesheet */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 4mm 6mm;
+  }
+  html, body {
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-a4-page {
+    width: 100% !important;
+    max-width: 210mm !important;
+    padding: 2mm 4mm !important;
+    margin: 0 auto !important;
+    background: white !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 🌟 Smooth Modern Infinite Marquee for Clients */
+@keyframes marquee-ltr {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes marquee-rtl {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee-ltr {
+  display: flex;
+  width: max-content;
+  animation: marquee-ltr 45s linear infinite;
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  animation: marquee-rtl 45s linear infinite;
+}
+
+.animate-marquee-ltr:hover,
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
+
+
+
+/* 🎬 Cinematic Video Pulse & Equalizer Animations */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes equalizer-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+.animate-eq-1 { animation: equalizer-bar 0.8s ease-in-out infinite; }
+.animate-eq-2 { animation: equalizer-bar 0.8s ease-in-out infinite 0.2s; }
+.animate-eq-3 { animation: equalizer-bar 0.8s ease-in-out infinite 0.4s; }
+.animate-eq-4 { animation: equalizer-bar 0.8s ease-in-out infinite 0.15s; }
+
+/* 🌟 Ken Burns Cinematic Gentle Pan */
+@keyframes ken-burns {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.08) translate(-1%, -1%); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 18s ease-in-out infinite alternate;
+}

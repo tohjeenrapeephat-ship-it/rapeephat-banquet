@@ -1,0 +1,16 @@
+{
+  "name": "rapeephat-chinese-banquet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "โต๊ะจีน รพีพัฒน์ พรีเมียม - Corporate Website & Smart Quotation Builder",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "preview": "cd frontend && npm run preview",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start:backend": "cd backend && npm start"
+  }
+}

@@ -1,0 +1,49 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Quotation {
+  id              String   @id @default(uuid())
+  quoteNo         String   @unique
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  eventDate       String
+  eventTime       String?
+  eventLocation   String
+  eventType       String?
+  packagePrice    Int
+  packageName     String
+  tableCount      Int
+  freeTableCount  Int      @default(0)
+  beveragePrice   Int      @default(0)
+  beverageName    String?
+  floorService    Int      @default(0)
+  subtotal        Int
+  discount        Int      @default(0)
+  grandTotal      Int
+  depositAmount   Int
+  finalAmount     Int
+  selectedDishes  String   // JSON formatted array of course selections
+  notes           String?
+  pdfDriveUrl     String?  // Google Drive Web View Link
+  status          String   @default("pending") // pending, confirmed, completed, cancelled
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Package {
+  id          String   @id @default(uuid())
+  name        String
+  price       Int
+  description String?
+  isPopular   Boolean  @default(false)
+  courses     String   // JSON of standard courses
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

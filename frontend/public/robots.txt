@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# AI Answer Engines & LLM Search Crawlers (AEO)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+Sitemap: https://rapeephat-banquet.com/sitemap.xml

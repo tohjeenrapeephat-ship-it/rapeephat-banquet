@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+.node/
+
+# Production Build Output
+dist/
+build/
+.dist/
+
+# Temporary and cache files
+scratch/
+.system_generated/
+*.log
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel

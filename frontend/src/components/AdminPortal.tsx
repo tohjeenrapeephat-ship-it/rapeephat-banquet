@@ -1,0 +1,707 @@
+import React, { useState, useEffect } from 'react';
+import { QuotationDoc } from '../types/quotation.js';
+import { QuotationApi } from '../services/api.js';
+import { BANQUET_PACKAGES } from '../data/packages.js';
+import { formatCurrency } from '../utils/currency.js';
+import { formatThaiDate } from '../utils/thaiDate.js';
+import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
+import {
+  LayoutDashboard,
+  FileText,
+  DollarSign,
+  Users,
+  Calendar,
+  Search,
+  Filter,
+  Eye,
+  Trash2,
+  CloudUpload,
+  Phone,
+  RefreshCw,
+  Edit3,
+  Save,
+  Settings,
+  Utensils,
+  TrendingUp,
+  ChevronRight
+} from 'lucide-react';
+
+interface AdminPortalProps {
+  onBackToSite: () => void;
+}
+
+export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
+  const [quotations, setQuotations] = useState<QuotationDoc[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
+  const [activeTab, setActiveTab] = useState<'quotations' | 'packages' | 'settings'>('quotations');
+
+  // GAS Webhook Settings
+  const [gasUrl, setGasUrl] = useState(() => localStorage.getItem('rapeephat_gas_url') || '');
+  const [gasSaved, setGasSaved] = useState(false);
+
+  // Edit Note Modal
+  const [editingNoteQuote, setEditingNoteQuote] = useState<QuotationDoc | null>(null);
+  const [tempNote, setTempNote] = useState('');
+
+  const fetchQuotations = async () => {
+    setIsLoading(true);
+    try {
+      const data = await QuotationApi.getAll(searchTerm);
+      setQuotations(data);
+    } catch (e) {
+      console.error('Error fetching quotations in admin:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuotations();
+  }, [searchTerm]);
+
+  // Status Change Handler
+  const handleStatusChange = async (quote: QuotationDoc, newStatus: string) => {
+    try {
+      if (quote.id && !quote.id.startsWith('loc_')) {
+        await fetch(`/api/quotations/${quote.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+      }
+    } catch (e) {
+      console.warn('Backend status update error:', e);
+    }
+
+    const updated = quotations.map((q) =>
+      q.quoteNo === quote.quoteNo ? { ...q, status: newStatus as any } : q
+    );
+    setQuotations(updated);
+    try {
+      localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updated));
+    } catch {}
+  };
+
+  // Save Note Handler
+  const handleSaveNote = async () => {
+    if (!editingNoteQuote) return;
+    try {
+      if (editingNoteQuote.id && !editingNoteQuote.id.startsWith('loc_')) {
+        await fetch(`/api/quotations/${editingNoteQuote.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes: tempNote }),
+        });
+      }
+    } catch (e) {
+      console.warn('Backend note update error:', e);
+    }
+
+    const updated = quotations.map((q) =>
+      q.quoteNo === editingNoteQuote.quoteNo ? { ...q, notes: tempNote, customer: { ...q.customer, notes: tempNote } } : q
+    );
+    setQuotations(updated);
+    try {
+      localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updated));
+    } catch {}
+    setEditingNoteQuote(null);
+  };
+
+  // Delete Quote Handler
+  const handleDelete = async (quote: QuotationDoc) => {
+    if (!confirm(`ยืนยันการลบใบเสนอราคา ${quote.quoteNo} หรือไม่?`)) return;
+    try {
+      if (quote.id && !quote.id.startsWith('loc_')) {
+        await fetch(`/api/quotations/${quote.id}`, { method: 'DELETE' });
+      }
+    } catch (e) {
+      console.warn('Delete error:', e);
+    }
+    const updated = quotations.filter((q) => q.quoteNo !== quote.quoteNo);
+    setQuotations(updated);
+    try {
+      localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updated));
+    } catch {}
+  };
+
+  const handleSaveGasUrl = () => {
+    localStorage.setItem('rapeephat_gas_url', gasUrl);
+    setGasSaved(true);
+    setTimeout(() => setGasSaved(false), 3000);
+  };
+
+  // Calculate Metrics
+  const totalQuotations = quotations.length;
+  const totalRevenue = quotations.reduce((acc, q) => acc + (q.grandTotal || 0), 0);
+  const totalDeposit = quotations.reduce((acc, q) => acc + (q.depositAmount || 0), 0);
+  const totalTables = quotations.reduce((acc, q) => acc + (q.tableCount || 0), 0);
+  
+  const pendingCount = quotations.filter((q) => !q.status || q.status === 'pending').length;
+  const depositPaidCount = quotations.filter((q) => q.status === 'deposit_paid').length;
+  const confirmedCount = quotations.filter((q) => q.status === 'confirmed').length;
+  const completedCount = quotations.filter((q) => q.status === 'completed').length;
+
+  const filteredQuotes = quotations.filter((q) => {
+    if (statusFilter === 'all') return true;
+    if (statusFilter === 'pending') return !q.status || q.status === 'pending';
+    return q.status === statusFilter;
+  });
+
+  return (
+    <div className="min-h-screen bg-luxury-mesh text-slate-900 font-sans pb-16 relative">
+      
+      {/* Top Admin Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200 px-4 sm:px-8 py-4 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+          
+          {/* Logo & Title */}
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center shadow-md">
+              <LayoutDashboard className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-black text-slate-900 tracking-tight">
+                  ระบบจัดการหลังบ้าน (Admin Portal)
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black shadow-sm">
+                  LIVE SYSTEM
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                โต๊ะจีน รพีพัฒน์ พรีเมียม • แดชบอร์ดบริหารจัดการใบเสนอราคาและคิวจัดเลี้ยง
+              </p>
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-3">
+            <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 text-xs font-bold">
+              <button
+                onClick={() => setActiveTab('quotations')}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeTab === 'quotations'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>ใบเสนอราคา</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('packages')}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeTab === 'packages'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Utensils className="w-3.5 h-3.5" />
+                <span>แพ็กเกจอาหาร</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeTab === 'settings'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Settings className="w-3.5 h-3.5" />
+                <span>ตั้งค่า Cloud / GAS</span>
+              </button>
+            </div>
+
+            {/* Back to Website Button */}
+            <button
+              onClick={onBackToSite}
+              className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <span>กลับสู่หน้าเว็บไซต์</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8 relative z-10">
+        
+        {/* Metric Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          {/* Total Revenue */}
+          <div className="p-6 rounded-3xl bg-white border border-red-200 shadow-md space-y-2 relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-red-700 uppercase">ยอดคำนวณรวมทั้งหมด</span>
+              <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center">
+                <DollarSign className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              {formatCurrency(totalRevenue)}
+            </div>
+            <div className="text-[11px] text-slate-500 font-medium">
+              มัดจำ 30% รวม: <strong className="text-red-700 font-bold">{formatCurrency(totalDeposit)}</strong>
+            </div>
+          </div>
+
+          {/* Total Tables */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase">จำนวนโต๊ะจัดเลี้ยง</span>
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              {totalTables.toLocaleString()} <span className="text-sm text-slate-500 font-normal">โต๊ะ</span>
+            </div>
+            <div className="text-[11px] text-slate-500 font-medium">
+              รองรับแขกประมาณ <strong className="text-slate-800">{(totalTables * 10).toLocaleString()}</strong> ท่าน
+            </div>
+          </div>
+
+          {/* Total Quotations */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase">ใบเสนอราคาที่ออก</span>
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">
+                <FileText className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              {totalQuotations} <span className="text-sm text-slate-500 font-normal">ฉบับ</span>
+            </div>
+            <div className="text-[11px] text-slate-500 font-medium">
+              เฉลี่ย ฿{totalQuotations > 0 ? Math.round(totalRevenue / totalQuotations).toLocaleString() : 0} / งาน
+            </div>
+          </div>
+
+          {/* Status Breakdown */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase">สถานะคิวงาน</span>
+              <div className="w-9 h-9 rounded-xl bg-green-50 text-green-600 border border-green-200 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+              <div className="flex items-center justify-between p-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                <span>รอยืนยัน:</span>
+                <span className="font-bold">{pendingCount}</span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-xl bg-green-50 text-green-800 border border-green-200 font-medium">
+                <span>มัดจำแล้ว:</span>
+                <span className="font-bold">{depositPaidCount + confirmedCount}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* TAB 1: Quotations Management Table */}
+        {activeTab === 'quotations' && (
+          <div className="space-y-6">
+            
+            {/* Search & Filter Bar */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              
+              {/* Search Box (Strict Bottom-Aligned Box) */}
+              <div className="flex-1 flex flex-col justify-end h-full">
+                <label className="text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+                  <Search className="w-3.5 h-3.5 text-red-600" />
+                  <span>ค้นหาใบเสนอราคา (เลขที่เอกสาร, ชื่อลูกค้า, หรือเบอร์โทรศัพท์):</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="พิมพ์ QT..., ชื่อลูกค้า, สถานที่ หรือเบอร์โทร..."
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-600 font-medium"
+                  />
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                </div>
+              </div>
+
+              {/* Status Filter Tabs */}
+              <div className="flex flex-col justify-end h-full">
+                <label className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                  <Filter className="w-3.5 h-3.5 text-red-600" />
+                  <span>กรองสถานะ:</span>
+                </label>
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 overflow-x-auto text-xs">
+                  {[
+                    { id: 'all', name: `ทั้งหมด (${quotations.length})` },
+                    { id: 'pending', name: `รอยืนยัน (${pendingCount})` },
+                    { id: 'deposit_paid', name: `ชำระมัดจำแล้ว (${depositPaidCount})` },
+                    { id: 'confirmed', name: `ยืนยันคิวแล้ว (${confirmedCount})` },
+                    { id: 'completed', name: `สำเร็จ (${completedCount})` },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setStatusFilter(tab.id)}
+                      className={`px-3 py-1.5 rounded-xl whitespace-nowrap font-bold transition-all ${
+                        statusFilter === tab.id
+                          ? 'bg-red-600 text-white shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {tab.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Refresh Button */}
+              <div className="flex flex-col justify-end">
+                <button
+                  onClick={fetchQuotations}
+                  className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 flex items-center justify-center gap-2 text-xs font-bold"
+                  title="รีเฟรช"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-red-600' : ''}`} />
+                  <span>รีเฟรช</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* Quotations Table */}
+            <div className="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-md">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold uppercase tracking-wider">
+                    <tr>
+                      <th className="p-4">เลขที่เอกสาร / วันที่</th>
+                      <th className="p-4">ข้อมูลลูกค้า & สถานที่จัดงาน</th>
+                      <th className="p-4">แพ็กเกจ & จำนวนโต๊ะ</th>
+                      <th className="p-4 text-right">ยอดสุทธิ / มัดจำ 30%</th>
+                      <th className="p-4 text-center">สถานะการจอง</th>
+                      <th className="p-4 text-center">การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredQuotes.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-12 text-center text-slate-400">
+                          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+                          <div className="text-sm font-bold text-slate-600">ไม่พบใบเสนอราคาที่ค้นหา</div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredQuotes.map((quote) => (
+                        <tr key={quote.quoteNo} className="hover:bg-slate-50 transition-colors">
+                          
+                          {/* Quote No & Date */}
+                          <td className="p-4 space-y-1">
+                            <div className="font-mono text-sm font-black text-red-600">
+                              {quote.quoteNo}
+                            </div>
+                            <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                              <Calendar className="w-3 h-3 text-slate-400" />
+                              ออกเมื่อ: {formatThaiDate(quote.createdAt)}
+                            </div>
+                          </td>
+
+                          {/* Customer & Location */}
+                          <td className="p-4 space-y-1">
+                            <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                              <span>{quote.customer?.name}</span>
+                              <a
+                                href={`tel:${quote.customer?.phone}`}
+                                className="text-xs text-red-600 hover:underline flex items-center gap-1 font-semibold"
+                              >
+                                <Phone className="w-3 h-3" /> {quote.customer?.phone}
+                              </a>
+                            </div>
+                            <div className="text-xs text-slate-600 flex items-center gap-1 font-medium">
+                              <span>วันจัดงาน:</span>
+                              <strong className="text-slate-900 font-bold">{formatThaiDate(quote.customer?.eventDate)}</strong>
+                              <span>({quote.customer?.eventTime || 'ช่วงเย็น'})</span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 truncate max-w-xs font-medium">
+                              📍 {quote.customer?.eventLocation}
+                            </div>
+                            {quote.notes && (
+                              <div className="text-[10px] text-red-700 font-semibold bg-red-50 px-2 py-0.5 rounded-lg border border-red-200 inline-block">
+                                หมายเหตุ: {quote.notes}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Package & Tables */}
+                          <td className="p-4 space-y-1">
+                            <div className="font-bold text-slate-900 text-xs">{quote.package?.name}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 font-bold text-xs">
+                                {quote.tableCount} โต๊ะ
+                              </span>
+                              {quote.freeTableCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-bold text-[10px] border border-green-200">
+                                  +แถม {quote.freeTableCount} โต๊ะ
+                                </span>
+                              )}
+                            </div>
+                            {quote.beverage && quote.beverage.pricePerTable > 0 && (
+                              <div className="text-[10px] text-slate-500 font-medium">
+                                + {quote.beverage.name}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Total & Deposit */}
+                          <td className="p-4 text-right space-y-0.5">
+                            <div className="text-base font-black text-red-600">
+                              {formatCurrency(quote.grandTotal)}
+                            </div>
+                            <div className="text-[11px] text-slate-600 font-medium">
+                              มัดจำ: <strong className="text-slate-900 font-bold">{formatCurrency(quote.depositAmount)}</strong>
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-medium">
+                              วันงาน: {formatCurrency(quote.finalAmount)}
+                            </div>
+                          </td>
+
+                          {/* Status Dropdown */}
+                          <td className="p-4 text-center">
+                            <select
+                              value={quote.status || 'pending'}
+                              onChange={(e) => handleStatusChange(quote, e.target.value)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border focus:outline-none cursor-pointer transition-all ${
+                                quote.status === 'confirmed' || quote.status === 'deposit_paid'
+                                  ? 'bg-green-50 text-green-800 border-green-300'
+                                  : quote.status === 'completed'
+                                  ? 'bg-blue-50 text-blue-800 border-blue-300'
+                                  : quote.status === 'cancelled'
+                                  ? 'bg-red-50 text-red-800 border-red-300'
+                                  : 'bg-amber-50 text-amber-800 border-amber-300'
+                              }`}
+                            >
+                              <option value="pending">รอยืนยันมัดจำ</option>
+                              <option value="deposit_paid">ชำระมัดจำ 30% แล้ว</option>
+                              <option value="confirmed">ยืนยันล็อกคิวงาน</option>
+                              <option value="completed">จัดเลี้ยงสำเร็จ</option>
+                              <option value="cancelled">ยกเลิก</option>
+                            </select>
+                          </td>
+
+                          {/* Action Buttons */}
+                          <td className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-1.5">
+                              {/* Open A4 Full Quotation */}
+                              <button
+                                onClick={() => setActiveQuote(quote)}
+                                className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white font-bold transition-all border border-red-200"
+                                title="เปิดดูใบเสนอราคา A4"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+
+                              {/* Google Drive Link */}
+                              {quote.pdfDriveUrl ? (
+                                <a
+                                  href={quote.pdfDriveUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white transition-colors border border-blue-200"
+                                  title="เปิดไฟล์ PDF บน Google Drive"
+                                >
+                                  <CloudUpload className="w-4 h-4" />
+                                </a>
+                              ) : (
+                                <span className="p-2 text-slate-300" title="ยังไม่มีไฟล์ Drive">
+                                  <CloudUpload className="w-4 h-4 opacity-25" />
+                                </span>
+                              )}
+
+                              {/* Edit Note */}
+                              <button
+                                onClick={() => {
+                                  setEditingNoteQuote(quote);
+                                  setTempNote(quote.notes || '');
+                                }}
+                                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"
+                                title="แก้ไขบันทึกภายใน"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
+
+                              {/* Delete */}
+                              <button
+                                onClick={() => handleDelete(quote)}
+                                className="p-2 rounded-xl bg-slate-50 hover:bg-red-100 text-slate-400 hover:text-red-600"
+                                title="ลบ"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 2: Packages & Menus Management Overview */}
+        {activeTab === 'packages' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
+              <div>
+                <h3 className="text-xl font-black text-slate-900">แพ็กเกจโต๊ะจีน & รายการอาหารมาตรฐาน ({BANQUET_PACKAGES.length} แพ็กเกจ)</h3>
+                <p className="text-xs text-slate-500 font-medium">ตรวจสอบราคาและรายการอาหารมาตรฐานของแบรนด์ โต๊ะจีน รพีพัฒน์</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {BANQUET_PACKAGES.map((pkg) => (
+                <div key={pkg.id} className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-red-700 px-3 py-1 rounded-full bg-red-50 border border-red-200">
+                      {pkg.dishCount} จาน
+                    </span>
+                    <span className="text-xl font-black text-slate-900">{formatCurrency(pkg.price)}</span>
+                  </div>
+                  <h4 className="text-lg font-black text-slate-900">{pkg.name}</h4>
+                  <p className="text-xs text-slate-600 font-medium">{pkg.description}</p>
+                  
+                  <div className="pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
+                    <div className="font-bold text-slate-800 text-[11px] uppercase">รายการอาหาร:</div>
+                    {pkg.courses.map((c, i) => (
+                      <div key={i} className="truncate font-medium">
+                        • {c.title}: <span className="text-slate-800">{c.options[0]?.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: Google Drive & GAS Settings */}
+        {activeTab === 'settings' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 space-y-6 shadow-md">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
+                <CloudUpload className="w-6 h-6 text-red-600" />
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">ตั้งค่า Google Apps Script (GAS) Webhook</h3>
+                  <p className="text-xs text-slate-500 font-medium">เชื่อมต่อ Google Drive เพื่อจัดเก็บไฟล์ PDF ใบเสนอราคาแบบไม่จำกัด Quota</p>
+                </div>
+              </div>
+
+              {/* Strict Bottom-Aligned Input */}
+              <div className="flex flex-col justify-end h-full space-y-2">
+                <label className="text-xs font-bold text-slate-800">
+                  Google Apps Script Web Application URL (Exec URL):
+                </label>
+                <input
+                  type="url"
+                  value={gasUrl}
+                  onChange={(e) => setGasUrl(e.target.value)}
+                  placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-red-600 font-medium"
+                />
+                <span className="text-[11px] text-slate-500 font-medium">
+                  * เมื่อผู้ใช้ดาวน์โหลดหรือบันทึก PDF ระบบจะส่ง Base64 ไปยัง Webhook นี้เพื่อสร้างไฟล์ใน Google Drive ทันที
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveGasUrl}
+                  className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{gasSaved ? '✓ บันทึกเรียบร้อยแล้ว' : 'บันทึกการตั้งค่า'}</span>
+                </button>
+              </div>
+
+              {/* Code Snippet for GAS Setup */}
+              <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2 text-xs">
+                <div className="font-bold text-amber-300">ตัวอย่างโค้ด Google Apps Script (Code.gs):</div>
+                <pre className="text-[11px] text-slate-300 font-mono overflow-x-auto p-3 rounded-lg bg-black/60 border border-white/10">
+{`function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var bytes = Utilities.base64Decode(data.base64Pdf);
+    var blob = Utilities.newBlob(bytes, 'application/pdf', 'ใบเสนอราคา_' + data.quoteNo + '.pdf');
+    var file = DriveApp.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      fileId: file.getId(),
+      webViewLink: file.getUrl()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }));
+  }
+}`}
+                </pre>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Edit Note Modal */}
+      {editingNoteQuote && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-slate-900">แก้ไขบันทึกภายใน ({editingNoteQuote.quoteNo})</h3>
+            <div className="flex flex-col justify-end h-full">
+              <label className="text-xs text-slate-600 font-medium mb-1">หมายเหตุของเจ้าหน้าที่ / ข้อมูลการชำระเงิน:</label>
+              <textarea
+                rows={4}
+                value={tempNote}
+                onChange={(e) => setTempNote(e.target.value)}
+                placeholder="เช่น ได้รับเงินมัดจำ 30% แล้วเมื่อวันที่..., ผ้าคลุมสีทอง..."
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-red-600 font-medium"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setEditingNoteQuote(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={handleSaveNote}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm"
+              >
+                บันทึกหมายเหตุ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full A4 Quotation Modal */}
+      {activeQuote && (
+        <QuotationModal
+          quotation={activeQuote}
+          onClose={() => setActiveQuote(null)}
+        />
+      )}
+
+    </div>
+  );
+};
