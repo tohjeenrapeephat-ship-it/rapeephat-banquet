@@ -20,6 +20,7 @@ import { ContactSection } from './components/ContactSection.js';
 import { Footer } from './components/Footer.js';
 import { VisitorFloatingBadge } from './components/VisitorCounter.js';
 import { AdminPortal } from './components/AdminPortal.js';
+import { MobileBottomNav } from './components/MobileBottomNav.js';
 import { Phone, MessageCircle, ArrowUp } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -100,7 +101,7 @@ export const App: React.FC = () => {
   // 2. If in Dedicated Quotation Builder Page View
   if (currentView === 'quotation') {
     return (
-      <>
+      <div className="pb-20 sm:pb-0 min-h-screen">
         <QuotationPage
           initialPackage={selectedPkgForBuilder}
           onBackToHome={handleNavigateToHome}
@@ -113,13 +114,19 @@ export const App: React.FC = () => {
           isOpen={historyOpen}
           onClose={() => setHistoryOpen(false)}
         />
-      </>
+        {/* Mobile Bottom Navigation Bar */}
+        <MobileBottomNav
+          currentView={currentView}
+          onNavigateHome={handleNavigateToHome}
+          onOpenBuilder={() => handleOpenBuilder()}
+        />
+      </div>
     );
   }
 
   // 3. Clean Main Home Landing Page (NO QuotationBuilder taking up home space)
   return (
-    <div className="min-h-screen bg-luxury-mesh text-slate-900 font-sans selection:bg-red-600 selection:text-white relative">
+    <div className="min-h-screen bg-luxury-mesh text-slate-900 font-sans selection:bg-red-600 selection:text-white relative pb-20 sm:pb-0">
       
       {/* Sticky Top Navigation */}
       <Navbar
@@ -154,11 +161,13 @@ export const App: React.FC = () => {
         onClose={() => setHistoryOpen(false)}
       />
 
-      {/* Floating Bottom Live Visitor Traffic Badge (Left Side) */}
-      <VisitorFloatingBadge />
+      {/* Floating Bottom Live Visitor Traffic Badge (Desktop Only) */}
+      <div className="hidden sm:block">
+        <VisitorFloatingBadge />
+      </div>
 
-      {/* Floating Bottom Quick Contact Buttons */}
-      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-2.5">
+      {/* Floating Bottom Quick Contact Buttons (Desktop Only) */}
+      <div className="hidden sm:flex fixed bottom-5 right-5 z-40 flex-col gap-2.5">
         <a
           href="https://line.me/ti/p/~pang_baichaa"
           target="_blank"
@@ -187,6 +196,13 @@ export const App: React.FC = () => {
           </button>
         )}
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        currentView={currentView}
+        onNavigateHome={handleNavigateToHome}
+        onOpenBuilder={() => handleOpenBuilder()}
+      />
 
     </div>
   );

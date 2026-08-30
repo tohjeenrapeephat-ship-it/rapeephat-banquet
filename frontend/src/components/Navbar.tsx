@@ -126,10 +126,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, hi
         <div className="flex lg:hidden items-center gap-1.5">
           <button
             onClick={onOpenHistory}
-            className="p-2 rounded-2xl bg-white text-slate-700 border border-amber-300 shadow-2xs"
+            className="relative p-2 rounded-2xl bg-white text-slate-700 border border-amber-300 shadow-2xs"
             title="ประวัติเอกสาร"
           >
             <FileText className="w-4 h-4 text-red-600" />
+            {historyCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-600 to-red-700 text-white text-[9px] w-4 h-4 rounded-full font-bold flex items-center justify-center leading-none shadow-xs">
+                {historyCount}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
