@@ -22,7 +22,9 @@ import {
   CreditCard,
   Copy,
   Check,
-  Maximize2
+  Maximize2,
+  Monitor,
+  Smartphone
 } from 'lucide-react';
 
 interface QuotationModalProps {
@@ -37,8 +39,27 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
   const [isUploadingDrive, setIsUploadingDrive] = useState(false);
   const [driveUrl, setDriveUrl] = useState<string | undefined>(quotation.pdfDriveUrl);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'fit'>('desktop');
+  const [scale, setScale] = useState<number>(1);
 
   const displayQuoteNo = quotation.quoteNo ? quotation.quoteNo.replace(/^QT-/, 'QT') : '';
+
+  // Calculate dynamic scale for fit view on mobile
+  useEffect(() => {
+    const updateScale = () => {
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth;
+        if (width < 820) {
+          setScale(Math.max((width - 32) / 794, 0.36));
+        } else {
+          setScale(1);
+        }
+      }
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   // Trigger celebration confetti on open
   useEffect(() => {
@@ -166,11 +187,34 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2">
+            
+            {/* View Mode Toggle (Desktop / Mobile Fit) */}
+            <button
+              type="button"
+              onClick={() => setViewMode(viewMode === 'desktop' ? 'fit' : 'desktop')}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold flex items-center gap-1.5 border border-amber-400/40 shadow-xs transition-all"
+              title="สลับมุมมองคอมพิวเตอร์ (ขนาดจริง A4) / พอดีจอมือถือ"
+            >
+              {viewMode === 'desktop' ? (
+                <>
+                  <Smartphone className="w-4 h-4 text-emerald-400" />
+                  <span className="hidden sm:inline">ดูแบบพอดีจอมือถือ</span>
+                  <span className="sm:hidden">พอดีจอ</span>
+                </>
+              ) : (
+                <>
+                  <Monitor className="w-4 h-4 text-amber-400" />
+                  <span className="hidden sm:inline">ดูแบบคอมพิวเตอร์</span>
+                  <span className="sm:hidden">แบบคอม</span>
+                </>
+              )}
+            </button>
+
             {/* Native Browser Print */}
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-colors shadow-xs"
+              className="hidden sm:flex px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold items-center gap-1.5 border border-slate-700 transition-colors shadow-xs"
               title="สั่งพิมพ์ออกเครื่องพิมพ์โดยตรง (A4 1 หน้า)"
             >
               <Printer className="w-4 h-4 text-amber-400" />
@@ -213,6 +257,41 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
           </div>
         </div>
 
+        {/* Mobile View Mode Switcher Banner */}
+        <div className="no-print sm:hidden px-3.5 py-2.5 bg-slate-800 border-b border-slate-700 flex items-center justify-between gap-2 text-xs">
+          <span className="text-slate-300 font-bold flex items-center gap-1.5">
+            {viewMode === 'desktop' ? (
+              <>
+                <Monitor className="w-4 h-4 text-amber-400" />
+                <span>มุมมอง: <strong className="text-amber-300">แบบคอมพิวเตอร์</strong> (A4 เต็มใบ)</span>
+              </>
+            ) : (
+              <>
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span>มุมมอง: <strong className="text-emerald-300">พอดีจอมือถือ</strong></span>
+              </>
+            )}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === 'desktop' ? 'fit' : 'desktop')}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all border border-amber-300 shrink-0"
+          >
+            {viewMode === 'desktop' ? (
+              <>
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>ดูแบบพอดีจอ</span>
+              </>
+            ) : (
+              <>
+                <Monitor className="w-3.5 h-3.5" />
+                <span>ดูแบบคอมพิวเตอร์</span>
+              </>
+            )}
+          </button>
+        </div>
+
         {/* Drive Link Banner if uploaded */}
         {driveUrl && (
           <div className="no-print mx-4 sm:mx-6 mt-3 p-3 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs text-blue-900">
@@ -237,17 +316,29 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
         {/* ========================================================================= */}
         <div className="p-2 sm:p-4 bg-slate-200/90 flex justify-center items-start overflow-x-auto">
           <div
-            ref={printRef}
-            className="print-a4-page bg-white text-slate-900 shadow-2xl rounded-xl border border-slate-300 font-sans mx-auto flex flex-col justify-between"
-            style={{
-              width: '100%',
-              maxWidth: '794px',
-              minHeight: '1123px',
-              padding: '20px 24px',
-              boxSizing: 'border-box',
-              backgroundColor: '#ffffff',
-            }}
+            style={
+              viewMode === 'fit' && scale < 1
+                ? {
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top center',
+                    marginBottom: `-${(1 - scale) * 1123}px`,
+                  }
+                : {}
+            }
+            className="transition-transform duration-200 shrink-0"
           >
+            <div
+              ref={printRef}
+              className="print-a4-page bg-white text-slate-900 shadow-2xl rounded-xl border border-slate-300 font-sans mx-auto flex flex-col justify-between"
+              style={{
+                width: '794px',
+                minWidth: '794px',
+                minHeight: '1123px',
+                padding: '20px 24px',
+                boxSizing: 'border-box',
+                backgroundColor: '#ffffff',
+              }}
+            >
             {/* Top Section Group */}
             <div className="space-y-2">
               
@@ -579,6 +670,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
 
           </div>
         </div>
+      </div>
 
         {/* ========================================================================= */}
         {/* 📱 MODAL BOTTOM ACTION BAR (DUAL ACTIONS + LINE) */}
