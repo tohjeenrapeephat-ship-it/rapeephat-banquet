@@ -341,12 +341,12 @@ export const ContactSection: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-xs font-black text-slate-900 mb-1">
-                      ชื่อเจ้าภาพ / ผู้ติดต่อ <span className="text-red-600">*</span>
+                      ชื่อเจ้าภาพ / ผู้ติดต่อ <span className="text-red-700 font-bold text-[11px] bg-red-50 px-1.5 py-0.5 rounded border border-red-200 ml-1">(ชื่อในการออกใบเสร็จ/สัญญาจ้างงาน)</span> <span className="text-red-600 font-black">*</span>
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="เช่น คุณสมชาย เจริญสุข"
+                      placeholder="เช่น คุณสมชาย เจริญสุข หรือ บริษัท เอ บี ซี จำกัด"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-3 rounded-2xl bg-amber-50/30 border-2 border-amber-200 text-xs sm:text-sm font-bold text-slate-900 focus:outline-hidden focus:border-amber-500 focus:bg-white transition-colors"

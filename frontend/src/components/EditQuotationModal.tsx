@@ -246,14 +246,16 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">ชื่อลูกค้า / หน่วยงาน *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  ชื่อเจ้าภาพ / ผู้ติดต่อ <span className="text-red-700 font-extrabold text-[11px] bg-red-50 px-1.5 py-0.5 rounded border border-red-200 ml-1">(ชื่อในการออกใบเสร็จ/สัญญาจ้างงาน)</span> <span className="text-red-600">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-medium text-slate-900 outline-none"
-                  placeholder="เช่น คุณสมศักดิ์ นครปฐม"
+                  placeholder="เช่น คุณสมศักดิ์ นครปฐม หรือ บริษัท เอ บี ซี จำกัด"
                 />
               </div>
 

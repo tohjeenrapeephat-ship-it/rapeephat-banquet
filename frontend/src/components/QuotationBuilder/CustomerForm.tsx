@@ -24,14 +24,20 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         
         {/* Customer Name */}
         <div className="flex flex-col justify-end h-full space-y-2">
-          <label className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
-            <User className="w-4 h-4 text-red-600 shrink-0" />
-            <span>ชื่อเจ้าภาพ / ผู้ติดต่อ <span className="text-red-600">*</span></span>
+          <label className="text-sm sm:text-base font-black text-slate-900 flex flex-wrap items-center gap-1.5 leading-tight">
+            <div className="flex items-center gap-1.5">
+              <User className="w-4 h-4 text-red-600 shrink-0" />
+              <span>ชื่อเจ้าภาพ / ผู้ติดต่อ</span>
+              <span className="text-red-600 font-black">*</span>
+            </div>
+            <span className="text-xs sm:text-[12.5px] font-extrabold text-red-700 bg-red-50 px-2 py-0.5 rounded-md border border-red-200 shadow-2xs">
+              (ชื่อในการออกใบเสร็จ/สัญญาจ้างงาน)
+            </span>
           </label>
           <input
             type="text"
             required
-            placeholder="เช่น คุณสมชาย ใจดี"
+            placeholder="เช่น คุณสมชาย ใจดี หรือ บริษัท เอ บี ซี จำกัด"
             value={formData.name}
             onChange={(e) => onChange({ name: e.target.value })}
             className="w-full h-13 bg-white border-2 border-slate-300 hover:border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100 rounded-2xl px-4 text-base sm:text-lg text-slate-900 placeholder:text-slate-400 font-bold shadow-2xs transition-all"
