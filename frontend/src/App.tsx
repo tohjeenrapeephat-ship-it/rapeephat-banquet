@@ -26,7 +26,32 @@ import { Phone, MessageCircle, ArrowUp } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Navigation & View State: 'site' (Clean Home Page), 'quotation' (Dedicated Page), 'admin' (Admin Portal)
-  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin'>('site');
+  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin'>(() => {
+    if (typeof window === 'undefined') return 'site';
+    const hash = window.location.hash.toLowerCase();
+    const path = window.location.pathname.toLowerCase();
+    const search = window.location.search.toLowerCase();
+    if (
+      hash.includes('admin') ||
+      hash.includes('backend') ||
+      hash.includes('portal') ||
+      path.includes('/admin') ||
+      path.includes('/backend') ||
+      path.includes('/portal') ||
+      search.includes('admin')
+    ) {
+      return 'admin';
+    }
+    if (
+      hash.includes('quotation') ||
+      hash.includes('calculate') ||
+      path.includes('/quotation') ||
+      path.includes('/calculate')
+    ) {
+      return 'quotation';
+    }
+    return 'site';
+  });
   const [selectedPkgForBuilder, setSelectedPkgForBuilder] = useState<PackageTier | undefined>(undefined);
   const [historyOpen, setHistoryOpen] = useState<boolean>(false);
   const [historyCount, setHistoryCount] = useState<number>(0);
@@ -37,22 +62,22 @@ export const App: React.FC = () => {
     const handleHashChange = () => {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
+      const search = window.location.search.toLowerCase();
       if (
-        hash === '#admin' ||
-        hash === '#admin-mini' ||
-        hash === '#mini-chat' ||
-        hash === '#backend' ||
-        hash === '#portal' ||
-        path.startsWith('/admin') ||
-        path.startsWith('/backend') ||
-        path.startsWith('/portal')
+        hash.includes('admin') ||
+        hash.includes('backend') ||
+        hash.includes('portal') ||
+        path.includes('/admin') ||
+        path.includes('/backend') ||
+        path.includes('/portal') ||
+        search.includes('admin')
       ) {
         setCurrentView('admin');
       } else if (
-        hash === '#quotation' ||
-        hash === '#calculate' ||
-        path.startsWith('/quotation') ||
-        path.startsWith('/calculate')
+        hash.includes('quotation') ||
+        hash.includes('calculate') ||
+        path.includes('/quotation') ||
+        path.includes('/calculate')
       ) {
         setCurrentView('quotation');
       } else {
@@ -175,7 +200,11 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer onOpenAdmin={() => {
+        setCurrentView('admin');
+        window.location.hash = '#admin';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }} />
 
       {/* Quotation History Drawer Modal */}
       <QuotationHistory

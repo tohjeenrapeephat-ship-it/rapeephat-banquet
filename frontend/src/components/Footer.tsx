@@ -2,41 +2,49 @@ import React from 'react';
 import { Phone, MessageCircle, MapPin, Award, Heart, Crown, Mail } from 'lucide-react';
 import { VisitorStatsSection } from './VisitorCounter.js';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenAdmin?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
   return (
-    <footer className="bg-white border-t-2 border-amber-300/80 py-12 text-xs text-slate-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <footer className="bg-[#FFFDF9] text-slate-800 border-t-4 border-amber-400/80 pt-10 pb-16 sm:pb-8 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-amber-200">
+        {/* Top Footer 4 Columns Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 pb-8 border-b border-amber-200/80">
           
-          {/* Official Brand Info with Full Logo */}
+          {/* Brand Col */}
           <div className="space-y-3">
-            <div className="bg-white p-2 rounded-2xl border-2 border-amber-300 shadow-sm inline-block">
-              <img
-                src="/images/brand/logo.png"
-                alt="โต๊ะจีน รพีพัฒน์ RAPEEPHAT"
-                className="h-20 w-auto object-contain"
-              />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white p-1 border-2 border-amber-400 shadow-sm flex items-center justify-center shrink-0">
+                <img src="/images/brand/logo.png" alt="โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <span className="text-lg font-black text-slate-900 leading-tight">
+                  โต๊ะจีน<span className="text-red-700 ml-1">รพีพัฒน์</span>
+                </span>
+                <div className="text-[10px] font-black text-amber-800 uppercase tracking-wide">
+                  RAPEEPHAT BANQUET CATERING
+                </div>
+              </div>
             </div>
-            <p className="text-slate-700 leading-relaxed font-medium">
-              บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร การันตีประสบการณ์กว่า 35 ปี มากกว่า 6,500 งาน
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              บริการจัดเลี้ยงโต๊ะจีนนครปฐมแท้ระดับภัตตาคาร ประสบการณ์กว่า 35 ปี การันตีความสดใหม่ สะอาด อร่อย ตรงเวลา ทั่วราชอาณาจักร 77 จังหวัด
             </p>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-2 font-bold">
-            <div className="text-sm font-black text-slate-900 mb-2 flex items-center gap-1">
-              <Crown className="w-4 h-4 text-amber-600" />
-              <span>เมนู & บริการ</span>
-            </div>
-            <div><a href="#packages" className="hover:text-red-700 transition-colors">แพ็กเกจโต๊ะจีน ฿1,400 - ฿5,000</a></div>
-            <div><a href="#menu-showcase" className="hover:text-red-700 transition-colors">แกลเลอรีเมนูอาหาร</a></div>
-            <div><a href="#portfolio" className="hover:text-red-700 transition-colors">ผลงานจัดเลี้ยงจริง</a></div>
-            <div><a href="#clients" className="hover:text-red-700 transition-colors">ลูกค้าองค์กรที่ไว้วางใจ</a></div>
-            <div><a href="#quotation" className="hover:text-red-700 text-red-700 font-black transition-colors">คำนวณราคา & ออกใบเสนอราคา (A4)</a></div>
+          <div className="space-y-2 text-xs font-bold text-slate-700">
+            <div className="text-sm font-black text-slate-900 mb-2">เมนูและบริการ</div>
+            <div><a href="#heritage" className="hover:text-red-700 transition-colors">🏆 ตำนานนครปฐม 35 ปี</a></div>
+            <div><a href="#menu-showcase" className="hover:text-red-700 transition-colors">🍱 เมนูอาหารยอดนิยม</a></div>
+            <div><a href="#packages" className="hover:text-red-700 transition-colors">🏷️ แพ็กเกจราคาเริ่มต้น 1,400.-</a></div>
+            <div><a href="#portfolio" className="hover:text-red-700 transition-colors">📸 ภาพผลงานจริงทั่วไทย</a></div>
+            <div><a href="#fleet-logistics" className="hover:text-red-700 transition-colors">🚚 รถครัวเคลื่อนที่ 77 จังหวัด</a></div>
           </div>
 
-          {/* Contact Direct */}
+          {/* Contact Details */}
           <div className="space-y-2 font-bold">
             <div className="text-sm font-black text-slate-900 mb-2">ติดต่อเจ้าหน้าที่</div>
             <div className="flex items-center gap-2">
@@ -86,7 +94,13 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-3 text-xs">
             <a
               href="#admin"
-              className="text-slate-500 hover:text-red-700 font-bold transition-colors flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-slate-200"
+              onClick={(e) => {
+                if (onOpenAdmin) {
+                  e.preventDefault();
+                  onOpenAdmin();
+                }
+              }}
+              className="text-slate-700 hover:text-red-700 font-black transition-colors flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-xl border border-slate-300 shadow-2xs cursor-pointer"
             >
               <span>🔑 เข้าสู่ระบบหลังบ้าน (Admin)</span>
             </a>
