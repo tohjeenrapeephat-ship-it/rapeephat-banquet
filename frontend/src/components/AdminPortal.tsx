@@ -7,6 +7,7 @@ import { formatThaiDate } from '../utils/thaiDate.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
 import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal } from './CateringReceiptModal.js';
+import { EditQuotationModal } from './EditQuotationModal.js';
 import {
   LayoutDashboard,
   FileText,
@@ -35,7 +36,9 @@ import {
   ExternalLink,
   FileCheck,
   Receipt,
-  Printer
+  Printer,
+  FileSpreadsheet,
+  Download
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -51,6 +54,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
   const [contractQuote, setContractQuote] = useState<QuotationDoc | null>(null);
   const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
+  const [editingQuote, setEditingQuote] = useState<QuotationDoc | null>(null);
   const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
   // Real-time Chat Operator States
@@ -247,6 +251,119 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
     try {
       localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updated));
     } catch {}
+  };
+
+  // Save Edited Quotation Handler (Full Update + Re-Generate PDF workflow)
+  const handleSaveEditedQuote = async (updatedQuote: QuotationDoc, openPreview?: boolean) => {
+    try {
+      await QuotationApi.update(updatedQuote);
+    } catch (e) {
+      console.warn('API update error:', e);
+    }
+
+    const updatedList = quotations.map((q) =>
+      q.quoteNo === updatedQuote.quoteNo || (updatedQuote.id && q.id === updatedQuote.id) ? updatedQuote : q
+    );
+    setQuotations(updatedList);
+    try {
+      localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updatedList));
+    } catch {}
+
+    setEditingQuote(null);
+
+    if (openPreview) {
+      setActiveQuote(updatedQuote);
+    }
+  };
+
+  // 1-Click Excel / CSV Report Exporter with UTF-8 BOM for perfect Thai font rendering in Excel
+  const exportQuotationsToExcel = (quotesToExport: QuotationDoc[]) => {
+    if (!quotesToExport || quotesToExport.length === 0) {
+      alert('ไม่มีข้อมูลใบเสนอราคาสำหรับการส่งออก');
+      return;
+    }
+
+    const headers = [
+      'เลขที่ใบเสนอราคา',
+      'วันที่ออกเอกสาร',
+      'ชื่อลูกค้า/หน่วยงาน',
+      'เบอร์โทรศัพท์',
+      'อีเมล',
+      'วันที่จัดงาน',
+      'เวลาเริ่มเสิร์ฟ',
+      'สถานที่จัดงาน',
+      'ประเภทงาน',
+      'แพ็กเกจอาหาร',
+      'ราคาต่อโต๊ะ (บาท)',
+      'จำนวนโต๊ะที่สั่ง',
+      'จำนวนโต๊ะแถมฟรี',
+      'รวมจำนวนโต๊ะจัดเสิร์ฟ',
+      'รายการอาหารที่เลือก',
+      'แพ็กเกจเครื่องดื่ม',
+      'ค่าบริการยกขึ้นชั้น',
+      'ยอดรวมก่อนหักส่วนลด (บาท)',
+      'ส่วนลด (บาท)',
+      'ยอดรวมสุทธิ (บาท)',
+      'ยอดเงินมัดจำ 30% (บาท)',
+      'ยอดคงเหลือชำระวันงาน 70% (บาท)',
+      'สถานะเอกสาร',
+      'หมายเหตุเพิ่มเติม',
+      'ลิงก์ Google Drive PDF'
+    ];
+
+    const rows = quotesToExport.map((q) => {
+      const totalTables = (q.tableCount || 0) + (q.freeTableCount || 0);
+      const dishesStr = q.selectedDishes?.map((d) => d.dishName).join(' / ') || '';
+      const dateFormatted = q.createdAt ? new Date(q.createdAt).toLocaleDateString('th-TH') : '';
+      const eventDateFormatted = q.customer?.eventDate || '';
+
+      const statusThaiMap: Record<string, string> = {
+        pending: 'รอยืนยันมัดจำ',
+        deposit_paid: 'ชำระมัดจำ 30% แล้ว',
+        confirmed: 'ยืนยันล็อกคิวงาน',
+        completed: 'จัดเลี้ยงสำเร็จ',
+        cancelled: 'ยกเลิก',
+      };
+
+      return [
+        `"${q.quoteNo || ''}"`,
+        `"${dateFormatted}"`,
+        `"${(q.customer?.name || '').replace(/"/g, '""')}"`,
+        `"${q.customer?.phone || ''}"`,
+        `"${q.customer?.email || ''}"`,
+        `"${eventDateFormatted}"`,
+        `"${q.customer?.eventTime || ''}"`,
+        `"${(q.customer?.eventLocation || '').replace(/"/g, '""')}"`,
+        `"${(q.customer?.eventType || '').replace(/"/g, '""')}"`,
+        `"${(q.package?.name || '').replace(/"/g, '""')}"`,
+        q.package?.price || 0,
+        q.tableCount || 0,
+        q.freeTableCount || 0,
+        totalTables,
+        `"${dishesStr.replace(/"/g, '""')}"`,
+        `"${(q.beverage?.name || '-').replace(/"/g, '""')}"`,
+        q.floorService?.total || 0,
+        q.subtotal || 0,
+        q.discount || 0,
+        q.grandTotal || 0,
+        q.depositAmount || 0,
+        q.finalAmount || 0,
+        `"${statusThaiMap[q.status || 'pending'] || q.status || 'รอยืนยัน'}"`,
+        `"${(q.customer?.notes || q.notes || '').replace(/"/g, '""')}"`,
+        `"${q.pdfDriveUrl || ''}"`
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    const nowStr = new Date().toISOString().slice(0, 10);
+    link.setAttribute('download', `รายงานใบเสนอราคา_โต๊ะจีนรพีพัฒน์_${nowStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSaveGasUrl = () => {
@@ -504,15 +621,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 </div>
               </div>
 
-              {/* Refresh Button */}
-              <div className="flex flex-col justify-end">
+              {/* Action Buttons: Excel Export & Refresh */}
+              <div className="flex items-center gap-2">
+                {/* 1-Click Excel Export Button */}
                 <button
+                  type="button"
+                  onClick={() => exportQuotationsToExcel(filteredQuotes)}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white flex items-center justify-center gap-2 text-xs font-black shadow-md transition-all border border-emerald-500 transform hover:scale-102"
+                  title="ส่งออกรายงานใบเสนอราคาทั้งหมดเป็นไฟล์ Excel (.csv รองรับภาษาไทย 100%)"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
+                  <span>ส่งออก Excel ({filteredQuotes.length})</span>
+                </button>
+
+                {/* Refresh Button */}
+                <button
+                  type="button"
                   onClick={fetchQuotations}
-                  className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 flex items-center justify-center gap-2 text-xs font-bold"
-                  title="รีเฟรช"
+                  className="p-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors"
+                  title="รีเฟรชรายการ"
                 >
                   <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-red-600' : ''}`} />
-                  <span>รีเฟรช</span>
+                  <span className="hidden sm:inline">รีเฟรช</span>
                 </button>
               </div>
 
@@ -666,6 +796,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                               >
                                 <Receipt className="w-3.5 h-3.5 text-emerald-600" />
                                 <span className="hidden xl:inline">ใบเสร็จ</span>
+                              </button>
+
+                              {/* Edit Quotation & Re-generate PDF Button */}
+                              <button
+                                onClick={() => setEditingQuote(quote)}
+                                className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-800 hover:text-white font-bold text-xs flex items-center gap-1 transition-all border border-blue-200 shadow-2xs"
+                                title="แก้ไขข้อมูลใบเสนอราคา / แก้ไขรายละเอียดเพื่อออก PDF ใหม่"
+                              >
+                                <Edit3 className="w-3.5 h-3.5 text-blue-600 group-hover:text-white" />
+                                <span>แก้ไข</span>
                               </button>
 
                               {/* Open A4 Full Quotation */}
@@ -1254,6 +1394,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Edit Quotation & PDF Modal */}
+      {editingQuote && (
+        <EditQuotationModal
+          quotation={editingQuote}
+          isOpen={!!editingQuote}
+          onClose={() => setEditingQuote(null)}
+          onSave={handleSaveEditedQuote}
+        />
       )}
 
       {/* Full A4 Quotation Modal */}

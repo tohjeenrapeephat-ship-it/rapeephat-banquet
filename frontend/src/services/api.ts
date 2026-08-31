@@ -112,6 +112,37 @@ export const QuotationApi = {
     }
   },
 
+  async update(quote: QuotationDoc): Promise<QuotationDoc> {
+    try {
+      await fetch(`/api/quotations/${quote.id || quote.quoteNo}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(quote),
+        signal: AbortSignal.timeout(3000),
+      });
+    } catch (e) {
+      console.warn('Backend API update skipped:', e);
+    }
+    const local = getLocalQuotations();
+    const updated = local.map(q => (q.quoteNo === quote.quoteNo || (quote.id && q.id === quote.id) ? quote : q));
+    saveLocalQuotations(updated);
+    return quote;
+  },
+
+  async delete(idOrQuoteNo: string): Promise<void> {
+    try {
+      await fetch(`/api/quotations/${idOrQuoteNo}`, {
+        method: 'DELETE',
+        signal: AbortSignal.timeout(3000),
+      });
+    } catch (e) {
+      console.warn('Backend API delete skipped:', e);
+    }
+    const local = getLocalQuotations();
+    const updated = local.filter(q => q.quoteNo !== idOrQuoteNo && q.id !== idOrQuoteNo);
+    saveLocalQuotations(updated);
+  },
+
   async updateDriveUrl(id: string, quoteNo: string, driveUrl: string): Promise<void> {
     try {
       await fetch(`/api/quotations/${id}`, {

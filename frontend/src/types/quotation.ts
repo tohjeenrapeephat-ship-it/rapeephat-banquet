@@ -88,4 +88,5 @@ export interface QuotationDoc {
   pdfDriveUrl?: string;
   status: 'pending' | 'deposit_paid' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
+  updatedAt?: number;
 }
