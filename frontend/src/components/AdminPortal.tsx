@@ -64,24 +64,40 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   // Operator presence heartbeat & real-time chat listener
   useEffect(() => {
     chatSync.setOperatorOnline(true);
-    const interval = setInterval(() => {
+    chatSync.fetchCloudHistory(false);
+
+    const presenceInterval = setInterval(() => {
       chatSync.setOperatorOnline(true);
-    }, 20000);
+    }, 15000);
+
+    const pollInterval = setInterval(() => {
+      const updated = chatSync.getAllSessions();
+      setChatSessions([...updated]);
+      setSelectedSessionId((curr) => {
+        if (!curr && updated.length > 0) return updated[0].id;
+        return curr;
+      });
+      try {
+        setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
+      } catch {}
+    }, 2500);
 
     const unsubscribe = chatSync.subscribe((event) => {
-      if (event.type === 'NEW_MESSAGE' || event.type === 'SESSION_READ' || event.type === 'STORAGE_UPDATE') {
-        const updated = chatSync.getAllSessions();
-        setChatSessions(updated);
-        setSelectedSessionId((curr) => curr || (updated.length > 0 ? updated[0].id : null));
-        try {
-          setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
-        } catch {}
-      }
+      const updated = chatSync.getAllSessions();
+      setChatSessions([...updated]);
+      setSelectedSessionId((curr) => {
+        if (!curr && updated.length > 0) return updated[0].id;
+        return curr;
+      });
+      try {
+        setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
+      } catch {}
     });
 
     return () => {
       chatSync.setOperatorOnline(false);
-      clearInterval(interval);
+      clearInterval(presenceInterval);
+      clearInterval(pollInterval);
       unsubscribe();
     };
   }, []);

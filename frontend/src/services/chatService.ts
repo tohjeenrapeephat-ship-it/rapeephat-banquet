@@ -21,9 +21,9 @@ export interface ChatSession {
   messages: LiveMessage[];
 }
 
-const STORAGE_KEY_SESSIONS = 'rapeephat_chat_sessions_v3';
-const STORAGE_KEY_OPERATOR = 'rapeephat_operator_online_status_v3';
-const CURRENT_SESSION_KEY = 'rapeephat_current_customer_session_id_v3';
+const STORAGE_KEY_SESSIONS = 'rapeephat_chat_sessions_master_v1';
+const STORAGE_KEY_OPERATOR = 'rapeephat_operator_online_status_master_v1';
+const CURRENT_SESSION_KEY = 'rapeephat_current_customer_session_id_master_v1';
 
 const TOPIC_MESSAGES = 'rapeephat_banquet_chat_messages_2026';
 const TOPIC_OPERATOR = 'rapeephat_banquet_chat_operator_2026';
@@ -40,7 +40,7 @@ class ChatSyncEngine {
   constructor() {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       try {
-        this.localBroadcast = new BroadcastChannel('rapeephat_live_chat_bus_v3');
+        this.localBroadcast = new BroadcastChannel('rapeephat_live_chat_master_bus');
         this.localBroadcast.onmessage = (e) => {
           this.notifyListeners(e.data);
         };
@@ -49,25 +49,22 @@ class ChatSyncEngine {
 
     if (typeof window !== 'undefined') {
       this.initCloudListener();
-      this.fetchCloudHistory();
+      this.fetchCloudHistory(false);
       this.startAlwaysOnPolling();
     }
   }
 
-  // 24/7 Always-On Polling fallback to guarantee NO SLEEP and NO dropped messages
   private startAlwaysOnPolling() {
     if (this.pollingTimer) clearInterval(this.pollingTimer);
     this.pollingTimer = setInterval(() => {
-      this.fetchCloudHistory(true);
-    }, 5000);
+      this.fetchCloudHistory(false);
+    }, 2500);
   }
 
-  // Connect to global SSE stream with automatic reconnection
   private initCloudListener() {
     try {
       if (typeof window === 'undefined' || !window.EventSource) return;
 
-      // 1. Message Stream
       if (this.eventSourceMessages) {
         this.eventSourceMessages.close();
       }
@@ -79,17 +76,16 @@ class ChatSyncEngine {
           if (data.event === 'message' && data.message) {
             const parsed = JSON.parse(data.message);
             if (parsed.type === 'NEW_MESSAGE' && parsed.message) {
-              this.handleIncomingCloudMessage(parsed.message);
+              this.handleIncomingCloudMessage(parsed.message, true);
             }
           }
         } catch {}
       };
 
       this.eventSourceMessages.onerror = () => {
-        // Silently handled by EventSource auto-retry
+        // Handled automatically
       };
 
-      // 2. Operator Presence Stream
       if (this.eventSourceOperator) {
         this.eventSourceOperator.close();
       }
@@ -109,14 +105,13 @@ class ChatSyncEngine {
       };
 
       this.eventSourceOperator.onerror = () => {
-        // Silently handled by EventSource auto-retry
+        // Handled automatically
       };
     } catch (err) {
-      console.warn('Cloud listener notice:', err);
+      console.warn('Cloud listener warning:', err);
     }
   }
 
-  // Fetch cloud message history
   public async fetchCloudHistory(isSilent = false) {
     try {
       const res = await fetch(`https://ntfy.sh/${TOPIC_MESSAGES}/json?poll=1&since=24h`, {
@@ -126,6 +121,7 @@ class ChatSyncEngine {
       const text = await res.text();
       const lines = text.trim().split('\n');
       let hasNew = false;
+
       for (const line of lines) {
         if (!line) continue;
         try {
@@ -141,7 +137,8 @@ class ChatSyncEngine {
           }
         } catch {}
       }
-      if (hasNew && !isSilent) {
+
+      if (hasNew || !isSilent) {
         this.notifyListeners({ type: 'STORAGE_UPDATE', payload: {} });
       }
     } catch {}
@@ -180,6 +177,9 @@ class ChatSyncEngine {
       }
     }
 
+    // Sort sessions by latest message first
+    sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+
     try {
       localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions));
     } catch {}
@@ -207,7 +207,6 @@ class ChatSyncEngine {
     });
   }
 
-  // Play crisp notification chime using Web Audio API
   public playChime(type: 'incoming' | 'outgoing' = 'incoming') {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -238,7 +237,6 @@ class ChatSyncEngine {
     } catch {}
   }
 
-  // Operator Presence: 24/7 Always Alive
   public setOperatorOnline(isOnline: boolean) {
     try {
       const status = {
@@ -262,7 +260,7 @@ class ChatSyncEngine {
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({ type: 'OPERATOR_PRESENCE', isOnline: true, updatedAt: Date.now() }),
           }).catch(() => {});
-        }, 12000);
+        }, 10000);
       } else if (!isOnline && this.keepAliveTimer) {
         clearInterval(this.keepAliveTimer);
         this.keepAliveTimer = null;
@@ -340,6 +338,8 @@ class ChatSyncEngine {
       }
     }
 
+    sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+
     try {
       localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions));
     } catch {}
@@ -352,7 +352,7 @@ class ChatSyncEngine {
       } catch {}
     }
 
-    // Publish to cloud for instant multi-device sync
+    // Publish to cloud for instant multi-device delivery
     fetch(`https://ntfy.sh/${TOPIC_MESSAGES}`, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
