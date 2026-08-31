@@ -17,7 +17,12 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
-  Printer
+  Printer,
+  Plus,
+  Trash2,
+  RotateCcw,
+  CheckCircle2,
+  Award
 } from 'lucide-react';
 
 interface EditQuotationModalProps {
@@ -45,7 +50,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   const [eventType, setEventType] = useState(quotation.customer?.eventType || 'งานเลี้ยงทั่วไป');
   const [notes, setNotes] = useState(quotation.customer?.notes || '');
 
-  const [selectedPackageId, setSelectedPackageId] = useState(quotation.package?.id || 'p-1400');
+  const [selectedPackageId, setSelectedPackageId] = useState(quotation.package?.id || 'pkg-1400');
   const [packagePrice, setPackagePrice] = useState<number>(quotation.package?.price || 1400);
   const [packageName, setPackageName] = useState(quotation.package?.name || '');
 
@@ -55,11 +60,29 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   const [status, setStatus] = useState<string>(quotation.status || 'pending');
   const [pdfDriveUrl, setPdfDriveUrl] = useState(quotation.pdfDriveUrl || '');
 
+  // Dishes State: Initialized with quotation's selectedDishes
+  const [dishes, setDishes] = useState<{ courseId: string; courseTitle: string; dishName: string }[]>(() => {
+    if (quotation.selectedDishes && quotation.selectedDishes.length > 0) {
+      return quotation.selectedDishes.map((d) => ({ ...d }));
+    }
+    const pkg = BANQUET_PACKAGES.find((p) => p.id === quotation.package?.id) || BANQUET_PACKAGES[0];
+    return pkg.courses.map((c) => {
+      const defDish = c.options.find((o) => o.id === c.defaultDishId) || c.options[0];
+      return {
+        courseId: c.id,
+        courseTitle: c.title,
+        dishName: defDish ? defDish.name : '',
+      };
+    });
+  });
+
   // Calculate prices dynamically
   const subtotal = tableCount * packagePrice;
   const grandTotal = Math.max(0, subtotal - discount);
   const depositAmount = Math.round(grandTotal * 0.3);
   const finalAmount = grandTotal - depositAmount;
+
+  const currentPackageData = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || BANQUET_PACKAGES[0];
 
   const handlePackageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const pkgId = e.target.value;
@@ -68,6 +91,16 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
     if (found) {
       setPackagePrice(found.price);
       setPackageName(found.name);
+      // Update dishes to new package defaults
+      const newDishes = found.courses.map((c) => {
+        const defDish = c.options.find((o) => o.id === c.defaultDishId) || c.options[0];
+        return {
+          courseId: c.id,
+          courseTitle: c.title,
+          dishName: defDish ? defDish.name : '',
+        };
+      });
+      setDishes(newDishes);
     }
   };
 
@@ -77,6 +110,53 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
     // Automatic Free Table promotion rule: 1 free table per 20 tables
     const autoFree = Math.floor(count / 20);
     setFreeTableCount(autoFree);
+  };
+
+  // Dish Handlers
+  const handleDishNameChange = (index: number, newName: string) => {
+    setDishes((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], dishName: newName };
+      return updated;
+    });
+  };
+
+  const handleSelectPredefinedDish = (index: number, dishName: string) => {
+    handleDishNameChange(index, dishName);
+  };
+
+  const handleAddCustomDish = () => {
+    const nextIdx = dishes.length + 1;
+    setDishes((prev) => [
+      ...prev,
+      {
+        courseId: `c-custom-${Date.now()}`,
+        courseTitle: `จานพิเศษที่ ${nextIdx}`,
+        dishName: '',
+      },
+    ]);
+  };
+
+  const handleRemoveDish = (index: number) => {
+    if (dishes.length <= 1) {
+      alert('ชุดโต๊ะจีนต้องมีรายการอาหารอย่างน้อย 1 รายการครับ');
+      return;
+    }
+    setDishes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleResetToPackageDefaults = () => {
+    if (!confirm('ต้องการรีเซ็ตรายการอาหารกลับเป็นค่าเริ่มต้นตามแพ็กเกจหรือไม่?')) return;
+    const pkg = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || BANQUET_PACKAGES[0];
+    const defaultDishes = pkg.courses.map((c) => {
+      const defDish = c.options.find((o) => o.id === c.defaultDishId) || c.options[0];
+      return {
+        courseId: c.id,
+        courseTitle: c.title,
+        dishName: defDish ? defDish.name : '',
+      };
+    });
+    setDishes(defaultDishes);
   };
 
   const handleFormSubmit = (e: React.FormEvent, openPreview: boolean = false) => {
@@ -103,6 +183,11 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
         name: packageName || selectedPkg.name,
         price: packagePrice,
       },
+      selectedDishes: dishes.map((d, i) => ({
+        courseId: d.courseId || `c-${i + 1}`,
+        courseTitle: d.courseTitle || `จานที่ ${i + 1}`,
+        dishName: d.dishName.trim() || `รายการอาหารที่ ${i + 1}`,
+      })),
       tableCount,
       freeTableCount,
       subtotal,
@@ -120,7 +205,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
-      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border-2 border-amber-300 overflow-hidden my-6">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border-2 border-amber-300 overflow-hidden my-6">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 px-6 py-4 flex items-center justify-between text-white border-b-2 border-amber-400">
@@ -130,13 +215,13 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-black text-amber-300 flex items-center gap-2">
-                <span>แก้ไขใบเสนอราคา & ข้อมูลจัดเลี้ยง</span>
+                <span>แก้ไขใบเสนอราคา & รายการอาหารจัดเลี้ยง</span>
                 <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/20">
                   {quotation.quoteNo}
                 </span>
               </h2>
               <p className="text-xs text-slate-300">
-                แก้ไขข้อมูลลูกค้า, วันจัดงาน, จำนวนโต๊ะ, ราคา และอัปเดตไฟล์ PDF ทันที
+                แก้ไขชื่อลูกค้า, วันจัดงาน, รายการอาหารทุกจาน, ราคา และอัปเดตไฟล์ PDF ทันที
               </p>
             </div>
           </div>
@@ -150,7 +235,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={(e) => handleFormSubmit(e, false)} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto bg-slate-50/50">
+        <form onSubmit={(e) => handleFormSubmit(e, false)} className="p-6 space-y-6 max-h-[82vh] overflow-y-auto bg-slate-50/50">
           
           {/* Section 1: Customer Information */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
@@ -357,11 +442,128 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
             </div>
           </div>
 
-          {/* Section 4: PDF Google Drive Link & Notes */}
+          {/* Section 4: EDIT DISHES / MENU ITEMS (NEW FEATURE) */}
+          <div className="bg-white p-5 rounded-2xl border-2 border-amber-300 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                  <Award className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">
+                    4. รายการอาหารในชุดโต๊ะจีน ({dishes.length} จาน)
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    คุณแป้งสามารถเลือกสลับเมนู หรือพิมพ์แก้ไขชื่อเมนูพิเศษตามที่ลูกค้าขอได้โดยตรง
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetToPackageDefaults}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition-colors border border-slate-200"
+                  title="รีเซ็ตกลับเป็นเมนูมาตรฐานตามแพ็กเกจ"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>รีเซ็ตตามแพ็กเกจ</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleAddCustomDish}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs transition-colors"
+                  title="เพิ่มรายการอาหารพิเศษ"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>เพิ่มจานพิเศษ</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Dish Rows List */}
+            <div className="space-y-3 pt-1">
+              {dishes.map((dish, idx) => {
+                // Find matching course in package if exists
+                const matchedCourse = currentPackageData.courses[idx];
+                const availableOptions = matchedCourse?.options || [];
+
+                return (
+                  <div
+                    key={dish.courseId || idx}
+                    className="p-3.5 rounded-xl bg-slate-50 hover:bg-amber-50/40 border border-slate-200 transition-all space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-red-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="text-xs font-bold text-slate-700">
+                          {dish.courseTitle || `จานที่ ${idx + 1}`}:
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDish(idx)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        title="ลบจานนี้"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {/* Option A: Pick Predefined Dish from Package Course */}
+                      {availableOptions.length > 0 && (
+                        <div>
+                          <label className="block text-[10.5px] font-bold text-slate-500 mb-0.5">
+                            เลือกจากตัวเลือกมาตรฐานของแพ็กเกจ:
+                          </label>
+                          <select
+                            value={availableOptions.some((o) => o.name === dish.dishName) ? dish.dishName : ''}
+                            onChange={(e) => {
+                              if (e.target.value) handleSelectPredefinedDish(idx, e.target.value);
+                            }}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-800 focus:border-red-600 outline-none"
+                          >
+                            <option value="">-- เลือกเมนูมาตรฐาน --</option>
+                            {availableOptions.map((opt) => (
+                              <option key={opt.id} value={opt.name}>
+                                {opt.name} {opt.tag ? `(${opt.tag})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Option B: Direct Custom Text Input for Dish Name */}
+                      <div className={availableOptions.length === 0 ? 'sm:col-span-2' : ''}>
+                        <label className="block text-[10.5px] font-bold text-slate-500 mb-0.5">
+                          ชื่อรายการอาหารที่จะพิมพ์ลงใบเสนอราคา & สัญญาจ้าง:
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={dish.dishName}
+                          onChange={(e) => handleDishNameChange(idx, e.target.value)}
+                          placeholder="พิมพ์ชื่อเมนูอาหาร..."
+                          className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-red-600 outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 5: PDF Google Drive Link & Notes */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
             <h3 className="text-xs font-black text-red-700 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
               <ExternalLink className="w-4 h-4 text-red-600" />
-              <span>4. ลิงก์ไฟล์ PDF และหมายเหตุ</span>
+              <span>5. ลิงก์ไฟล์ PDF และหมายเหตุ</span>
             </h3>
 
             <div>
