@@ -5,15 +5,17 @@ interface MobileBottomNavProps {
   currentView: 'site' | 'quotation' | 'admin';
   onNavigateHome: () => void;
   onOpenBuilder: () => void;
+  onOpenChat?: () => void;
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   currentView,
   onNavigateHome,
   onOpenBuilder,
+  onOpenChat,
 }) => {
   return (
-    <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-t-2 border-amber-300 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] px-2 py-1.5 flex items-center justify-around safe-area-bottom">
+    <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t-2 border-amber-300 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] px-2 py-1.5 flex items-center justify-around safe-area-bottom">
       
       {/* 1. Home / หน้าแรก */}
       <button
@@ -63,18 +65,23 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         </span>
       </button>
 
-      {/* 4. LINE Chat / คุยไลน์ */}
-      <a
-        href="https://line.me/ti/p/~pang_baichaa"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-600 hover:text-[#06C755] font-bold transition-all"
+      {/* 4. Real-time Live Web Chat / แชทสดหน้าเว็บ */}
+      <button
+        onClick={() => {
+          if (onOpenChat) {
+            onOpenChat();
+          } else {
+            window.location.href = 'https://line.me/ti/p/~pang_baichaa';
+          }
+        }}
+        className="flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-600 hover:text-red-700 font-bold transition-all relative"
       >
-        <div className="p-1 rounded-xl hover:bg-green-50">
-          <MessageCircle className="w-5 h-5 text-[#06C755]" />
+        <div className="p-1 rounded-xl hover:bg-red-50 relative">
+          <MessageCircle className="w-5 h-5 text-red-600" />
+          <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
         </div>
-        <span className="text-[10px] leading-tight mt-0.5">คุยไลน์</span>
-      </a>
+        <span className="text-[10px] leading-tight mt-0.5 text-red-700 font-black">แชทสด</span>
+      </button>
 
       {/* 5. Direct Call / โทรด่วน */}
       <a

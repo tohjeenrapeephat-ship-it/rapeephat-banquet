@@ -21,6 +21,7 @@ import { Footer } from './components/Footer.js';
 import { VisitorFloatingBadge } from './components/VisitorCounter.js';
 import { AdminPortal } from './components/AdminPortal.js';
 import { MobileBottomNav } from './components/MobileBottomNav.js';
+import { LiveChatWidget } from './components/LiveChatWidget.js';
 import { Phone, MessageCircle, ArrowUp } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -114,6 +115,8 @@ export const App: React.FC = () => {
           isOpen={historyOpen}
           onClose={() => setHistoryOpen(false)}
         />
+        {/* Real-time Live Chat Widget */}
+        <LiveChatWidget onOpenBuilder={() => handleOpenBuilder()} />
         {/* Mobile Bottom Navigation Bar */}
         <MobileBottomNav
           currentView={currentView}
@@ -166,8 +169,11 @@ export const App: React.FC = () => {
         <VisitorFloatingBadge />
       </div>
 
+      {/* Real-time Live Chat Widget */}
+      <LiveChatWidget onOpenBuilder={() => handleOpenBuilder()} />
+
       {/* Floating Bottom Quick Contact Buttons (Desktop Only) */}
-      <div className="hidden sm:flex fixed bottom-5 right-5 z-40 flex-col gap-2.5">
+      <div className="hidden sm:flex fixed bottom-24 right-6 z-30 flex-col gap-2.5">
         <a
           href="https://line.me/ti/p/~pang_baichaa"
           target="_blank"

@@ -23,7 +23,8 @@ import {
   Settings,
   Utensils,
   TrendingUp,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 
 interface AdminPortalProps {
@@ -36,7 +37,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(false);
   const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
-  const [activeTab, setActiveTab] = useState<'quotations' | 'packages' | 'settings'>('quotations');
+  const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
+  const [chatLeads, setChatLeads] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   // GAS Webhook Settings
   const [gasUrl, setGasUrl] = useState(() => localStorage.getItem('rapeephat_gas_url') || '');
@@ -190,6 +198,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
               >
                 <FileText className="w-3.5 h-3.5" />
                 <span>ใบเสนอราคา</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('chat_leads');
+                  try {
+                    setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
+                  } catch {}
+                }}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 relative ${
+                  activeTab === 'chat_leads'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>ลูกค้าแชทสด</span>
+                {chatLeads.length > 0 && (
+                  <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full leading-none">
+                    {chatLeads.length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -556,7 +586,100 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
           </div>
         )}
 
-        {/* TAB 2: Packages & Menus Management Overview */}
+        {/* TAB 2: Live Chat Leads Management */}
+        {activeTab === 'chat_leads' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+              <div>
+                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-red-600" />
+                  <span>รายชื่อลูกค้าที่ติดต่อผ่าน Live Chat ({chatLeads.length} ท่าน)</span>
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  เบอร์ติดต่อและข้อมูลที่ลูกค้าฝากไว้ผ่านช่องแชทสดหน้าเว็บแบบเรียลไทม์
+                </p>
+              </div>
+
+              {chatLeads.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (confirm('ต้องการล้างประวัติข้อมูลแชททั้งหมดใช่หรือไม่?')) {
+                      localStorage.removeItem('rapeephat_chat_leads');
+                      setChatLeads([]);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 text-xs font-bold transition-colors border border-slate-200 flex items-center gap-1.5"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>ล้างประวัติ</span>
+                </button>
+              )}
+            </div>
+
+            {chatLeads.length === 0 ? (
+              <div className="p-12 text-center rounded-3xl bg-white border border-slate-200 space-y-3">
+                <MessageSquare className="w-10 h-10 text-slate-300 mx-auto" />
+                <h4 className="text-base font-bold text-slate-800">ยังไม่มีข้อมูลลูกค้าที่ฝากเบอร์ในขณะนี้</h4>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  เมื่อลูกค้าเข้ามาคุยในระบบ Live Chat หน้าเว็บและฝากเบอร์โทรศัพท์ไว้ ข้อมูลจะปรากฏในหน้านี้ทันทีแบบเรียลไทม์
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-black uppercase text-[11px]">
+                        <th className="p-4">ลำดับ</th>
+                        <th className="p-4">ชื่อลูกค้า</th>
+                        <th className="p-4">เบอร์โทรศัพท์</th>
+                        <th className="p-4">จำนวนโต๊ะ / วันที่จัดงาน</th>
+                        <th className="p-4">เวลาที่ส่ง</th>
+                        <th className="p-4 text-center">การจัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {chatLeads.map((lead, idx) => (
+                        <tr key={idx} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="p-4 font-bold text-slate-500">{idx + 1}</td>
+                          <td className="p-4 font-black text-slate-900 text-sm">
+                            {lead.name || 'ลูกค้าหน้าเว็บ'}
+                          </td>
+                          <td className="p-4">
+                            <a
+                              href={`tel:${lead.phone}`}
+                              className="font-mono font-black text-red-700 hover:text-red-900 flex items-center gap-1.5 text-sm"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>{lead.phone}</span>
+                            </a>
+                          </td>
+                          <td className="p-4 font-medium text-slate-700">
+                            {lead.tables || lead.rawText || '-'}
+                          </td>
+                          <td className="p-4 text-slate-500 font-medium">
+                            {lead.createdAt || lead.time ? new Date(lead.createdAt || lead.time).toLocaleString('th-TH') : '-'}
+                          </td>
+                          <td className="p-4 text-center">
+                            <a
+                              href={`tel:${lead.phone}`}
+                              className="px-3 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-xs"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>โทรกลับ</span>
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: Packages & Menus Management Overview */}
         {activeTab === 'packages' && (
           <div className="space-y-6">
             <div className="p-6 rounded-3xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
