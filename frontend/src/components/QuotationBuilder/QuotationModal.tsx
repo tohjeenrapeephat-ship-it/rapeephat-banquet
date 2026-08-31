@@ -20,6 +20,7 @@ import {
   BadgeCheck,
   ShieldCheck,
   CreditCard,
+  QrCode,
   Copy,
   Check,
   Maximize2,
@@ -587,26 +588,34 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                   </ul>
                 </div>
 
-                {/* Bank Account Details Box */}
-                <div className="col-span-6 p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 flex flex-col justify-center space-y-0.5 shadow-2xs">
-                  <div className="flex items-center gap-1 text-[11px] font-black text-blue-950 uppercase">
-                    <CreditCard className="w-3.5 h-3.5 text-blue-700" />
-                    <span>ข้อมูลการโอนเงิน (ธนาคารไทยพาณิชย์):</span>
+                {/* Bank Account & SCB Thai QR Payment Box */}
+                <div className="col-span-6 p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-purple-50/90 via-slate-50 to-purple-50/70 border-2 border-purple-300 flex items-center gap-2.5 shadow-2xs">
+                  {/* Official SCB Thai QR Code Frame */}
+                  <div className="w-16 h-20 sm:w-20 sm:h-24 rounded-lg bg-white p-0.5 border border-purple-400 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+                    <img
+                      src="/images/payment/scb-qr.jpg"
+                      alt="สแกนจ่าย Thai QR Payment / SCB"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <div className="text-xs text-slate-950 font-bold leading-tight space-y-0.5" style={{ lineHeight: '1.5', overflow: 'visible' }}>
-                    <div>
-                      <span className="text-slate-600">ชื่อบัญชี:</span> <strong className="text-blue-950 font-black text-xs ml-1">นางสาวทัศวรรณ จันทร์หอม</strong>
+
+                  {/* Account Text info */}
+                  <div className="text-xs text-slate-950 font-bold leading-tight space-y-0.5 flex-1" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                    <div className="flex items-center gap-1 text-[11px] font-black text-purple-950 uppercase">
+                      <QrCode className="w-3.5 h-3.5 text-purple-700" />
+                      <span>สแกน QR Code หรือโอนเงิน:</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-slate-600">ธนาคารไทยพาณิชย์:</span>
-                      <strong className="font-mono text-blue-950 font-black text-sm bg-white px-2 py-0.5 rounded-md border border-blue-300 shadow-2xs">
+                    <div>
+                      <span className="text-slate-600 font-medium">ชื่อบัญชี:</span> <strong className="text-purple-950 font-black text-xs ml-0.5">นางสาวทัศวรรณ จันทร์หอม</strong>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-600 font-medium">ธ.ไทยพาณิชย์:</span>
+                      <strong className="font-mono text-purple-950 font-black text-xs bg-white px-1.5 py-0.5 rounded border border-purple-300 shadow-2xs">
                         411-239908-0
                       </strong>
                     </div>
-                    <div className="text-[10.5px] text-slate-600">
-                      <span>สาขา: <strong className="text-slate-900">เซ็นทรัล นครปฐม</strong></span>
-                      <span className="mx-1.5 text-slate-300">|</span>
-                      <span>พร้อมเพย์: <strong className="font-mono text-slate-900 font-black">083-087-2257</strong></span>
+                    <div className="text-[10px] text-purple-800 font-bold">
+                      * สแกน QR Code เพื่อชำระมัดจำล็อกคิว 30%
                     </div>
                   </div>
                 </div>

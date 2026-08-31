@@ -246,7 +246,7 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                     <span>สถานะการชำระเงิน: <strong className="text-emerald-700">ชำระเงินมัดจำเรียบร้อยแล้ว</strong></span>
                   </div>
                   <p className="text-[10.5px] text-slate-600 pl-5">
-                    โอนผ่านบัญชี ธ.กสิกรไทย 028-8-82559-0 นางสาวทัศวรรณ จันทร์หอม
+                    โอนผ่านบัญชี ธ.ไทยพาณิชย์ 411-239908-0 หรือสแกน Thai QR Payment (นางสาวทัศวรรณ จันทร์หอม)
                   </p>
                 </div>
                 <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black shrink-0 border border-emerald-300">
