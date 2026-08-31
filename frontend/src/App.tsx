@@ -20,13 +20,14 @@ import { ContactSection } from './components/ContactSection.js';
 import { Footer } from './components/Footer.js';
 import { VisitorFloatingBadge } from './components/VisitorCounter.js';
 import { AdminPortal } from './components/AdminPortal.js';
+import { OwnerMiniChatPortal } from './components/OwnerMiniChatPortal.js';
 import { MobileBottomNav } from './components/MobileBottomNav.js';
 import { LiveChatWidget } from './components/LiveChatWidget.js';
 import { Phone, MessageCircle, ArrowUp } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Navigation & View State: 'site' (Clean Home Page), 'quotation' (Dedicated Page), 'admin' (Admin Portal)
-  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin'>('site');
+  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin' | 'admin_mini'>('site');
   const [selectedPkgForBuilder, setSelectedPkgForBuilder] = useState<PackageTier | undefined>(undefined);
   const [historyOpen, setHistoryOpen] = useState<boolean>(false);
   const [historyCount, setHistoryCount] = useState<number>(0);
@@ -36,7 +37,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === '#admin') {
+      if (hash === '#admin-mini' || hash === '#mini-chat' || hash === '#admin_mini') {
+        setCurrentView('admin_mini');
+      } else if (hash === '#admin') {
         setCurrentView('admin');
       } else if (hash === '#quotation' || hash === '#calculate') {
         setCurrentView('quotation');
@@ -94,7 +97,19 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 1. If in Admin Portal View
+  // 1. If in Mini Corner Admin Chat View
+  if (currentView === 'admin_mini') {
+    return (
+      <OwnerMiniChatPortal
+        onExpandToFullAdmin={() => {
+          setCurrentView('admin');
+          window.location.hash = '#admin';
+        }}
+      />
+    );
+  }
+
+  // 2. If in Full Admin Portal View
   if (currentView === 'admin') {
     return <AdminPortal onBackToSite={handleNavigateToHome} />;
   }
