@@ -72,6 +72,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
       if (event.type === 'NEW_MESSAGE' || event.type === 'SESSION_READ' || event.type === 'STORAGE_UPDATE') {
         const updated = chatSync.getAllSessions();
         setChatSessions(updated);
+        setSelectedSessionId((curr) => curr || (updated.length > 0 ? updated[0].id : null));
         try {
           setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
         } catch {}

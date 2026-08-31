@@ -76,6 +76,11 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
             setUnreadCount((c) => c + 1);
           }
         }
+      } else if (event.type === 'STORAGE_UPDATE') {
+        const existing = chatSync.getSession(sessionId);
+        if (existing && existing.messages.length > 0) {
+          setMessages(existing.messages);
+        }
       }
     });
 
