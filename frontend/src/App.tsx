@@ -33,15 +33,35 @@ export const App: React.FC = () => {
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
 
-  // Check URL Hash for Routing
+  // Check URL Hash and Path for Routing
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash;
-      if (hash === '#admin-mini' || hash === '#mini-chat' || hash === '#admin_mini') {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      if (
+        hash === '#admin-mini' ||
+        hash === '#mini-chat' ||
+        hash === '#admin_mini' ||
+        path.startsWith('/admin-mini') ||
+        path.startsWith('/mini')
+      ) {
         setCurrentView('admin_mini');
-      } else if (hash === '#admin') {
+      } else if (
+        hash === '#admin' ||
+        hash === '#backend' ||
+        hash === '#portal' ||
+        hash === '#dashboard' ||
+        path.startsWith('/admin') ||
+        path.startsWith('/backend') ||
+        path.startsWith('/portal')
+      ) {
         setCurrentView('admin');
-      } else if (hash === '#quotation' || hash === '#calculate') {
+      } else if (
+        hash === '#quotation' ||
+        hash === '#calculate' ||
+        path.startsWith('/quotation') ||
+        path.startsWith('/calculate')
+      ) {
         setCurrentView('quotation');
       } else {
         setCurrentView('site');
@@ -50,7 +70,11 @@ export const App: React.FC = () => {
 
     handleHashChange(); // Initial check
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
   }, []);
 
   // Fetch Quotation Count for Badge
