@@ -5,6 +5,8 @@ import { BANQUET_PACKAGES } from '../data/packages.js';
 import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
+import { CateringContractModal } from './CateringContractModal.js';
+import { CateringReceiptModal } from './CateringReceiptModal.js';
 import {
   LayoutDashboard,
   FileText,
@@ -30,7 +32,10 @@ import {
   Sparkles,
   Crown,
   Bell,
-  ExternalLink
+  ExternalLink,
+  FileCheck,
+  Receipt,
+  Printer
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -44,6 +49,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(false);
   const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
+  const [contractQuote, setContractQuote] = useState<QuotationDoc | null>(null);
+  const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
   const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
   // Real-time Chat Operator States
@@ -633,6 +640,34 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                           {/* Action Buttons */}
                           <td className="p-4 text-center">
                             <div className="flex items-center justify-center gap-1.5">
+                              {/* Print Contract Button */}
+                              <button
+                                onClick={() => setContractQuote(quote)}
+                                className={`px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${
+                                  quote.status === 'deposit_paid' || quote.status === 'confirmed'
+                                    ? 'bg-amber-50 hover:bg-amber-500 text-amber-900 hover:text-white border-amber-300 shadow-2xs'
+                                    : 'bg-slate-50 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                }`}
+                                title="พิมพ์สัญญาจ้างงานจัดเลี้ยงโต๊ะจีน (A4)"
+                              >
+                                <FileCheck className="w-3.5 h-3.5 text-amber-600" />
+                                <span className="hidden xl:inline">สัญญาจ้าง</span>
+                              </button>
+
+                              {/* Print Receipt Button */}
+                              <button
+                                onClick={() => setReceiptQuote(quote)}
+                                className={`px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${
+                                  quote.status === 'deposit_paid' || quote.status === 'confirmed'
+                                    ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-900 hover:text-white border-emerald-300 shadow-2xs'
+                                    : 'bg-slate-50 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                }`}
+                                title="พิมพ์ใบเสร็จรับเงินมัดจำ (A4)"
+                              >
+                                <Receipt className="w-3.5 h-3.5 text-emerald-600" />
+                                <span className="hidden xl:inline">ใบเสร็จ</span>
+                              </button>
+
                               {/* Open A4 Full Quotation */}
                               <button
                                 onClick={() => setActiveQuote(quote)}
@@ -1226,6 +1261,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
         <QuotationModal
           quotation={activeQuote}
           onClose={() => setActiveQuote(null)}
+        />
+      )}
+
+      {/* Official A4 Catering Contract Modal */}
+      {contractQuote && (
+        <CateringContractModal
+          quotation={contractQuote}
+          isOpen={!!contractQuote}
+          onClose={() => setContractQuote(null)}
+        />
+      )}
+
+      {/* Official A4 Catering Deposit Receipt Modal */}
+      {receiptQuote && (
+        <CateringReceiptModal
+          quotation={receiptQuote}
+          isOpen={!!receiptQuote}
+          onClose={() => setReceiptQuote(null)}
         />
       )}
 

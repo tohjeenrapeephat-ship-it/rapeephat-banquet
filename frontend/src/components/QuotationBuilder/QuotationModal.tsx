@@ -365,7 +365,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                   <div className="text-[11px] text-slate-700 pt-0.5 leading-tight font-semibold" style={{ lineHeight: '1.5', overflow: 'visible' }}>
                     บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร
                     <div>
-                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">083-087-2257</strong> (คุณแป้ง) | <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong> | <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">tohjeen.rapeephat@gmail.com</strong>
+                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">083-087-2257</strong> (คุณแป้ง) | <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong> | <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>

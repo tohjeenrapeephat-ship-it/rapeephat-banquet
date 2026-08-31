@@ -69,7 +69,7 @@ class ChatSyncEngine {
     if (this.pollingTimer) clearInterval(this.pollingTimer);
     this.pollingTimer = setInterval(() => {
       this.fetchCloudDatabase();
-    }, 2000);
+    }, 1200);
   }
 
   public async fetchCloudHistory(_isSilent = false) {
