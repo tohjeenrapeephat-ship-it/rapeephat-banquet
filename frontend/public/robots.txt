@@ -26,4 +26,4 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
-Sitemap: https://rapeephatcatering.com/sitemap.xml
+Sitemap: https://www.rapeephat-catering.com/sitemap.xml
