@@ -8,7 +8,7 @@ interface NavbarProps {
   historyCount: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, historyCount }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, onOpenAdmin, historyCount }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -101,6 +101,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, hi
             )}
           </button>
 
+          {/* Admin Shortcut Button */}
+          {onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="px-3 py-2 rounded-2xl bg-amber-100/80 hover:bg-red-50 text-slate-900 hover:text-red-700 font-extrabold text-xs flex items-center gap-1 border border-amber-300 shadow-2xs transition-all whitespace-nowrap"
+              title="เข้าสู่ระบบหลังบ้าน (Admin)"
+            >
+              <span>🔑 หลังบ้าน</span>
+            </button>
+          )}
+
           {/* Direct Phone Call Button */}
           <a
             href="tel:0830872257"
@@ -174,6 +185,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, hi
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>คำนวณราคา & ออกใบเสนอราคา A4</span>
             </button>
+
+            {onOpenAdmin && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAdmin();
+                }}
+                className="w-full py-2.5 rounded-2xl bg-amber-100/90 hover:bg-amber-200 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-1.5 border border-amber-300 shadow-2xs"
+              >
+                <span>🔑 เข้าสู่ระบบหลังบ้าน (Admin Portal)</span>
+              </button>
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               <a

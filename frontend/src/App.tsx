@@ -179,6 +179,11 @@ export const App: React.FC = () => {
       <Navbar
         onOpenBuilder={() => handleOpenBuilder()}
         onOpenHistory={() => setHistoryOpen(true)}
+        onOpenAdmin={() => {
+          setCurrentView('admin');
+          window.location.hash = '#admin';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         historyCount={historyCount}
       />
 
