@@ -9,22 +9,13 @@ import {
   User,
   CheckCircle2,
   FileText,
-  ChevronDown,
   Minimize2,
   Maximize2,
-  Volume2,
-  VolumeX,
-  Crown
+  Crown,
+  Radio,
+  Bell
 } from 'lucide-react';
-import { formatCurrency } from '../utils/currency.js';
-
-interface ChatMessage {
-  id: string;
-  sender: 'bot' | 'user' | 'system';
-  text: string;
-  timestamp: string;
-  quickActions?: Array<{ label: string; action: () => void; isPrimary?: boolean }>;
-}
+import { chatSync, LiveMessage } from '../services/chatService.js';
 
 interface LiveChatWidgetProps {
   onOpenBuilder?: () => void;
@@ -36,7 +27,8 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
+  const [isOwnerOnline, setIsOwnerOnline] = useState(false);
+  const [sessionId] = useState(() => chatSync.getOrCreateCustomerSessionId());
 
   // Customer Lead Capture State
   const [showLeadForm, setShowLeadForm] = useState(false);
@@ -46,29 +38,49 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
   const [leadSubmitted, setLeadSubmitted] = useState(false);
 
   // Message History
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    try {
-      const saved = localStorage.getItem('rapeephat_live_chat_messages');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return [
-      {
-        id: 'msg-welcome-1',
-        sender: 'bot',
-        text: 'สวัสดีค่ะ! ยินดีต้อนรับสู่ โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม) ค่ะ 👑✨\n\nสนใจจัดเลี้ยงโต๊ะจีนกี่โต๊ะ หรือต้องการสอบถามเรื่องใด พิมพ์คุยกับเจ้าหน้าที่ตรงนี้ได้เลยนะคะ ยินดีดูแลตลอด 24 ชม. ค่ะ',
-        timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-      },
-    ];
+  const [messages, setMessages] = useState<LiveMessage[]>(() => {
+    const existing = chatSync.getSession(sessionId);
+    if (existing && existing.messages.length > 0) {
+      return existing.messages;
+    }
+    const welcomeMsg: LiveMessage = {
+      id: 'msg-welcome-1',
+      sessionId,
+      sender: 'bot',
+      senderName: 'ผู้ช่วยโต๊ะจีนรพีพัฒน์',
+      text: 'สวัสดีค่ะ! ยินดีต้อนรับสู่ โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม) ค่ะ 👑✨\n\nสนใจจัดเลี้ยงโต๊ะจีนกี่โต๊ะ หรือต้องการสอบถามเรื่องใด พิมพ์คุยกับเจ้าหน้าที่ตรงนี้ได้เลยนะคะ ยินดีดูแลตลอด 24 ชม. ค่ะ',
+      timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      createdAt: Date.now(),
+    };
+    return [welcomeMsg];
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Save messages to LocalStorage
+  // Listen to live events from chatSync (Owner reply, Operator status)
   useEffect(() => {
-    try {
-      localStorage.setItem('rapeephat_live_chat_messages', JSON.stringify(messages));
-    } catch {}
-  }, [messages]);
+    setIsOwnerOnline(chatSync.isOperatorOnline());
+
+    const unsubscribe = chatSync.subscribe((event) => {
+      if (event.type === 'OPERATOR_PRESENCE') {
+        setIsOwnerOnline(event.payload.isOnline);
+      } else if (event.type === 'NEW_MESSAGE') {
+        const msg: LiveMessage = event.payload.message;
+        if (msg.sessionId === sessionId) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+
+          if (msg.sender === 'owner' && !isOpen) {
+            setUnreadCount((c) => c + 1);
+          }
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [sessionId, isOpen]);
 
   // Auto scroll to bottom
   const scrollToBottom = () => {
@@ -78,24 +90,15 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
   useEffect(() => {
     if (isOpen && !isMinimized) {
       scrollToBottom();
+      chatSync.markAsReadByCustomer(sessionId);
     }
-  }, [messages, isOpen, isMinimized, isTyping]);
-
-  // Initial welcome pop after 4 seconds if never opened
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasOpenedBefore) {
-        setUnreadCount((prev) => (prev === 0 ? 1 : prev));
-      }
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [hasOpenedBefore]);
+  }, [messages, isOpen, isMinimized, isTyping, sessionId]);
 
   const handleOpenChat = () => {
     setIsOpen(true);
     setIsMinimized(false);
     setUnreadCount(0);
-    setHasOpenedBefore(true);
+    chatSync.markAsReadByCustomer(sessionId);
   };
 
   // Smart Real-time Knowledge Engine
@@ -106,23 +109,6 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     if (text.includes('ราคา') || text.includes('แพ็กเกจ') || text.includes('แพคเกจ') || text.includes('ชุดละ') || text.includes('โต๊ะละ') || text.includes('คอร์ส')) {
       return {
         text: 'โต๊ะจีน รพีพัฒน์ มีบริการแพ็กเกจอาหารระดับภัตตาคาร 8 ระดับราคาค่ะ:\n\n• 🌟 มิตรภาพ: 1,400.- (9 จาน รวมของหวาน)\n• 🌸 มงคลสมรส: 1,700.- (เมนูยอดนิยม)\n• 👑 เศรษฐี: 2,000.- (คุ้มค่าที่สุด)\n• 💎 พรีเมียม: 2,400.- (เป็ดย่างฮ่องกง & ซีฟู้ด)\n• 🏆 วีไอพี: 2,800.- (ปลากะพงนึ่งซีอิ๊วตัวโต)\n• 👑 จักรพรรดิ: 3,300.- / 3,800.- (วัตถุดิบชั้นสูง)\n\n🎁 พิเศษ! สั่ง 20 โต๊ะขึ้นไป แถมฟรี 1 โต๊ะทันทีค่ะ',
-        quickActions: [
-          {
-            label: '📋 สร้างใบเสนอราคา A4 ทันที',
-            action: () => {
-              onOpenBuilder?.();
-              setIsOpen(false);
-            },
-            isPrimary: true,
-          },
-          {
-            label: '🍽️ เลื่อนดูรูปเมนูอาหาร',
-            action: () => {
-              document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' });
-              setIsOpen(false);
-            },
-          },
-        ],
       };
     }
 
@@ -130,16 +116,6 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     if (text.includes('ขั้นต่ำ') || text.includes('กี่โต๊ะ') || text.includes('น้อยสุด')) {
       return {
         text: 'รับจัดเลี้ยงเริ่มต้นตั้งแต่ 5 โต๊ะขึ้นไปค่ะ จัดได้ตั้งแต่ 5 โต๊ะ ถึง 500+ โต๊ะ พร้อมทีมงานเชฟมืออาชีพและบริกรดูแลครบวงจรค่ะ\n\n📌 โปรโมชั่นพิเศษ: สั่งจอง 20 โต๊ะ แถมฟรี 1 โต๊ะทันทีค่ะ!',
-        quickActions: [
-          {
-            label: '📋 คำนวณราคาโต๊ะของคุณ',
-            action: () => {
-              onOpenBuilder?.();
-              setIsOpen(false);
-            },
-            isPrimary: true,
-          },
-        ],
       };
     }
 
@@ -147,15 +123,6 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     if (text.includes('จังหวัด') || text.includes('ส่ง') || text.includes('พื้นที่') || text.includes('ต่างจังหวัด') || text.includes('กทม') || text.includes('กรุงเทพ') || text.includes('ที่ไหน')) {
       return {
         text: 'เรามีรถบริการควบคุมอุณหภูมิพร้อมจัดเลี้ยง ทั่วประเทศไทย 77 จังหวัด เลยค่ะ!\n\n• กรุงเทพฯ และปริมณฑล (นครปฐม นนทบุรี ปทุมธานี สมุทรปราการ สมุทรสาคร)\n• ภาคกลาง ภาคตะวันออก ภาคอีสาน ภาคเหนือ ภาคใต้\n\nครัวของเรายกเตาและปรุงสุกสดใหม่หน้างาน 100% อาหารร้อนอร่อยทุกโต๊ะแน่นอนค่ะ 🚚💨',
-        quickActions: [
-          {
-            label: '📞 โทรสอบถามคิวงานในพื้นที่',
-            action: () => {
-              window.location.href = 'tel:0830872257';
-            },
-            isPrimary: true,
-          },
-        ],
       };
     }
 
@@ -166,57 +133,26 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
       };
     }
 
-    // 5. Deposit / Payment
-    if (text.includes('มัดจำ') || text.includes('จ่ายเงิน') || text.includes('ชำระ') || text.includes('มัดจำกี่บาท') || text.includes('โอน')) {
-      return {
-        text: 'เงื่อนไขการชำระเงินสะดวกและปลอดภัย 100% ค่ะ:\n\n1. มัดจำล็อกคิวงาน 30% ในวันตกลงว่าจ้าง\n2. ส่วนที่เหลือ 70% ชำระในวันงานจริงหลังจัดเลี้ยงเสร็จเรียบร้อยค่ะ\n\nมีใบเสนอราคาและสัญญาว่าจ้างระบุรายการอาหารชัดเจนถูกต้องตามกฎหมายค่ะ 📄',
-      };
-    }
-
-    // 6. Popular Menus
+    // 5. Popular Menus
     if (text.includes('เมนู') || text.includes('แนะนำ') || text.includes('อร่อย') || text.includes('กับข้าว')) {
       return {
         text: 'เมนูซิกเนเจอร์ต้นตำรับ 35 ปี ที่เจ้าภาพนิยมสั่งมากที่สุด:\n\n1. 🌟 ขาหมูน้ำแดงยอดผัก & เห็ดหอมตุ๋นยาจีน (เนื้อนุ่มละลายในปาก)\n2. 🦆 เป็ดย่างน้ำผึ้งฮ่องกงหมี่หยก (หนังกรอบเนื้อฉ่ำ)\n3. 🐟 ปลากะพงนึ่งมะนาว / นึ่งซีอิ๊วขิงสด\n4. 👑 ข้าวผัดห่อใบบัวทรงเครื่องจักรพรรดิ\n5. 🍲 กระเพาะปลาน้ำแดงเนื้อปูก้อน\n6. 🥣 แปะก๊วยนมสดมะพร้าวอ่อน / บัวลอยน้ำขิง',
-        quickActions: [
-          {
-            label: '🍽️ ดูรูปภาพเมนูทั้งหมด',
-            action: () => {
-              document.getElementById('menu-showcase')?.scrollIntoView({ behavior: 'smooth' });
-              setIsOpen(false);
-            },
-            isPrimary: true,
-          },
-        ],
       };
     }
 
-    // 7. Contact / Phone
+    // 6. Contact / Phone
     if (text.includes('เบอร์') || text.includes('โทร') || text.includes('ติดต่อ') || text.includes('คุณแป้ง') || text.includes('ไลน์')) {
       return {
-        text: 'ช่องทางติดต่อโต๊ะจีน รพีพัฒน์ พรีเมียม:\n\n📞 โทรด่วน: 083-087-2257 (คุณแป้ง)\n💬 LINE: pang_baichaa\n✉️ Email: info@rapeephat-catering.com\n\nหรือจะกดปุ่ม "ให้เจ้าหน้าที่ติดต่อกลับ" ด้านล่างนี้ได้เลยนะคะ เดี๋ยวแป้งโทรกลับหาทันทีค่ะ 😊',
-        quickActions: [
-          {
-            label: '📞 โทรออก 083-087-2257',
-            action: () => {
-              window.location.href = 'tel:0830872257';
-            },
-            isPrimary: true,
-          },
-          {
-            label: '📝 ฝากชื่อ-เบอร์ให้โทรกลับ',
-            action: () => {
-              setShowLeadForm(true);
-            },
-          },
-        ],
+        text: 'ช่องทางติดต่อโต๊ะจีน รพีพัฒน์ พรีเมียม:\n\n📞 โทรด่วน: 083-087-2257 (คุณแป้ง)\n💬 LINE: pang_baichaa\n✉️ Email: info@rapeephat-catering.com\n\nหรือจะพิมพ์เบอร์โทรไว้ในแชทนี้ได้เลยนะคะ เจ้าหน้าที่จะโทรกลับทันทีค่ะ 😊',
       };
     }
 
-    // 8. Lead Capture (Phone numbers detection e.g. 0812345678)
+    // 7. Lead Detection
     const phoneMatch = userText.match(/(0\d{8,9})/);
     if (phoneMatch) {
       try {
         const lead = {
+          name: leadName || 'ลูกค้าจาก Live Chat',
           phone: phoneMatch[0],
           rawText: userText,
           time: new Date().toISOString(),
@@ -233,29 +169,9 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
 
     // Default Fallback
     return {
-      text: 'ขอบคุณสำหรับข้อความนะคะ หากต้องการให้ออกใบเสนอราคาทางการ หรือต้องการคุยรายละเอียดเพิ่มเติม แป้งยินดีแนะนำให้ทันทีค่ะ สามารถเลือกเมนูด้านล่างหรือพิมพ์สอบถามเพิ่มเติมได้เลยนะคะ 😊',
-      quickActions: [
-        {
-          label: '📋 สร้างใบเสนอราคา A4',
-          action: () => {
-            onOpenBuilder?.();
-            setIsOpen(false);
-          },
-          isPrimary: true,
-        },
-        {
-          label: '📞 โทรหาเจ้าหน้าที่ (083-087-2257)',
-          action: () => {
-            window.location.href = 'tel:0830872257';
-          },
-        },
-        {
-          label: '📝 ฝากเบอร์ให้โทรกลับ',
-          action: () => {
-            setShowLeadForm(true);
-          },
-        },
-      ],
+      text: isOwnerOnline
+        ? 'ขอบคุณสำหรับข้อความนะคะ ขณะนี้คุณแป้ง (เจ้าของร้าน) กำลังออนไลน์อยู่ กำลังอ่านข้อความและเตรียมพิมพ์ตอบกลับค่ะ หรือต้องการให้ออกใบเสนอราคาสามารถกดปุ่มด้านล่างได้เลยนะคะ 😊'
+        : 'ขอบคุณสำหรับข้อความนะคะ หากต้องการให้ออกใบเสนอราคาทางการ หรือต้องการคุยรายละเอียดเพิ่มเติม แป้งยินดีแนะนำให้ทันทีค่ะ สามารถเลือกเมนูด้านล่างหรือพิมพ์สอบถามเพิ่มเติมได้เลยนะคะ 😊',
     };
   };
 
@@ -263,31 +179,38 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     const text = (textToSend || inputValue).trim();
     if (!text) return;
 
-    const userMsg: ChatMessage = {
+    const userMsg: LiveMessage = {
       id: `usr-${Date.now()}`,
-      sender: 'user',
+      sessionId,
+      sender: 'customer',
+      senderName: leadName || 'ลูกค้าผู้มีเกียรติ',
       text,
       timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      createdAt: Date.now(),
     };
 
+    chatSync.saveMessage(userMsg);
     setMessages((prev) => [...prev, userMsg]);
     setInputValue('');
-    setIsTyping(true);
 
-    // Realistic typing delay
-    setTimeout(() => {
-      const reply = generateBotReply(text);
-      const botMsg: ChatMessage = {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: reply.text,
-        timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-        quickActions: reply.quickActions,
-      };
-
-      setMessages((prev) => [...prev, botMsg]);
-      setIsTyping(false);
-    }, 700);
+    // If owner is NOT actively typing a manual reply, respond with intelligent assistant
+    if (!isOwnerOnline) {
+      setIsTyping(true);
+      setTimeout(() => {
+        const reply = generateBotReply(text);
+        const botMsg: LiveMessage = {
+          id: `bot-${Date.now()}`,
+          sessionId,
+          sender: 'bot',
+          senderName: 'ผู้ช่วยโต๊ะจีนรพีพัฒน์',
+          text: reply.text,
+          timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+        };
+        chatSync.saveMessage(botMsg);
+        setIsTyping(false);
+      }, 700);
+    }
   };
 
   const handleLeadSubmit = (e: React.FormEvent) => {
@@ -307,6 +230,17 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
       localStorage.setItem('rapeephat_chat_leads', JSON.stringify(saved));
     } catch {}
 
+    const leadMsg: LiveMessage = {
+      id: `usr-lead-${Date.now()}`,
+      sessionId,
+      sender: 'customer',
+      senderName: leadName || 'ลูกค้า',
+      text: `[ข้อมูลติดต่อกลับ] ชื่อ: ${leadName || '-'}, เบอร์โทร: ${leadPhone}, จำนวนโต๊ะ/วันที่: ${leadTables || '-'}`,
+      timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      createdAt: Date.now(),
+    };
+    chatSync.saveMessage(leadMsg);
+
     setLeadSubmitted(true);
     setTimeout(() => {
       setShowLeadForm(false);
@@ -314,21 +248,13 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
       setLeadName('');
       setLeadPhone('');
       setLeadTables('');
-
-      const thankYouMsg: ChatMessage = {
-        id: `sys-${Date.now()}`,
-        sender: 'bot',
-        text: `ได้รับข้อมูลเรียบร้อยแล้วค่ะ ขอบพระคุณคุณ ${leadName || ''} มากนะคะ ทางร้านจะรีบติดต่อกลับที่เบอร์ ${leadPhone} ให้เร็วที่สุดค่ะ 🙏✨`,
-        timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages((prev) => [...prev, thankYouMsg]);
     }, 1500);
   };
 
   return (
     <>
       {/* ========================================================================= */}
-      {/* 🟢 1. FLOATING CHAT TRIGGER BUTTON (DESKTOP & TABLET BOTTOM-RIGHT) */}
+      {/* 🟢 1. FLOATING CHAT TRIGGER BUTTON */}
       {/* ========================================================================= */}
       {!isOpen && (
         <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
@@ -340,7 +266,11 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
           >
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
             <div className="text-xs">
-              <span className="font-bold text-red-700">แชทสอบถามสด</span> • <span className="text-slate-600 font-medium">เจ้าหน้าที่พร้อมตอบทันทีค่ะ</span>
+              <span className="font-bold text-red-700">
+                {isOwnerOnline ? 'คุณแป้ง (เจ้าของร้าน) ออนไลน์อยู่' : 'แชทสดสอบถาม'}
+              </span>
+              {' • '}
+              <span className="text-slate-600 font-medium">พร้อมคุยสดทันทีค่ะ</span>
             </div>
           </div>
 
@@ -375,7 +305,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
           className={`fixed z-50 transition-all duration-300 ${
             isMinimized
               ? 'bottom-4 right-4 w-72 h-14 bg-slate-900 rounded-2xl shadow-2xl border border-amber-300 flex items-center justify-between px-4 text-white cursor-pointer'
-              : 'bottom-0 right-0 sm:bottom-6 sm:right-6 w-full h-[100dvh] sm:h-[580px] sm:w-[410px] sm:rounded-3xl bg-white shadow-2xl border sm:border-2 border-amber-300/90 flex flex-col overflow-hidden animate-fadeIn'
+              : 'bottom-0 right-0 sm:bottom-6 sm:right-6 w-full h-[100dvh] sm:h-[590px] sm:w-[420px] sm:rounded-3xl bg-white shadow-2xl border sm:border-2 border-amber-300/90 flex flex-col overflow-hidden animate-fadeIn'
           }`}
         >
           {/* Header Bar */}
@@ -395,14 +325,16 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-black text-white">แชทสด โต๊ะจีนรพีพัฒน์</h3>
+                  <h3 className="text-sm font-black text-white">
+                    {isOwnerOnline ? 'คุณแป้ง (โต๊ะจีนรพีพัฒน์)' : 'แชทสด โต๊ะจีนรพีพัฒน์'}
+                  </h3>
                   <span className="px-1.5 py-0.2 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded text-[9px] font-black uppercase">
-                    OFFICIAL
+                    {isOwnerOnline ? '👑 เจ้าของร้าน' : 'OFFICIAL'}
                   </span>
                 </div>
                 <p className="text-[10.5px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  ออนไลน์พร้อมตอบ 24 ชม.
+                  {isOwnerOnline ? 'เจ้าของร้านออนไลน์อยู่ พร้อมตอบทันที 🟢' : 'ออนไลน์พร้อมตอบ 24 ชม.'}
                 </p>
               </div>
             </div>
@@ -436,7 +368,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                 
                 {/* Security Guarantee Pill */}
                 <div className="text-center my-1">
-                  <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-bold bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                  <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 font-bold bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
                     <Crown className="w-3 h-3 text-amber-600" />
                     คุยสดกับฝ่ายจัดเลี้ยง โต๊ะจีน รพีพัฒน์ พรีเมียม 35+ ปี
                   </span>
@@ -445,12 +377,26 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                    className={`flex flex-col ${msg.sender === 'customer' ? 'items-end' : 'items-start'}`}
                   >
+                    {/* Sender Label */}
+                    <span className="text-[10px] text-slate-400 font-bold mb-1 px-1 flex items-center gap-1">
+                      {msg.sender === 'owner' && (
+                        <span className="text-amber-600 font-black flex items-center gap-0.5">
+                          <Crown className="w-3 h-3 text-amber-600" />
+                          คุณแป้ง (เจ้าของร้าน):
+                        </span>
+                      )}
+                      {msg.sender === 'customer' && 'คุณ'}
+                      {msg.sender === 'bot' && 'โต๊ะจีนรพีพัฒน์'}
+                    </span>
+
                     <div
                       className={`max-w-[85%] rounded-2xl p-3 sm:p-3.5 space-y-1.5 shadow-xs ${
-                        msg.sender === 'user'
+                        msg.sender === 'customer'
                           ? 'bg-gradient-to-r from-red-600 to-red-700 text-white rounded-br-xs'
+                          : msg.sender === 'owner'
+                          ? 'bg-gradient-to-br from-amber-50 to-amber-100/80 border-2 border-amber-400 text-slate-950 rounded-bl-xs shadow-md'
                           : 'bg-white border border-amber-200/90 text-slate-900 rounded-bl-xs'
                       }`}
                     >
@@ -458,29 +404,13 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                         {msg.text}
                       </p>
 
-                      {/* Quick Action Interactive Buttons inside Bot Message */}
-                      {msg.quickActions && msg.quickActions.length > 0 && (
-                        <div className="pt-2 flex flex-col gap-1.5">
-                          {msg.quickActions.map((qa, idx) => (
-                            <button
-                              key={idx}
-                              onClick={qa.action}
-                              className={`w-full py-2 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all transform active:scale-95 shadow-xs ${
-                                qa.isPrimary
-                                  ? 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white border border-amber-300'
-                                  : 'bg-slate-50 hover:bg-amber-50 text-slate-800 border border-slate-200'
-                              }`}
-                            >
-                              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                              <span>{qa.label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
                       <div
                         className={`text-[9.5px] font-bold text-right pt-0.5 ${
-                          msg.sender === 'user' ? 'text-red-200' : 'text-slate-400'
+                          msg.sender === 'customer'
+                            ? 'text-red-200'
+                            : msg.sender === 'owner'
+                            ? 'text-amber-800'
+                            : 'text-slate-400'
                         }`}
                       >
                         {msg.timestamp}
@@ -510,28 +440,35 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
               {/* Quick Prompt Suggestion Chips */}
               <div className="px-3 py-2 bg-amber-50/60 border-t border-amber-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
                 <button
+                  onClick={() => {
+                    onOpenBuilder?.();
+                    setIsOpen(false);
+                  }}
+                  className="px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-amber-600 text-white font-black text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0 flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-200" />
+                  <span>ออกใบเสนอราคา A4</span>
+                </button>
+
+                <button
                   onClick={() => handleSendMessage('ขอทราบราคาแพ็กเกจโต๊ะจีนทั้งหมด')}
                   className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
                 >
-                  🍽️ แพ็กเกจ & ราคา
+                  🍽️ ราคาแพ็กเกจ
                 </button>
+
                 <button
                   onClick={() => handleSendMessage('ขั้นต่ำกี่โต๊ะ มีโปรโมชั่นอะไรบ้าง')}
                   className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
                 >
                   🎁 โปรสั่ง 20 ฟรี 1
                 </button>
-                <button
-                  onClick={() => handleSendMessage('จัดเลี้ยงต่างจังหวัดคิดค่าเดินทางอย่างไร')}
-                  className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
-                >
-                  🚚 ต่างจังหวัดจัดไหม
-                </button>
+
                 <button
                   onClick={() => setShowLeadForm(true)}
-                  className="px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-amber-600 text-white font-black text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0 flex items-center gap-1"
+                  className="px-3 py-1 rounded-full bg-white hover:bg-amber-50 text-amber-900 border border-amber-400 font-black text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0 flex items-center gap-1"
                 >
-                  <Phone className="w-3 h-3 text-amber-200" />
+                  <Phone className="w-3 h-3 text-red-600" />
                   <span>ฝากเบอร์โทรกลับ</span>
                 </button>
               </div>
@@ -599,7 +536,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
               <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
                 <input
                   type="text"
-                  placeholder="พิมพ์ข้อความคุยกับเจ้าหน้าที่ตรงนี้..."
+                  placeholder={isOwnerOnline ? 'พิมพ์คุยกับคุณแป้งตรงนี้ได้เลย...' : 'พิมพ์ข้อความคุยกับเจ้าหน้าที่ตรงนี้...'}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => {

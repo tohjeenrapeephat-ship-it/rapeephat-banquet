@@ -24,8 +24,13 @@ import {
   Utensils,
   TrendingUp,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Send,
+  Radio,
+  Sparkles,
+  Crown
 } from 'lucide-react';
+import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
 interface AdminPortalProps {
   onBackToSite: () => void;
@@ -38,6 +43,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
   const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
+  
+  // Real-time Chat Operator States
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => chatSync.getAllSessions());
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(() => {
+    const all = chatSync.getAllSessions();
+    return all.length > 0 ? all[0].id : null;
+  });
+  const [ownerReplyText, setOwnerReplyText] = useState('');
+  const [chatSubView, setChatSubView] = useState<'live_room' | 'leads_table'>('live_room');
+
   const [chatLeads, setChatLeads] = useState<any[]>(() => {
     try {
       return JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]');
@@ -45,6 +60,54 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
       return [];
     }
   });
+
+  // Operator presence heartbeat & real-time chat listener
+  useEffect(() => {
+    chatSync.setOperatorOnline(true);
+    const interval = setInterval(() => {
+      chatSync.setOperatorOnline(true);
+    }, 20000);
+
+    const unsubscribe = chatSync.subscribe((event) => {
+      if (event.type === 'NEW_MESSAGE' || event.type === 'SESSION_READ' || event.type === 'STORAGE_UPDATE') {
+        const updated = chatSync.getAllSessions();
+        setChatSessions(updated);
+        try {
+          setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
+        } catch {}
+      }
+    });
+
+    return () => {
+      chatSync.setOperatorOnline(false);
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, []);
+
+  const handleSelectSession = (sId: string) => {
+    setSelectedSessionId(sId);
+    chatSync.markAsReadByOwner(sId);
+  };
+
+  const handleSendOwnerReply = (textToSend?: string) => {
+    const text = (textToSend || ownerReplyText).trim();
+    if (!text || !selectedSessionId) return;
+
+    const replyMsg: LiveMessage = {
+      id: `owner-${Date.now()}`,
+      sessionId: selectedSessionId,
+      sender: 'owner',
+      senderName: 'คุณแป้ง (เจ้าของร้าน)',
+      text,
+      timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      createdAt: Date.now(),
+    };
+
+    chatSync.saveMessage(replyMsg);
+    setOwnerReplyText('');
+    setChatSessions(chatSync.getAllSessions());
+  };
 
   // GAS Webhook Settings
   const [gasUrl, setGasUrl] = useState(() => localStorage.getItem('rapeephat_gas_url') || '');
@@ -586,96 +649,369 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
           </div>
         )}
 
-        {/* TAB 2: Live Chat Leads Management */}
+        {/* TAB 2: Live Chat & Real-Time Operator Room */}
         {activeTab === 'chat_leads' && (
           <div className="space-y-6">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-              <div>
-                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-red-600" />
-                  <span>รายชื่อลูกค้าที่ติดต่อผ่าน Live Chat ({chatLeads.length} ท่าน)</span>
-                </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  เบอร์ติดต่อและข้อมูลที่ลูกค้าฝากไว้ผ่านช่องแชทสดหน้าเว็บแบบเรียลไทม์
-                </p>
-              </div>
-
-              {chatLeads.length > 0 && (
-                <button
-                  onClick={() => {
-                    if (confirm('ต้องการล้างประวัติข้อมูลแชททั้งหมดใช่หรือไม่?')) {
-                      localStorage.removeItem('rapeephat_chat_leads');
-                      setChatLeads([]);
-                    }
-                  }}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 text-xs font-bold transition-colors border border-slate-200 flex items-center gap-1.5"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span>ล้างประวัติ</span>
-                </button>
-              )}
-            </div>
-
-            {chatLeads.length === 0 ? (
-              <div className="p-12 text-center rounded-3xl bg-white border border-slate-200 space-y-3">
-                <MessageSquare className="w-10 h-10 text-slate-300 mx-auto" />
-                <h4 className="text-base font-bold text-slate-800">ยังไม่มีข้อมูลลูกค้าที่ฝากเบอร์ในขณะนี้</h4>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  เมื่อลูกค้าเข้ามาคุยในระบบ Live Chat หน้าเว็บและฝากเบอร์โทรศัพท์ไว้ ข้อมูลจะปรากฏในหน้านี้ทันทีแบบเรียลไทม์
-                </p>
-              </div>
-            ) : (
-              <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-black uppercase text-[11px]">
-                        <th className="p-4">ลำดับ</th>
-                        <th className="p-4">ชื่อลูกค้า</th>
-                        <th className="p-4">เบอร์โทรศัพท์</th>
-                        <th className="p-4">จำนวนโต๊ะ / วันที่จัดงาน</th>
-                        <th className="p-4">เวลาที่ส่ง</th>
-                        <th className="p-4 text-center">การจัดการ</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {chatLeads.map((lead, idx) => (
-                        <tr key={idx} className="hover:bg-amber-50/40 transition-colors">
-                          <td className="p-4 font-bold text-slate-500">{idx + 1}</td>
-                          <td className="p-4 font-black text-slate-900 text-sm">
-                            {lead.name || 'ลูกค้าหน้าเว็บ'}
-                          </td>
-                          <td className="p-4">
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="font-mono font-black text-red-700 hover:text-red-900 flex items-center gap-1.5 text-sm"
-                            >
-                              <Phone className="w-3.5 h-3.5" />
-                              <span>{lead.phone}</span>
-                            </a>
-                          </td>
-                          <td className="p-4 font-medium text-slate-700">
-                            {lead.tables || lead.rawText || '-'}
-                          </td>
-                          <td className="p-4 text-slate-500 font-medium">
-                            {lead.createdAt || lead.time ? new Date(lead.createdAt || lead.time).toLocaleString('th-TH') : '-'}
-                          </td>
-                          <td className="p-4 text-center">
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="px-3 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-xs"
-                            >
-                              <Phone className="w-3.5 h-3.5" />
-                              <span>โทรกลับ</span>
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            
+            {/* Top Status & Sub-Navigation Bar */}
+            <div className="p-5 rounded-3xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 to-amber-600 text-white flex items-center justify-center shadow-md">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-black text-slate-900">
+                      ศูนย์รับแชทสด & ข้อมูลลูกค้าเรียลไทม์
+                    </h3>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center gap-1 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                      คุณแป้งกำลังออนไลน์ (LIVE)
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium">
+                    เมื่อคุณเปิดหน้านี้อยู่ ลูกค้าบนหน้าเว็บจะเห็นว่าเจ้าของร้านออนไลน์ และสามารถพิมพ์คุยตอบโต้กันได้ทันที
+                  </p>
                 </div>
               </div>
+
+              {/* Sub-view Switcher */}
+              <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 text-xs font-bold">
+                <button
+                  onClick={() => setChatSubView('live_room')}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                    chatSubView === 'live_room'
+                      ? 'bg-red-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>ห้องสนทนาสด ({chatSessions.length})</span>
+                </button>
+
+                <button
+                  onClick={() => setChatSubView('leads_table')}
+                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                    chatSubView === 'leads_table'
+                      ? 'bg-red-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>ลูกค้าฝากเบอร์ ({chatLeads.length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* VIEW A: Real-Time Two-Way Live Chat Operator Room */}
+            {chatSubView === 'live_room' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden grid md:grid-cols-12 min-h-[580px]">
+                
+                {/* Left Pane: Customer Sessions List (4 Cols) */}
+                <div className="md:col-span-4 border-r border-slate-200 flex flex-col bg-slate-50/50">
+                  <div className="p-3.5 border-b border-slate-200 flex items-center justify-between">
+                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                      รายการลูกค้าที่กำลังแชท ({chatSessions.length})
+                    </span>
+                    <button
+                      onClick={() => setChatSessions(chatSync.getAllSessions())}
+                      className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                      title="รีเฟรชรายการ"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+                    {chatSessions.length === 0 ? (
+                      <div className="p-8 text-center text-xs text-slate-400 space-y-2">
+                        <MessageSquare className="w-8 h-8 mx-auto text-slate-300" />
+                        <p>ยังไม่มีข้อความแชทใหม่</p>
+                        <p className="text-[11px] text-slate-400">เมื่อลูกค้าทักแชทหน้าเว็บ รายชื่อจะปรากฏตรงนี้ทันที</p>
+                      </div>
+                    ) : (
+                      chatSessions.map((session) => (
+                        <div
+                          key={session.id}
+                          onClick={() => handleSelectSession(session.id)}
+                          className={`p-3.5 cursor-pointer transition-all flex items-start gap-3 ${
+                            selectedSessionId === session.id
+                              ? 'bg-red-50/80 border-l-4 border-red-600 shadow-2xs'
+                              : 'hover:bg-slate-100/80'
+                          }`}
+                        >
+                          <div className="w-9 h-9 rounded-2xl bg-amber-100 border border-amber-300 text-red-700 font-black text-xs flex items-center justify-center shrink-0">
+                            {session.customerName.substring(0, 2) || 'ลค'}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-xs font-black text-slate-900 truncate">
+                                {session.customerName}
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                {session.lastMessageTime}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 truncate mt-0.5 font-medium">
+                              {session.lastMessage}
+                            </p>
+                          </div>
+
+                          {session.unreadByOwner > 0 && (
+                            <span className="w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shrink-0 shadow-xs">
+                              {session.unreadByOwner}
+                            </span>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Pane: Active Conversation Console (8 Cols) */}
+                <div className="md:col-span-8 flex flex-col bg-[#FFFDF9]">
+                  {selectedSessionId ? (
+                    (() => {
+                      const session = chatSessions.find((s) => s.id === selectedSessionId);
+                      const currentMessages = session ? session.messages : [];
+
+                      return (
+                        <>
+                          {/* Chat Room Top Bar */}
+                          <div className="p-3.5 px-5 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-2xl bg-red-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                                {session?.customerName.substring(0, 2) || 'ลค'}
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                                  <span>{session?.customerName || 'ลูกค้า'}</span>
+                                  <span className="px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-bold">
+                                    ลูกค้ากำลังเปิดหน้าเว็บ
+                                  </span>
+                                </h4>
+                                <p className="text-[11px] text-slate-400 font-mono">
+                                  Session ID: {session?.id}
+                                </p>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                if (confirm('ต้องการลบการสนทนานี้ใช่หรือไม่?')) {
+                                  const updated = chatSessions.filter((s) => s.id !== selectedSessionId);
+                                  localStorage.setItem('rapeephat_chat_sessions_v1', JSON.stringify(updated));
+                                  setChatSessions(updated);
+                                  setSelectedSessionId(updated.length > 0 ? updated[0].id : null);
+                                }
+                              }}
+                              className="p-2 text-slate-400 hover:text-red-600 transition-colors"
+                              title="ลบแชทนี้"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Chat Message Scrollable Feed */}
+                          <div className="flex-1 p-5 overflow-y-auto space-y-3.5 text-xs">
+                            {currentMessages.map((msg) => (
+                              <div
+                                key={msg.id}
+                                className={`flex flex-col ${msg.sender === 'owner' ? 'items-end' : 'items-start'}`}
+                              >
+                                <span className="text-[10px] text-slate-400 font-bold mb-1 px-1 flex items-center gap-1">
+                                  {msg.sender === 'owner' && (
+                                    <span className="text-amber-600 font-black flex items-center gap-0.5">
+                                      <Crown className="w-3 h-3 text-amber-600" />
+                                      คุณแป้ง (เจ้าของร้าน):
+                                    </span>
+                                  )}
+                                  {msg.sender === 'customer' && `ลูกค้า (${msg.senderName}):`}
+                                  {msg.sender === 'bot' && 'ระบบผู้ช่วยอัตโนมัติ:'}
+                                </span>
+
+                                <div
+                                  className={`max-w-[80%] rounded-2xl p-3.5 space-y-1 shadow-xs ${
+                                    msg.sender === 'owner'
+                                      ? 'bg-gradient-to-r from-red-600 to-red-700 text-white rounded-br-xs'
+                                      : msg.sender === 'customer'
+                                      ? 'bg-white border-2 border-red-200 text-slate-950 font-bold rounded-bl-xs'
+                                      : 'bg-slate-100 border border-slate-200 text-slate-700 rounded-bl-xs'
+                                  }`}
+                                >
+                                  <p className="whitespace-pre-line leading-relaxed font-medium">
+                                    {msg.text}
+                                  </p>
+                                  <div
+                                    className={`text-[9.5px] font-bold text-right pt-0.5 ${
+                                      msg.sender === 'owner' ? 'text-red-200' : 'text-slate-400'
+                                    }`}
+                                  >
+                                    {msg.timestamp}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Quick Reply Suggestions for Owner */}
+                          <div className="px-4 py-2 bg-amber-50/60 border-t border-amber-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+                            <button
+                              onClick={() => handleSendOwnerReply('สวัสดีค่ะ โต๊ะจีนรพีพัฒน์ยินดีดูแลค่ะ สนใจจัดเลี้ยงกี่โต๊ะคะ 😊')}
+                              className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
+                            >
+                              👋 ทักทายต้อนรับ
+                            </button>
+                            <button
+                              onClick={() => handleSendOwnerReply('วันที่ลูกค้าสอบถาม มีคิวว่างพร้อมดูแลได้เลยนะคะ สามารถล็อกคิวได้เลยค่ะ ✨')}
+                              className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
+                            >
+                              📅 แจ้งคิวว่าง
+                            </button>
+                            <button
+                              onClick={() => handleSendOwnerReply('แพ็กเกจยอดนิยมเริ่มต้น 1,400.- ฟรีโต๊ะ เก้าอี้ ผ้าคลุมผูกโบว์ และบริกรครบชุดค่ะ')}
+                              className="px-3 py-1 rounded-full bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 border border-amber-300 font-bold text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
+                            >
+                              🍽️ แนะนำแพ็กเกจ
+                            </button>
+                            <button
+                              onClick={() => handleSendOwnerReply('รบกวนขอทราบสถานที่จัดงาน และเบอร์โทรศัพท์ติดต่อกลับด้วยนะคะ เดี๋ยวแป้งโทรคุยรายละเอียดให้ค่ะ 📞')}
+                              className="px-3 py-1 rounded-full bg-white hover:bg-amber-50 text-amber-900 border border-amber-400 font-black text-[10.5px] whitespace-nowrap shadow-2xs transition-colors shrink-0"
+                            >
+                              📞 ขอเบอร์โทรกลับ
+                            </button>
+                          </div>
+
+                          {/* Owner Message Input Box */}
+                          <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
+                            <input
+                              type="text"
+                              placeholder="พิมพ์ข้อความตอบกลับลูกค้าในฐานะคุณแป้ง..."
+                              value={ownerReplyText}
+                              onChange={(e) => setOwnerReplyText(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSendOwnerReply();
+                              }}
+                              className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:bg-white text-xs font-medium"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => handleSendOwnerReply()}
+                              disabled={!ownerReplyText.trim()}
+                              className={`px-4 py-2.5 rounded-2xl font-black text-xs flex items-center gap-1.5 transition-all ${
+                                ownerReplyText.trim()
+                                  ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md transform hover:scale-105 active:scale-95'
+                                  : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                              }`}
+                            >
+                              <Send className="w-4 h-4" />
+                              <span>ส่งตอบกลับ</span>
+                            </button>
+                          </div>
+                        </>
+                      );
+                    })()
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400 space-y-2">
+                      <MessageSquare className="w-10 h-10 text-slate-300" />
+                      <h4 className="font-bold text-slate-700">เลือกรายการลูกค้าเพื่อเริ่มสนทนาสด</h4>
+                      <p className="text-xs text-slate-400">คลิกที่รายชื่อลูกค้าทางซ้ายมือเพื่อดูข้อความและพิมพ์ตอบกลับ</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             )}
+
+            {/* VIEW B: Lead Capture Table */}
+            {chatSubView === 'leads_table' && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">
+                    รายการลูกค้าที่กด "ฝากเบอร์โทรกลับ" ทั้งหมด ({chatLeads.length} ท่าน)
+                  </span>
+
+                  {chatLeads.length > 0 && (
+                    <button
+                      onClick={() => {
+                        if (confirm('ต้องการล้างประวัติข้อมูลลูกค้าฝากเบอร์ทั้งหมดใช่หรือไม่?')) {
+                          localStorage.removeItem('rapeephat_chat_leads');
+                          setChatLeads([]);
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 text-xs font-bold transition-colors border border-slate-200 flex items-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>ล้างประวัติ</span>
+                    </button>
+                  )}
+                </div>
+
+                {chatLeads.length === 0 ? (
+                  <div className="p-12 text-center rounded-3xl bg-white border border-slate-200 space-y-3">
+                    <Phone className="w-10 h-10 text-slate-300 mx-auto" />
+                    <h4 className="text-base font-bold text-slate-800">ยังไม่มีข้อมูลลูกค้าที่ฝากเบอร์ในขณะนี้</h4>
+                    <p className="text-xs text-slate-500 max-w-md mx-auto">
+                      เมื่อลูกค้าเข้ามาคุยในระบบ Live Chat หน้าเว็บและฝากเบอร์โทรศัพท์ไว้ ข้อมูลจะปรากฏในหน้านี้ทันทีแบบเรียลไทม์
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-black uppercase text-[11px]">
+                            <th className="p-4">ลำดับ</th>
+                            <th className="p-4">ชื่อลูกค้า</th>
+                            <th className="p-4">เบอร์โทรศัพท์</th>
+                            <th className="p-4">จำนวนโต๊ะ / วันที่จัดงาน</th>
+                            <th className="p-4">เวลาที่ส่ง</th>
+                            <th className="p-4 text-center">การจัดการ</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {chatLeads.map((lead, idx) => (
+                            <tr key={idx} className="hover:bg-amber-50/40 transition-colors">
+                              <td className="p-4 font-bold text-slate-500">{idx + 1}</td>
+                              <td className="p-4 font-black text-slate-900 text-sm">
+                                {lead.name || 'ลูกค้าหน้าเว็บ'}
+                              </td>
+                              <td className="p-4">
+                                <a
+                                  href={`tel:${lead.phone}`}
+                                  className="font-mono font-black text-red-700 hover:text-red-900 flex items-center gap-1.5 text-sm"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                  <span>{lead.phone}</span>
+                                </a>
+                              </td>
+                              <td className="p-4 font-medium text-slate-700">
+                                {lead.tables || lead.rawText || '-'}
+                              </td>
+                              <td className="p-4 text-slate-500 font-medium">
+                                {lead.createdAt || lead.time ? new Date(lead.createdAt || lead.time).toLocaleString('th-TH') : '-'}
+                              </td>
+                              <td className="p-4 text-center">
+                                <a
+                                  href={`tel:${lead.phone}`}
+                                  className="px-3.5 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-xs"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                  <span>โทรกลับ</span>
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         )}
 
