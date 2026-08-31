@@ -47,10 +47,33 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
   // Real-time Chat Operator States
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => chatSync.getAllSessions());
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
+    const all = chatSync.getAllSessions();
+    if (all.length === 0) {
+      return [{
+        id: 'room_main',
+        customerName: 'ลูกค้าจากหน้าเว็บ (แชทสด)',
+        lastMessage: 'ยินดีต้อนรับสู่โต๊ะจีนรพีพัฒน์ค่ะ',
+        lastMessageTime: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+        unreadByOwner: 0,
+        unreadByCustomer: 0,
+        updatedAt: Date.now(),
+        messages: [{
+          id: 'sys-welcome',
+          sessionId: 'room_main',
+          sender: 'bot',
+          senderName: 'ระบบโต๊ะจีนรพีพัฒน์',
+          text: 'ยินดีต้อนรับสู่ศูนย์รับแชทสดโต๊ะจีน รพีพัฒน์ ค่ะ คุณแป้งสามารถพิมพ์ตอบข้อความลูกค้าได้ทันทีตรงนี้เลยนะคะ 😊',
+          timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+        }]
+      }];
+    }
+    return all;
+  });
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(() => {
     const all = chatSync.getAllSessions();
-    return all.length > 0 ? all[0].id : null;
+    return all.length > 0 ? all[0].id : 'room_main';
   });
   const [ownerReplyText, setOwnerReplyText] = useState('');
   const [chatSubView, setChatSubView] = useState<'live_room' | 'leads_table'>('live_room');
@@ -77,23 +100,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
 
     const pollInterval = setInterval(() => {
       const updated = chatSync.getAllSessions();
-      setChatSessions([...updated]);
-      setSelectedSessionId((curr) => {
-        if (!curr && updated.length > 0) return updated[0].id;
-        return curr;
-      });
+      if (updated.length > 0) {
+        setChatSessions([...updated]);
+        setSelectedSessionId((curr) => curr || updated[0].id);
+      }
       try {
         setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
       } catch {}
-    }, 2500);
+    }, 2000);
 
     const unsubscribe = chatSync.subscribe((event) => {
       const updated = chatSync.getAllSessions();
-      setChatSessions([...updated]);
-      setSelectedSessionId((curr) => {
-        if (!curr && updated.length > 0) return updated[0].id;
-        return curr;
-      });
+      if (updated.length > 0) {
+        setChatSessions([...updated]);
+        setSelectedSessionId((curr) => curr || updated[0].id);
+      }
       try {
         setChatLeads(JSON.parse(localStorage.getItem('rapeephat_chat_leads') || '[]'));
       } catch {}
@@ -114,11 +135,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
 
   const handleSendOwnerReply = (textToSend?: string) => {
     const text = (textToSend || ownerReplyText).trim();
-    if (!text || !selectedSessionId) return;
+    const targetSessionId = selectedSessionId || (chatSessions.length > 0 ? chatSessions[0].id : 'room_main');
+    if (!text || !targetSessionId) return;
 
     const replyMsg: LiveMessage = {
       id: `owner-${Date.now()}`,
-      sessionId: selectedSessionId,
+      sessionId: targetSessionId,
       sender: 'owner',
       senderName: 'คุณแป้ง (เจ้าของร้าน)',
       text,
@@ -128,7 +150,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
 
     chatSync.saveMessage(replyMsg);
     setOwnerReplyText('');
-    setChatSessions(chatSync.getAllSessions());
+    setChatSessions([...chatSync.getAllSessions()]);
   };
 
   // GAS Webhook Settings
@@ -816,40 +838,39 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 </div>
 
                 {/* Right Pane: Active Conversation Console (8 Cols) */}
-                <div className={`md:col-span-8 flex flex-col bg-[#FFFDF9] ${!selectedSessionId ? 'hidden md:flex' : 'flex'}`}>
-                  {selectedSessionId ? (
-                    (() => {
-                      const session = chatSessions.find((s) => s.id === selectedSessionId);
-                      const currentMessages = session ? session.messages : [];
+                <div className="md:col-span-8 flex flex-col bg-[#FFFDF9] flex-1">
+                  {(() => {
+                    const session = chatSessions.find((s) => s.id === selectedSessionId) || chatSessions[0];
+                    const currentMessages = session ? session.messages : [];
 
-                      return (
-                        <>
-                          {/* Chat Room Top Bar */}
-                          <div className="p-3.5 px-4 sm:px-5 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2.5">
-                              {/* Mobile Back to List Button */}
-                              <button
-                                onClick={() => setSelectedSessionId(null)}
-                                className="md:hidden px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1"
-                              >
-                                <span>← รายชื่อ</span>
-                              </button>
+                    return (
+                      <>
+                        {/* Chat Room Top Bar */}
+                        <div className="p-3.5 px-4 sm:px-5 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
+                          <div className="flex items-center gap-2.5">
+                            {/* Mobile Back to List Button */}
+                            <button
+                              onClick={() => setSelectedSessionId(null)}
+                              className="md:hidden px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1"
+                            >
+                              <span>← รายชื่อ</span>
+                            </button>
 
-                              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-red-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-xs">
-                                {session?.customerName.substring(0, 2) || 'ลค'}
-                              </div>
-                              <div>
-                                <h4 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
-                                  <span>{session?.customerName || 'ลูกค้า'}</span>
-                                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 text-[9px] font-bold">
-                                    ออนไลน์
-                                  </span>
-                                </h4>
-                                <p className="text-[10px] text-slate-400 font-mono">
-                                  ID: {session?.id}
-                                </p>
-                              </div>
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-red-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-xs">
+                              {session?.customerName.substring(0, 2) || 'ลค'}
                             </div>
+                            <div>
+                              <h4 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
+                                <span>{session?.customerName || 'ลูกค้า (แชทสด)'}</span>
+                                <span className="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-300 text-[9px] font-bold">
+                                  ออนไลน์
+                                </span>
+                              </h4>
+                              <p className="text-[10px] text-slate-400 font-mono">
+                                ID: {session?.id || 'room_main'}
+                              </p>
+                            </div>
+                          </div>
 
                             <button
                               onClick={() => {
@@ -966,14 +987,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                           </div>
                         </>
                       );
-                    })()
-                  ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400 space-y-2">
-                      <MessageSquare className="w-10 h-10 text-slate-300" />
-                      <h4 className="font-bold text-slate-700">เลือกรายการลูกค้าเพื่อเริ่มสนทนาสด</h4>
-                      <p className="text-xs text-slate-400">คลิกที่รายชื่อลูกค้าทางซ้ายมือเพื่อดูข้อความและพิมพ์ตอบกลับ</p>
-                    </div>
-                  )}
+                    })()}
                 </div>
 
               </div>
