@@ -809,24 +809,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                           }`}
                         >
                           <div className="w-9 h-9 rounded-2xl bg-amber-100 border border-amber-300 text-red-700 font-black text-xs flex items-center justify-center shrink-0">
-                            {session.customerName.substring(0, 2) || 'ลค'}
+                            {(session?.customerName || 'ลูกค้า').substring(0, 2)}
                           </div>
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <h4 className="text-xs font-black text-slate-900 truncate">
-                                {session.customerName}
+                                {session?.customerName || 'ลูกค้า'}
                               </h4>
                               <span className="text-[10px] text-slate-400 font-medium">
-                                {session.lastMessageTime}
+                                {session?.lastMessageTime || ''}
                               </span>
                             </div>
                             <p className="text-xs text-slate-500 truncate mt-0.5 font-medium">
-                              {session.lastMessage}
+                              {session?.lastMessage || ''}
                             </p>
                           </div>
 
-                          {session.unreadByOwner > 0 && (
+                          {(session?.unreadByOwner || 0) > 0 && (
                             <span className="w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shrink-0 shadow-xs">
                               {session.unreadByOwner}
                             </span>
@@ -840,8 +840,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 {/* Right Pane: Active Conversation Console (8 Cols) */}
                 <div className="md:col-span-8 flex flex-col bg-[#FFFDF9] flex-1">
                   {(() => {
-                    const session = chatSessions.find((s) => s.id === selectedSessionId) || chatSessions[0];
-                    const currentMessages = session ? session.messages : [];
+                    const session = (chatSessions && chatSessions.find((s) => s.id === selectedSessionId)) || (chatSessions && chatSessions[0]);
+                    const currentMessages = Array.isArray(session?.messages) ? session.messages : [];
 
                     return (
                       <>
@@ -857,7 +857,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                             </button>
 
                             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-red-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-xs">
-                              {session?.customerName.substring(0, 2) || 'ลค'}
+                              {(session?.customerName || 'ลูกค้า').substring(0, 2)}
                             </div>
                             <div>
                               <h4 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
