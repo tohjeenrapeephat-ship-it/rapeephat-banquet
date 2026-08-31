@@ -28,7 +28,8 @@ import {
   Send,
   Radio,
   Sparkles,
-  Crown
+  Crown,
+  Bell
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -52,6 +53,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   });
   const [ownerReplyText, setOwnerReplyText] = useState('');
   const [chatSubView, setChatSubView] = useState<'live_room' | 'leads_table'>('live_room');
+  const [notifPermission, setNotifPermission] = useState<string>(() => {
+    return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
+  });
 
   const [chatLeads, setChatLeads] = useState<any[]>(() => {
     try {
@@ -692,31 +696,53 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 </div>
               </div>
 
-              {/* Sub-view Switcher */}
-              <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 text-xs font-bold">
+              {/* Sub-view Switcher & Notification Toggle */}
+              <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={() => setChatSubView('live_room')}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                    chatSubView === 'live_room'
-                      ? 'bg-red-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                  onClick={async () => {
+                    const res = await chatSync.requestNotificationPermission();
+                    setNotifPermission(res);
+                  }}
+                  className={`px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-2xs ${
+                    notifPermission === 'granted'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300 animate-pulse'
                   }`}
+                  title="แจ้งเตือนเวลาพับหน้าจอหรือเปิดแท็บอื่น"
                 >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>ห้องสนทนาสด ({chatSessions.length})</span>
+                  <Bell className={`w-3.5 h-3.5 ${notifPermission === 'granted' ? 'text-emerald-600' : 'text-amber-600 animate-bounce'}`} />
+                  <span>
+                    {notifPermission === 'granted'
+                      ? 'เปิดแจ้งเตือนพับจอแล้ว 🔔'
+                      : 'กดเปิดแจ้งเตือนเวลาพับจอ 🔔'}
+                  </span>
                 </button>
 
-                <button
-                  onClick={() => setChatSubView('leads_table')}
-                  className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-                    chatSubView === 'leads_table'
-                      ? 'bg-red-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>ลูกค้าฝากเบอร์ ({chatLeads.length})</span>
-                </button>
+                <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 text-xs font-bold">
+                  <button
+                    onClick={() => setChatSubView('live_room')}
+                    className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                      chatSubView === 'live_room'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>ห้องสนทนาสด ({chatSessions.length})</span>
+                  </button>
+
+                  <button
+                    onClick={() => setChatSubView('leads_table')}
+                    className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                      chatSubView === 'leads_table'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>ลูกค้าฝากเบอร์ ({chatLeads.length})</span>
+                  </button>
+                </div>
               </div>
             </div>
 

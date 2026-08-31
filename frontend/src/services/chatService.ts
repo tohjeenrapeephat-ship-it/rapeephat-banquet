@@ -1,4 +1,4 @@
-// Cloud Real-Time Two-Way Chat Sync Engine for โต๊ะจีน รพีพัฒน์ (Always-On 24/7 No Sleep)
+// Cloud Real-Time Two-Way Chat Sync Engine for โต๊ะจีน รพีพัฒน์ (Always-On 24/7 with Desktop & Background Alerts)
 export interface LiveMessage {
   id: string;
   sessionId: string;
@@ -36,6 +36,8 @@ class ChatSyncEngine {
   private keepAliveTimer: any = null;
   private pollingTimer: any = null;
   private processedMsgIds = new Set<string>();
+  private titleFlashInterval: any = null;
+  private defaultTitle = 'โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)';
 
   constructor() {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -48,6 +50,18 @@ class ChatSyncEngine {
     }
 
     if (typeof window !== 'undefined') {
+      if (document.title) this.defaultTitle = document.title;
+
+      // Handle visibility changes to restore tab title
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          this.stopTitleFlashing();
+        }
+      });
+      window.addEventListener('focus', () => {
+        this.stopTitleFlashing();
+      });
+
       this.initCloudListener();
       this.fetchCloudHistory(false);
       this.startAlwaysOnPolling();
@@ -83,7 +97,7 @@ class ChatSyncEngine {
       };
 
       this.eventSourceMessages.onerror = () => {
-        // Handled automatically
+        // Auto-handled
       };
 
       if (this.eventSourceOperator) {
@@ -105,10 +119,10 @@ class ChatSyncEngine {
       };
 
       this.eventSourceOperator.onerror = () => {
-        // Handled automatically
+        // Auto-handled
       };
     } catch (err) {
-      console.warn('Cloud listener warning:', err);
+      console.warn('Cloud listener notice:', err);
     }
   }
 
@@ -144,7 +158,7 @@ class ChatSyncEngine {
     } catch {}
   }
 
-  private handleIncomingCloudMessage(msg: LiveMessage, playAudio = true) {
+  private handleIncomingCloudMessage(msg: LiveMessage, isLiveArrival = true) {
     if (!msg || !msg.id || this.processedMsgIds.has(msg.id)) return;
     this.processedMsgIds.add(msg.id);
 
@@ -177,7 +191,6 @@ class ChatSyncEngine {
       }
     }
 
-    // Sort sessions by latest message first
     sessions.sort((a, b) => b.updatedAt - a.updatedAt);
 
     try {
@@ -185,9 +198,79 @@ class ChatSyncEngine {
     } catch {}
 
     this.notifyListeners({ type: 'NEW_MESSAGE', payload: { message: msg, session } });
-    if (playAudio) {
-      this.playChime(msg.sender === 'owner' ? 'outgoing' : 'incoming');
+
+    // Trigger full background notifications if customer message arrived
+    if (msg.sender === 'customer' && isLiveArrival) {
+      this.triggerBackgroundNotification(msg);
     }
+  }
+
+  public triggerBackgroundNotification(msg: LiveMessage) {
+    if (typeof window === 'undefined') return;
+
+    // 1. Play audible sound chime
+    this.playChime('incoming');
+
+    // 2. Mobile vibration
+    if ('vibrate' in navigator) {
+      try {
+        navigator.vibrate([250, 100, 250]);
+      } catch {}
+    }
+
+    // 3. Desktop Native Notification (when minimized or in background tab)
+    if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+      try {
+        const notif = new Notification('🔔 ลูกค้าทักแชทสด! โต๊ะจีน รพีพัฒน์', {
+          body: `${msg.senderName || 'ลูกค้า'}: "${msg.text}"`,
+          icon: '/images/brand/logo.png',
+          tag: 'rapeephat_chat_alert',
+          silent: false,
+        });
+
+        notif.onclick = () => {
+          window.focus();
+          notif.close();
+        };
+      } catch {}
+    }
+
+    // 4. Flashing Browser Tab Title
+    if (document.hidden) {
+      this.startTitleFlashing(msg.senderName || 'ลูกค้า');
+    }
+  }
+
+  public startTitleFlashing(customerName: string) {
+    if (this.titleFlashInterval) return;
+    let isFlashing = false;
+    this.titleFlashInterval = setInterval(() => {
+      if (!document.hidden) {
+        this.stopTitleFlashing();
+        return;
+      }
+      document.title = isFlashing
+        ? `🔴 (1) ${customerName} ทักแชทมา!`
+        : `💬 มีข้อความใหม่ - โต๊ะจีนรพีพัฒน์`;
+      isFlashing = !isFlashing;
+    }, 900);
+  }
+
+  public stopTitleFlashing() {
+    if (this.titleFlashInterval) {
+      clearInterval(this.titleFlashInterval);
+      this.titleFlashInterval = null;
+    }
+    if (typeof document !== 'undefined') {
+      document.title = this.defaultTitle || 'โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)';
+    }
+  }
+
+  public requestNotificationPermission(): Promise<NotificationPermission | 'unsupported'> {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return Promise.resolve('unsupported');
+    }
+    return Notification.requestPermission();
   }
 
   public subscribe(callback: (event: { type: string; payload: any }) => void) {
@@ -221,11 +304,11 @@ class ChatSyncEngine {
       if (type === 'incoming') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-        osc.frequency.setValueAtTime(880.0, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc.frequency.setValueAtTime(880.0, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
         osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.35);
+        osc.stop(ctx.currentTime + 0.4);
       } else {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440.0, ctx.currentTime);
