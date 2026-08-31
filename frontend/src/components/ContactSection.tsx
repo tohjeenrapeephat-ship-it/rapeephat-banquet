@@ -269,7 +269,7 @@ export const ContactSection: React.FC = () => {
 
               {/* Email Official Card */}
               <a
-                href="mailto:tohjeen.rapeephat@gmail.com"
+                href="mailto:info@rapeephat-catering.com"
                 className="p-5 rounded-3xl bg-white border-2 border-amber-300 hover:border-red-500 flex items-center gap-4 transition-all group shadow-md shadow-amber-900/5 transform hover:-translate-y-0.5"
               >
                 <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-md">
@@ -278,9 +278,9 @@ export const ContactSection: React.FC = () => {
                 <div>
                   <div className="text-xs text-slate-500 font-bold">อีเมลสำหรับติดต่อขอใบเสนอราคา</div>
                   <div className="text-sm sm:text-base font-black text-slate-900 group-hover:text-red-700 transition-colors font-mono">
-                    tohjeen.rapeephat@gmail.com
+                    info@rapeephat-catering.com
                   </div>
-                  <div className="text-[11.5px] text-red-700 font-bold">ส่งรายละเอียดและเอกสารจัดเลี้ยง</div>
+                  <div className="text-[11.5px] text-red-700 font-bold">ส่งตรงเข้ากล่องข้อความเจ้าหน้าที่ทันที</div>
                 </div>
               </a>
 
