@@ -272,10 +272,10 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
             <div className="text-xs">
               <span className="font-bold text-red-700">
-                {isOwnerOnline ? 'คุณแป้ง (เจ้าของร้าน) ออนไลน์อยู่' : 'แชทสดสอบถาม'}
+                {isOwnerOnline ? '👑 คุณแป้ง (เจ้าของร้าน) ออนไลน์อยู่' : '💬 แชทสด โต๊ะจีนรพีพัฒน์'}
               </span>
               {' • '}
-              <span className="text-slate-600 font-medium">พร้อมคุยสดทันทีค่ะ</span>
+              <span className="text-emerald-700 font-extrabold">ออนไลน์ตลอด 24 ชม.</span>
             </div>
           </div>
 
@@ -284,7 +284,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
             onClick={handleOpenChat}
             className="relative w-14 h-14 sm:w-15 sm:h-15 rounded-full bg-gradient-to-tr from-red-700 via-red-600 to-amber-500 text-white shadow-2xl shadow-red-900/40 ring-4 ring-white flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all group"
             aria-label="เปิดแชทสดกับเจ้าหน้าที่"
-            title="คุยแชทสดกับเจ้าหน้าที่โต๊ะจีน รพีพัฒน์"
+            title="คุยแชทสดกับเจ้าหน้าที่โต๊ะจีน รพีพัฒน์ ออนไลน์ตลอด 24 ชม."
           >
             <MessageSquare className="w-7 h-7 text-amber-100 group-hover:scale-110 transition-transform" />
             
@@ -334,12 +334,12 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                     {isOwnerOnline ? 'คุณแป้ง (โต๊ะจีนรพีพัฒน์)' : 'แชทสด โต๊ะจีนรพีพัฒน์'}
                   </h3>
                   <span className="px-1.5 py-0.2 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded text-[9px] font-black uppercase">
-                    {isOwnerOnline ? '👑 เจ้าของร้าน' : 'OFFICIAL'}
+                    {isOwnerOnline ? '👑 เจ้าของร้าน' : '24/7 ONLINE'}
                   </span>
                 </div>
                 <p className="text-[10.5px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {isOwnerOnline ? 'เจ้าของร้านออนไลน์อยู่ พร้อมตอบทันที 🟢' : 'ออนไลน์พร้อมตอบ 24 ชม.'}
+                  {isOwnerOnline ? 'คุณแป้ง (เจ้าของร้าน) ร่วมสนทนาสด 🟢' : 'ออนไลน์ตลอด 24 ชม. (ไม่มีหลับ/พร้อมตอบทันที) 🟢'}
                 </p>
               </div>
             </div>
