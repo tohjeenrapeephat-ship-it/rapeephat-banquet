@@ -85,16 +85,9 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-3 text-xs">
             <a
               href="#admin"
-              className="text-slate-500 hover:text-red-700 font-bold transition-colors flex items-center gap-1"
+              className="text-slate-500 hover:text-red-700 font-bold transition-colors flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-slate-200"
             >
               <span>🔑 เข้าสู่ระบบหลังบ้าน (Admin)</span>
-            </a>
-            <span className="text-slate-300">•</span>
-            <a
-              href="#admin-mini"
-              className="text-slate-500 hover:text-amber-700 font-bold transition-colors"
-            >
-              <span>🪟 แชทมุมจอ (Mini)</span>
             </a>
           </div>
 

@@ -697,45 +697,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 </div>
               </div>
 
-              {/* Sub-view Switcher, Mini Window, & Notification Toggle */}
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Sub-view Switcher & Desktop Notification Toggle */}
+              <div className="flex flex-wrap items-center gap-2.5">
                 
-                {/* Pop-out Mini Window Button */}
-                <button
-                  onClick={() => {
-                    const left = Math.max(10, (window.screen.availWidth || window.screen.width) - 400);
-                    const top = Math.max(10, (window.screen.availHeight || window.screen.height) - 580);
-                    window.open(
-                      `${window.location.origin}/#admin-mini`,
-                      'RapeephatMiniChat',
-                      `width=380,height=540,left=${left},top=${top},status=0,toolbar=0,location=0,menubar=0,resizable=1`
-                    );
-                  }}
-                  className="px-3 py-2 rounded-2xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-black transition-all flex items-center gap-1.5 shadow-md transform hover:scale-105 active:scale-95"
-                  title="เปิดเป็นหน้าต่างจิ๋วแยกไว้ที่มุมขวาล่างของจอคอมพิวเตอร์"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>🪟 เปิดหน้าต่างจิ๋วมุมจอ</span>
-                </button>
-
                 {/* Desktop Notification Toggle */}
                 <button
                   onClick={async () => {
                     const res = await chatSync.requestNotificationPermission();
                     setNotifPermission(res);
                   }}
-                  className={`px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-2xs ${
+                  className={`px-3.5 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 border shadow-sm ${
                     notifPermission === 'granted'
                       ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                      : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300 animate-pulse'
+                      : 'bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-600 hover:to-red-600 text-white border-transparent animate-pulse shadow-md'
                   }`}
-                  title="แจ้งเตือนเวลาพับหน้าจอหรือเปิดแท็บอื่น"
+                  title="แจ้งเตือนป๊อปอัปบนหน้าจอคอมพิวเตอร์เมื่อย่อหน้าจอหรือเปิดแท็บอื่น"
                 >
-                  <Bell className={`w-3.5 h-3.5 ${notifPermission === 'granted' ? 'text-emerald-600' : 'text-amber-600 animate-bounce'}`} />
+                  <Bell className={`w-4 h-4 ${notifPermission === 'granted' ? 'text-emerald-600' : 'text-white animate-bounce'}`} />
                   <span>
                     {notifPermission === 'granted'
-                      ? 'เปิดแจ้งเตือนพับจอแล้ว 🔔'
-                      : 'กดเปิดแจ้งเตือน 🔔'}
+                      ? 'เปิดป๊อปอัปแจ้งเตือนเวลาพับหน้าจอแล้ว 🔔'
+                      : 'กดเปิดป๊อปอัปแจ้งเตือนเวลาพับจอ 🔔'}
                   </span>
                 </button>
 

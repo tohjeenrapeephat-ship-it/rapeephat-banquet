@@ -20,14 +20,13 @@ import { ContactSection } from './components/ContactSection.js';
 import { Footer } from './components/Footer.js';
 import { VisitorFloatingBadge } from './components/VisitorCounter.js';
 import { AdminPortal } from './components/AdminPortal.js';
-import { OwnerMiniChatPortal } from './components/OwnerMiniChatPortal.js';
 import { MobileBottomNav } from './components/MobileBottomNav.js';
 import { LiveChatWidget } from './components/LiveChatWidget.js';
 import { Phone, MessageCircle, ArrowUp } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Navigation & View State: 'site' (Clean Home Page), 'quotation' (Dedicated Page), 'admin' (Admin Portal)
-  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin' | 'admin_mini'>('site');
+  const [currentView, setCurrentView] = useState<'site' | 'quotation' | 'admin'>('site');
   const [selectedPkgForBuilder, setSelectedPkgForBuilder] = useState<PackageTier | undefined>(undefined);
   const [historyOpen, setHistoryOpen] = useState<boolean>(false);
   const [historyCount, setHistoryCount] = useState<number>(0);
@@ -39,18 +38,11 @@ export const App: React.FC = () => {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
       if (
+        hash === '#admin' ||
         hash === '#admin-mini' ||
         hash === '#mini-chat' ||
-        hash === '#admin_mini' ||
-        path.startsWith('/admin-mini') ||
-        path.startsWith('/mini')
-      ) {
-        setCurrentView('admin_mini');
-      } else if (
-        hash === '#admin' ||
         hash === '#backend' ||
         hash === '#portal' ||
-        hash === '#dashboard' ||
         path.startsWith('/admin') ||
         path.startsWith('/backend') ||
         path.startsWith('/portal')
@@ -121,19 +113,7 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 1. If in Mini Corner Admin Chat View
-  if (currentView === 'admin_mini') {
-    return (
-      <OwnerMiniChatPortal
-        onExpandToFullAdmin={() => {
-          setCurrentView('admin');
-          window.location.hash = '#admin';
-        }}
-      />
-    );
-  }
-
-  // 2. If in Full Admin Portal View
+  // 1. If in Full Admin Portal View
   if (currentView === 'admin') {
     return <AdminPortal onBackToSite={handleNavigateToHome} />;
   }
