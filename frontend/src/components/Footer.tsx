@@ -87,30 +87,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
         {/* Live Website Visitor & Traffic Counter Banner (1 Million+ Starting Milestone) */}
         <VisitorStatsSection />
 
-        {/* Copyright & Admin Portal Shortcut */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-600 font-medium border-t border-amber-200">
+        {/* Copyright */}
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium border-t border-amber-200">
           <div>
             © {new Date().getFullYear()} โต๊ะจีน รพีพัฒน์ พรีเมียม (RAPEEPHAT BANQUET CATERING). สงวนลิขสิทธิ์ทุกประการ
           </div>
-          
-          <div className="flex items-center gap-3 text-xs">
-            <a
-              href="#admin"
-              onClick={(e) => {
-                if (onOpenAdmin) {
-                  e.preventDefault();
-                  onOpenAdmin();
-                }
-              }}
-              className="text-slate-700 hover:text-red-700 font-black transition-colors flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-xl border border-slate-300 shadow-2xs cursor-pointer"
-            >
-              <span>🔑 เข้าสู่ระบบหลังบ้าน (Admin)</span>
-            </a>
-          </div>
 
-          <div className="flex items-center gap-1 font-bold text-amber-900">
+          <div className="flex items-center gap-1.5 font-bold text-amber-900">
             <span>บริการด้วยใจเพื่อวันสำคัญของคุณ</span>
-            <Heart className="w-3.5 h-3.5 text-red-600 fill-red-600" />
+            <Heart className="w-4 h-4 text-red-600 fill-red-600" />
           </div>
         </div>
 
