@@ -355,27 +355,27 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                       />
                     </div>
                     <div>
-                      <h1 className="text-xl sm:text-2xl font-black text-red-700 tracking-tight leading-none">
+                      <h1 className="text-xl sm:text-2xl font-black text-red-700 tracking-tight leading-none whitespace-nowrap">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม
                       </h1>
-                      <div className="text-[10px] font-black text-amber-800 uppercase tracking-wider mt-0.5">
+                      <div className="text-[10px] font-black text-amber-800 uppercase tracking-wider mt-0.5 whitespace-nowrap">
                         RAPEEPHAT BANQUET CATERING • ประสบการณ์จัดเลี้ยงภัตตาคาร 35+ ปี
                       </div>
                     </div>
                   </div>
-                  <div className="text-[10px] text-slate-700 pt-0.5 font-medium space-y-0.5" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                  <div className="text-[11px] text-slate-800 pt-1 font-medium space-y-0.5 leading-tight">
                     <div>
-                      <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                      <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                     </div>
                     <div>
-                      <strong className="text-slate-900 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                      <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
-                      <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-red-700 font-mono text-[11px] font-black">081-331-1646</strong> (คุณแป้ง)</span>
-                      <span><strong className="text-slate-900 font-bold">LINE:</strong> pang_baichaa</span>
+                      <span><strong className="text-slate-950 font-bold">โทร:</strong> <strong className="text-red-700 font-mono text-[11.5px] font-black">081-331-1646</strong> (คุณแป้ง)</span>
+                      <span><strong className="text-slate-950 font-bold">LINE:</strong> pang_baichaa</span>
                     </div>
                     <div>
-                      <strong className="text-slate-900 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-800">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <strong className="text-slate-950 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>
