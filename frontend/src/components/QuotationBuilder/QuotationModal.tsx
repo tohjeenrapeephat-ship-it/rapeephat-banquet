@@ -351,7 +351,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                       <img
                         src="/images/brand/logo.png"
                         alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
-                        className="h-12 sm:h-14 w-auto object-contain"
+                        className="h-14 sm:h-16 w-auto object-contain"
                       />
                     </div>
                     <div>

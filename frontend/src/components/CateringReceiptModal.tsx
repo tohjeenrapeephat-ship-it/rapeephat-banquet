@@ -133,8 +133,8 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
               {/* 1. Header Section with Brand Logo & Royal Title */}
               <div className="flex items-center justify-between pb-3 border-b-2 border-emerald-600 gap-4">
                 <div className="flex items-center gap-3.5">
-                  {/* Majestic Brand Logo */}
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
+                  {/* Majestic Brand Logo (20% Larger) */}
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
                     <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
                   </div>
                   <div>
