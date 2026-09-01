@@ -330,18 +330,24 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
           >
             <div
               ref={printRef}
-              className="print-a4-page bg-white text-slate-900 shadow-2xl rounded-xl border border-slate-300 font-sans mx-auto flex flex-col justify-between"
+              className="print-a4-page bg-white text-slate-900 shadow-2xl rounded-2xl border-2 border-red-300 font-sans mx-auto flex flex-col justify-between relative print:m-0 print:p-6 print:border-none print:shadow-none print:w-full print:max-w-none print:h-auto"
               style={{
                 width: '794px',
                 minWidth: '794px',
                 minHeight: '1123px',
-                padding: '20px 24px',
+                padding: '24px 28px',
                 boxSizing: 'border-box',
                 backgroundColor: '#ffffff',
+                fontFamily: "'Sarabun', 'Noto Sans Thai', sans-serif",
               }}
             >
+              {/* Background Watermark */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+                <img src="/images/brand/logo.png" alt="" className="w-[400px] h-[400px] object-contain" />
+              </div>
+
             {/* Top Section Group */}
-            <div className="space-y-2">
+            <div className="space-y-2 relative z-10">
               
               {/* 1. Header: Clean Letterhead */}
               <div className="flex justify-between items-start pb-1.5 border-b-2 border-red-600 gap-3">
@@ -573,7 +579,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
             </div>
 
             {/* Bottom Section Group (Payment Terms + Bank + Signatures) */}
-            <div className="space-y-2 pt-1.5">
+            <div className="space-y-2 pt-1.5 relative z-10">
               
               {/* 5. Payment Terms & Bank Account Details */}
               <div className="grid grid-cols-12 gap-3 p-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
