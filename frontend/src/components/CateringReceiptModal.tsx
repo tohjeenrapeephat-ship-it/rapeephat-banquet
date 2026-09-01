@@ -149,8 +149,11 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                     <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
                       RAPEEPHAT BANQUET CATERING • ใบเสร็จรับเงิน / ใบรับเงินมัดจำจัดเลี้ยง
                     </p>
-                    <p className="text-[10px] text-slate-600 font-semibold pt-0.5">
-                      โทร: <strong className="text-emerald-800 font-black">081-331-1646</strong> (คุณแป้ง) • LINE: <strong>pang_baichaa</strong> • อีเมล: <strong>info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                    <p className="text-[10.5px] text-slate-600 font-semibold pt-0.5">
+                      โทร: <strong className="text-emerald-800 font-black">081-331-1646</strong> (คุณแป้ง) • LINE: <strong>pang_baichaa</strong>
+                    </p>
+                    <p className="text-[10.5px] text-slate-600 font-semibold">
+                      อีเมล: <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </p>
                   </div>
                 </div>

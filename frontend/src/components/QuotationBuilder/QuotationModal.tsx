@@ -363,10 +363,13 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                       </div>
                     </div>
                   </div>
-                  <div className="text-[11px] text-slate-700 pt-0.5 leading-tight font-semibold" style={{ lineHeight: '1.5', overflow: 'visible' }}>
-                    บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร
+                  <div className="text-[11px] text-slate-700 pt-0.5 font-semibold space-y-0.5" style={{ lineHeight: '1.45', overflow: 'visible' }}>
+                    <div>บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร</div>
                     <div>
-                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">081-331-1646</strong> (คุณแป้ง) | <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong> | <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">081-331-1646</strong> (คุณแป้ง) • <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong>
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>
