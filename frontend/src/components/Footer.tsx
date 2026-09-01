@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, MessageCircle, MapPin, Award, Heart, Crown, Mail } from 'lucide-react';
+import { Phone, MessageCircle, MapPin, Award, Heart, Crown, Mail, ShieldCheck } from 'lucide-react';
 import { VisitorStatsSection } from './VisitorCounter.js';
 
 interface FooterProps {
@@ -82,6 +82,30 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             </div>
           </div>
 
+        </div>
+
+        {/* Enterprise Security & PDPA Compliance Assurance Bar */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-amber-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-3 text-slate-800">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-black text-slate-900 flex items-center gap-1.5">
+                <span>มาตรฐานความปลอดภัยระดับองค์กร & นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
+                <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-mono font-bold rounded">SSL 256-BIT</span>
+              </div>
+              <div className="text-[11px] text-slate-600 font-medium">
+                รองรับการจัดซื้อจัดจ้าง ออกใบเสนอราคา สัญญาจ้าง และเอกสารหักภาษี ณ ที่จ่าย (WHT 3%) ถูกต้องตามกฎหมาย 100%
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 text-[11px] font-bold text-slate-600">
+            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">🔒 HTTPS Secured</span>
+            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">📋 นิติบุคคลตรวจสอบได้</span>
+            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">🛡️ PDPA Compliant</span>
+          </div>
         </div>
 
         {/* Live Website Visitor & Traffic Counter Banner (1 Million+ Starting Milestone) */}

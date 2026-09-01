@@ -342,6 +342,47 @@ export const OurClients: React.FC = () => {
           </div>
         </div>
 
+        {/* Enterprise Security & Compliance Trust Bar */}
+        <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white border border-slate-700/80 shadow-lg">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shrink-0 shadow-inner">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="text-sm sm:text-base font-black text-white flex items-center gap-2 justify-center sm:justify-start">
+                  <span>มาตรฐานความปลอดภัยระดับองค์กร & นโยบายคุ้มครองข้อมูล (PDPA)</span>
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-500/30 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-400/40">
+                    GRADE A+
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 font-medium mt-0.5">
+                  ระบบเว็บและเซิร์ฟเวอร์ได้รับการเข้ารหัส 256-bit SSL/TLS มาตรฐานสากล ข้อมูลติดต่อและงบประมาณขององค์กรถูกจัดเก็บเป็นความลับสูงสุด
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto text-[11px] font-bold shrink-0">
+              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
+                <span className="text-emerald-400 font-mono font-black text-xs">256-BIT SSL</span>
+                <span className="text-slate-400 text-[10px]">เข้ารหัสความปลอดภัย</span>
+              </div>
+              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
+                <span className="text-amber-400 font-black text-xs">PDPA 100%</span>
+                <span className="text-slate-400 text-[10px]">คุ้มครองข้อมูลส่วนบุคคล</span>
+              </div>
+              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
+                <span className="text-blue-400 font-black text-xs">WHT 3%</span>
+                <span className="text-slate-400 text-[10px]">เอกสารหักภาษี ณ ที่จ่าย</span>
+              </div>
+              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
+                <span className="text-purple-400 font-black text-xs">B2B READY</span>
+                <span className="text-slate-400 text-[10px]">ระบบจัดซื้อจัดจ้าง</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );
