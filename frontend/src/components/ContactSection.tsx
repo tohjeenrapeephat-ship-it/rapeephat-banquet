@@ -270,21 +270,38 @@ export const ContactSection: React.FC = () => {
               </a>
 
               {/* Email Official Card */}
-              <a
-                href="mailto:info@rapeephat-catering.com"
-                className="p-5 rounded-3xl bg-white border-2 border-amber-300 hover:border-red-500 flex items-center gap-4 transition-all group shadow-md shadow-amber-900/5 transform hover:-translate-y-0.5"
-              >
-                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-md">
-                  <Mail className="w-6 h-6" />
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-300 hover:border-red-500 flex items-start gap-4 transition-all group shadow-md shadow-amber-900/5">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white flex items-center justify-center shrink-0 shadow-md border border-amber-300 mt-1">
+                  <Mail className="w-6 h-6 text-amber-200" />
                 </div>
-                <div>
-                  <div className="text-xs text-slate-500 font-bold">อีเมลสำหรับติดต่อขอใบเสนอราคา</div>
-                  <div className="text-sm sm:text-base font-black text-slate-900 group-hover:text-red-700 transition-colors font-mono">
-                    info@rapeephat-catering.com
+                <div className="space-y-2 flex-1">
+                  <div>
+                    <div className="text-xs sm:text-sm text-slate-700 font-bold">
+                      อีเมลสำหรับติดต่อขอใบเสนอราคา & เอกสาร
+                    </div>
                   </div>
-                  <div className="text-[11.5px] text-red-700 font-bold">ส่งตรงเข้ากล่องข้อความเจ้าหน้าที่ทันที</div>
+
+                  <div className="space-y-1.5 pt-0.5">
+                    <a
+                      href="mailto:info@rapeephat-catering.com"
+                      className="block text-base sm:text-lg font-black text-red-700 hover:text-red-900 transition-colors font-mono tracking-tight bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
+                    >
+                      info@rapeephat-catering.com
+                    </a>
+                    <a
+                      href="mailto:baicha@rapeephat-catering.com"
+                      className="block text-base sm:text-lg font-black text-red-700 hover:text-red-900 transition-colors font-mono tracking-tight bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
+                    >
+                      baicha@rapeephat-catering.com
+                    </a>
+                  </div>
+
+                  <div className="text-xs text-red-700 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>ส่งตรงเข้ากล่องข้อความเจ้าหน้าที่ทันที</span>
+                  </div>
                 </div>
-              </a>
+              </div>
 
               {/* Service Area Card */}
               <div className="p-5 rounded-3xl bg-white border-2 border-amber-200 flex items-center gap-4 shadow-2xs">
