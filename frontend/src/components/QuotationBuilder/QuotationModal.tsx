@@ -363,13 +363,19 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                       </div>
                     </div>
                   </div>
-                  <div className="text-[11px] text-slate-700 pt-0.5 font-semibold space-y-0.5" style={{ lineHeight: '1.45', overflow: 'visible' }}>
-                    <div>บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร</div>
+                  <div className="text-[10px] text-slate-700 pt-0.5 font-medium space-y-0.5" style={{ lineHeight: '1.4', overflow: 'visible' }}>
                     <div>
-                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">081-331-1646</strong> (คุณแป้ง) • <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong>
+                      <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <strong className="text-slate-900 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
+                      <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-red-700 font-mono text-[11px] font-black">081-331-1646</strong> (คุณแป้ง)</span>
+                      <span><strong className="text-slate-900 font-bold">LINE:</strong> pang_baichaa</span>
+                    </div>
+                    <div>
+                      <strong className="text-slate-900 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-800">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>

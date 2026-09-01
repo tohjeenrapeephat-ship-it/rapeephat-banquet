@@ -148,12 +148,21 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                     <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
                       RAPEEPHAT BANQUET CATERING • สัญญาว่าจ้างบริการจัดเลี้ยงระดับภัตตาคาร
                     </p>
-                    <p className="text-[10.5px] text-slate-600 font-semibold pt-0.5">
-                      โทร: <strong className="text-red-700 font-black">081-331-1646</strong> (คุณแป้ง) • LINE: <strong>pang_baichaa</strong>
-                    </p>
-                    <p className="text-[10.5px] text-slate-600 font-semibold">
-                      อีเมล: <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
-                    </p>
+                    <div className="text-[10px] text-slate-700 pt-0.5 space-y-0.5 font-medium leading-tight">
+                      <div>
+                        <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                      </div>
+                      <div>
+                        <strong className="text-slate-900 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
+                        <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-red-700 font-black">081-331-1646</strong> (คุณแป้ง)</span>
+                        <span><strong className="text-slate-900 font-bold">LINE:</strong> pang_baichaa</span>
+                      </div>
+                      <div>
+                        <strong className="text-slate-900 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
