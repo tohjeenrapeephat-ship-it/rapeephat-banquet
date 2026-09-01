@@ -64,9 +64,21 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
                 <a href="mailto:baicha@rapeephat-catering.com" className="hover:text-red-700">baicha@rapeephat-catering.com</a>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="w-3.5 h-3.5 text-amber-700" />
-              <span>บริการจัดเลี้ยงทั่วประเทศไทย 100%</span>
+            <div className="space-y-1.5 pt-1 text-[11px] text-slate-700 font-medium">
+              <div className="flex items-start gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong><br />
+                  50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี
+                </div>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-slate-900 font-bold">ฐานผลิต & โรงครัวกลาง:</strong><br />
+                  72/7 ต.นครปฐม อ.เมือง จ.นครปฐม
+                </div>
+              </div>
             </div>
           </div>
 
