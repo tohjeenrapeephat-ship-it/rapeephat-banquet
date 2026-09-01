@@ -166,11 +166,11 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
           
           {/* Brand Info */}
           <div className="flex items-center gap-2.5">
-            <div className="bg-white p-1 rounded-2xl border border-amber-300 shadow-md flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-center shrink-0">
               <img
                 src="/images/brand/logo.png"
                 alt="โลโก้ โต๊ะจีน รพีพัฒน์"
-                className="h-9 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </div>
             <div>
@@ -347,11 +347,11 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
               <div className="flex justify-between items-start pb-1.5 border-b-2 border-red-600 gap-2">
                 <div className="space-y-0.5 flex-1">
                   <div className="flex items-center gap-2">
-                    <div className="bg-white p-0.5 rounded-lg border border-amber-300 shadow-2xs flex items-center justify-center shrink-0">
+                    <div className="flex items-center justify-center shrink-0">
                       <img
                         src="/images/brand/logo.png"
                         alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
-                        className="h-11 sm:h-12 w-auto object-contain"
+                        className="h-12 sm:h-14 w-auto object-contain"
                       />
                     </div>
                     <div>

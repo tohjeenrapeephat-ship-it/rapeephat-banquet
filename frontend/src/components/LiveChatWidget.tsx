@@ -318,7 +318,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
             
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-10 h-10 rounded-2xl bg-white p-0.5 border border-amber-300 shadow-sm flex items-center justify-center overflow-hidden">
+                <div className="w-11 h-11 flex items-center justify-center">
                   <img
                     src="/images/brand/logo.png"
                     alt="รพีพัฒน์ โต๊ะจีน"

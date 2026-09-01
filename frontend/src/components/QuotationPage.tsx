@@ -41,11 +41,11 @@ export const QuotationPage: React.FC<QuotationPageProps> = ({
             </button>
 
             <a href="#" onClick={(e) => { e.preventDefault(); onBackToHome(); }} className="flex items-center gap-2.5">
-              <div className="bg-white p-1 rounded-2xl border-2 border-amber-300 shadow-2xs">
+              <div className="flex items-center justify-center shrink-0">
                 <img
                   src="/images/brand/logo.png"
                   alt="โต๊ะจีน รพีพัฒน์ RAPEEPHAT"
-                  className="h-10 sm:h-12 w-auto object-contain"
+                  className="h-11 sm:h-13 w-auto object-contain"
                 />
               </div>
               <div className="hidden md:flex flex-col">

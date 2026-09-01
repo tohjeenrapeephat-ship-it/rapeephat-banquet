@@ -17,7 +17,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
           {/* Brand Col */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white p-1 border-2 border-amber-400 shadow-sm flex items-center justify-center shrink-0">
+              <div className="w-13 h-13 flex items-center justify-center shrink-0">
                 <img src="/images/brand/logo.png" alt="โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
               </div>
               <div>

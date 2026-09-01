@@ -43,8 +43,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
         {/* ========================================================================= */}
         {/* 👑 LEFT: OFFICIAL ROYAL BRAND LOGO & TITLE (RED & GOLD LUXURY) */}
         {/* ========================================================================= */}
-        <a href="#" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white p-0.5 border-2 border-amber-400 shadow-sm ring-2 ring-amber-300/30 flex items-center justify-center transform group-hover:scale-105 transition-all overflow-hidden">
+        <a href="#" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+          <div className="w-11 h-11 sm:w-13 sm:h-13 flex items-center justify-center transform group-hover:scale-105 transition-all shrink-0">
             <img
               src="/images/brand/logo.png"
               alt="โต๊ะจีน รพีพัฒน์ RAPEEPHAT"
