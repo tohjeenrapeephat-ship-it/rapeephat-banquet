@@ -346,16 +346,16 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
               {/* 1. Header: Clean Letterhead */}
               <div className="flex justify-between items-start pb-1.5 border-b-2 border-red-600 gap-2">
                 <div className="space-y-0.5 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center shrink-0">
                       <img
                         src="/images/brand/logo.png"
                         alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
-                        className="h-14 sm:h-16 w-auto object-contain"
+                        className="h-18 sm:h-20 w-auto object-contain"
                       />
                     </div>
                     <div>
-                      <h1 className="text-xl sm:text-2xl font-black text-red-700 tracking-tight leading-none">
+                      <h1 className="text-2xl sm:text-[26px] font-black text-red-700 tracking-tight leading-none">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม
                       </h1>
                       <div className="text-[10px] font-black text-amber-800 uppercase tracking-wider mt-0.5">

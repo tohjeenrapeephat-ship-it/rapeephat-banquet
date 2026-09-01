@@ -40,7 +40,7 @@ class ChatSyncEngine {
   private isSyncing = false;
   private processedMsgIds = new Set<string>();
   private titleFlashInterval: any = null;
-  private defaultTitle = 'โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)';
+  private defaultTitle = 'โต๊ะจีน รพีพัฒน์ พรีเมียม';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -321,7 +321,7 @@ class ChatSyncEngine {
       this.titleFlashInterval = null;
     }
     if (typeof document !== 'undefined') {
-      document.title = this.defaultTitle || 'โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)';
+      document.title = this.defaultTitle || 'โต๊ะจีน รพีพัฒน์ พรีเมียม';
     }
   }
 
