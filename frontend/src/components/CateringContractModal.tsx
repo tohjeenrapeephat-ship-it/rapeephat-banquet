@@ -149,7 +149,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                       RAPEEPHAT BANQUET CATERING • สัญญาว่าจ้างบริการจัดเลี้ยงระดับภัตตาคาร
                     </p>
                     <p className="text-[10px] text-slate-600 font-semibold pt-0.5">
-                      โทร: <strong className="text-red-700 font-black">083-087-2257</strong> (คุณแป้ง) • LINE: <strong>pang_baichaa</strong> • อีเมล: <strong>info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      โทร: <strong className="text-red-700 font-black">081-331-1646</strong> (คุณแป้ง) • LINE: <strong>pang_baichaa</strong> • อีเมล: <strong>info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </p>
                   </div>
                 </div>

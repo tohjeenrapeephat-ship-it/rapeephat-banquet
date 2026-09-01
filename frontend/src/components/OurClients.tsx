@@ -326,10 +326,10 @@ export const OurClients: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <a
-              href="tel:0830872257"
+              href="tel:0813311646"
               className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors"
             >
-              โทรสอบถาม 083-087-2257
+              โทรสอบถาม 081-331-1646
             </a>
 
             <a

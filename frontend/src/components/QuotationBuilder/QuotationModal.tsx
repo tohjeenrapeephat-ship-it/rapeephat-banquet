@@ -140,7 +140,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
       `🏦 ข้อมูลการโอนเงิน:\n` +
       `   • ชื่อบัญชี: นางสาวทัศวรรณ จันทร์หอม\n` +
       `   • ธนาคารไทยพาณิชย์: 411-239908-0 (สาขาเซ็นทรัล นครปฐม)\n` +
-      `   • พร้อมเพย์: 083-087-2257\n` +
+      `   • พร้อมเพย์: 081-331-1646\n` +
       (driveUrl ? `📄 ลิงก์ PDF บน Google Drive: ${driveUrl}\n` : '') +
       `ขอบคุณครับ`;
   };
@@ -366,7 +366,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                   <div className="text-[11px] text-slate-700 pt-0.5 leading-tight font-semibold" style={{ lineHeight: '1.5', overflow: 'visible' }}>
                     บริการจัดเลี้ยงโต๊ะจีนระดับภัตตาคาร สด สะอาด อร่อย ทั่วราชอาณาจักร
                     <div>
-                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">083-087-2257</strong> (คุณแป้ง) | <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong> | <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <span className="font-bold text-slate-900">โทร:</span> <strong className="text-red-700 font-mono text-[12px] font-black">081-331-1646</strong> (คุณแป้ง) | <span className="font-bold text-slate-900">LINE:</span> <strong>pang_baichaa</strong> | <span className="font-bold text-slate-900">อีเมล:</span> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>
@@ -687,7 +687,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
         <div className="no-print p-4 sm:p-5 bg-slate-900 text-white border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-slate-300">
             <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="text-xs font-medium">ติดต่อสอบถามข้อมูลเพิ่มเติม โทร <strong className="text-white font-bold">083-087-2257</strong> (คุณแป้ง)</span>
+            <span className="text-xs font-medium">ติดต่อสอบถามข้อมูลเพิ่มเติม โทร <strong className="text-white font-bold">081-331-1646</strong> (คุณแป้ง)</span>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">

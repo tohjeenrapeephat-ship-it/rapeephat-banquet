@@ -238,9 +238,9 @@ export const App: React.FC = () => {
         </a>
 
         <a
-          href="tel:0830872257"
+          href="tel:0813311646"
           className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-red-glow flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all border border-white"
-          title="โทรติดต่อด่วน 083-087-2257"
+          title="โทรติดต่อด่วน 081-331-1646"
         >
           <Phone className="w-5 h-5 animate-bounce" />
         </a>

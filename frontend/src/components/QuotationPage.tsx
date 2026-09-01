@@ -80,11 +80,11 @@ export const QuotationPage: React.FC<QuotationPageProps> = ({
             </button>
 
             <a
-              href="tel:0830872257"
+              href="tel:0813311646"
               className="px-4 py-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 border border-amber-500/40 shadow-xs transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline font-mono">083-087-2257</span>
+              <span className="hidden sm:inline font-mono">081-331-1646</span>
             </a>
           </div>
 
@@ -122,7 +122,7 @@ export const QuotationPage: React.FC<QuotationPageProps> = ({
             <span>โต๊ะจีน รพีพัฒน์ พรีเมียม • บริการจัดเลี้ยงระดับภัตตาคาร 35+ ปี ทั่วราชอาณาจักร</span>
           </div>
           <p className="font-bold text-slate-700">
-            สอบถามรายละเอียดเพิ่มเติม โทร <strong className="text-red-700 font-mono text-sm font-black">083-087-2257</strong> (คุณแป้ง) | LINE: <strong>pang_baichaa</strong>
+            สอบถามรายละเอียดเพิ่มเติม โทร <strong className="text-red-700 font-mono text-sm font-black">081-331-1646</strong> (คุณแป้ง) | LINE: <strong>pang_baichaa</strong>
           </p>
         </div>
       </footer>

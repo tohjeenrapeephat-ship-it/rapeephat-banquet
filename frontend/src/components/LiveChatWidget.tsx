@@ -148,7 +148,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     // 6. Contact / Phone
     if (text.includes('เบอร์') || text.includes('โทร') || text.includes('ติดต่อ') || text.includes('คุณแป้ง') || text.includes('ไลน์')) {
       return {
-        text: 'ช่องทางติดต่อโต๊ะจีน รพีพัฒน์ พรีเมียม:\n\n📞 โทรด่วน: 083-087-2257 (คุณแป้ง)\n💬 LINE: pang_baichaa\n✉️ Email: info@rapeephat-catering.com\n\nหรือจะพิมพ์เบอร์โทรไว้ในแชทนี้ได้เลยนะคะ เจ้าหน้าที่จะโทรกลับทันทีค่ะ 😊',
+        text: 'ช่องทางติดต่อโต๊ะจีน รพีพัฒน์ พรีเมียม:\n\n📞 โทรด่วน: 081-331-1646 (คุณแป้ง)\n💬 LINE: pang_baichaa\n✉️ Email: info@rapeephat-catering.com\n\nหรือจะพิมพ์เบอร์โทรไว้ในแชทนี้ได้เลยนะคะ เจ้าหน้าที่จะโทรกลับทันทีค่ะ 😊',
       };
     }
 

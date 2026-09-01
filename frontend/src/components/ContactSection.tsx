@@ -233,7 +233,7 @@ export const ContactSection: React.FC = () => {
               
               {/* Phone Card */}
               <a
-                href="tel:0830872257"
+                href="tel:0813311646"
                 className="p-5 rounded-3xl bg-white border-2 border-amber-300 hover:border-amber-500 flex items-center gap-4 transition-all group shadow-md shadow-amber-900/5 transform hover:-translate-y-0.5"
               >
                 <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-md border border-amber-300">
@@ -242,7 +242,7 @@ export const ContactSection: React.FC = () => {
                 <div>
                   <div className="text-xs text-amber-900 font-black">โทรศัพท์สายด่วน</div>
                   <div className="text-xl font-black text-slate-900 group-hover:text-red-700 transition-colors font-mono">
-                    083-087-2257
+                    081-331-1646
                   </div>
                   <div className="text-[11.5px] text-red-700 font-black">ติดต่อคุณแป้ง (รับสายตลอดเวลา)</div>
                 </div>

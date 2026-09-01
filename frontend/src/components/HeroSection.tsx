@@ -535,11 +535,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenBuilder }) => {
 
               <div className="flex items-center gap-2.5 shrink-0">
                 <a
-                  href="tel:0830872257"
+                  href="tel:0813311646"
                   className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-all flex items-center gap-2 border border-white/20"
                 >
                   <Phone className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-black">โทร 083-087-2257</span>
+                  <span className="text-sm font-black">โทร 081-331-1646</span>
                 </a>
 
                 <button

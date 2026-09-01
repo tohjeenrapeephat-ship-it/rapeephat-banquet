@@ -1035,7 +1035,7 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                               ทีมหลักลงพื้นที่เรียบร้อย
                             </div>
                             <a
-                              href="tel:0830872257"
+                              href="tel:0813311646"
                               className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1"
                             >
                               <Phone className="w-3 h-3 text-red-600" />
@@ -1168,11 +1168,11 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
 
           <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
             <a
-              href="tel:0830872257"
+              href="tel:0813311646"
               className="px-6 py-3.5 rounded-2xl bg-white hover:bg-amber-50 text-red-700 font-black text-xs sm:text-sm shadow-xl transition-all transform hover:scale-105 flex items-center gap-2 border border-amber-300"
             >
               <Phone className="w-4 h-4 text-red-600" />
-              <span>โทร 083-087-2257</span>
+              <span>โทร 081-331-1646</span>
             </a>
 
             <a

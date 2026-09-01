@@ -132,7 +132,7 @@ const FleetWatermarkBadge: React.FC<{ isLarge?: boolean }> = ({ isLarge = false 
           โต๊ะจีนรพีพัฒน์
         </div>
         <div className="text-[8.5px] font-bold text-slate-200 mt-0.5">
-          © รถบริการจัดเลี้ยงทั่วไทย • โทร 083-087-2257
+          © รถบริการจัดเลี้ยงทั่วไทย • โทร 081-331-1646
         </div>
       </div>
     </div>
@@ -445,11 +445,11 @@ export const FleetLogistics: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full lg:w-auto">
               <a
-                href="tel:0830872257"
+                href="tel:0813311646"
                 className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95"
               >
                 <PhoneCall className="w-4 h-4" />
-                <span>สายด่วนรถบริการ: 083-087-2257</span>
+                <span>สายด่วนรถบริการ: 081-331-1646</span>
               </a>
 
               <a

@@ -114,11 +114,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
 
           {/* Direct Phone Call Button */}
           <a
-            href="tel:0830872257"
+            href="tel:0813311646"
             className="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs flex items-center gap-1.5 border border-amber-500/40 shadow-2xs transition-all whitespace-nowrap"
           >
             <Phone className="w-3.5 h-3.5 animate-bounce text-amber-400" />
-            <span className="text-white">083-087-2257</span>
+            <span className="text-white">081-331-1646</span>
           </a>
 
           {/* Primary Action: Dedicated Quotation Builder Page Button */}
@@ -200,11 +200,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
 
             <div className="grid grid-cols-2 gap-2">
               <a
-                href="tel:0830872257"
+                href="tel:0813311646"
                 className="py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs border border-amber-500/40"
               >
                 <Phone className="w-3.5 h-3.5 text-amber-400" />
-                <span>083-087-2257</span>
+                <span>081-331-1646</span>
               </a>
               <a
                 href="https://line.me/ti/p/~pang_baichaa"

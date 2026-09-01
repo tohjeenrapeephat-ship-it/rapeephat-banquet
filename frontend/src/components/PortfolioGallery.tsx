@@ -1634,7 +1634,7 @@ const WatermarkBadge: React.FC<{ isLarge?: boolean }> = ({ isLarge = false }) =>
           โต๊ะจีน รพีพัฒน์ พรีเมียม
         </div>
         <div className="text-[8.5px] font-bold text-slate-200 mt-0.5">
-          © ผลงานจริง 100% • โทร 083-087-2257
+          © ผลงานจริง 100% • โทร 081-331-1646
         </div>
       </div>
     </div>

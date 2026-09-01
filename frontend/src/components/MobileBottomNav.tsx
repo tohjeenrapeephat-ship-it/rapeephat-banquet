@@ -85,7 +85,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
       {/* 5. Direct Call / โทรด่วน */}
       <a
-        href="tel:0830872257"
+        href="tel:0813311646"
         className="flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-600 hover:text-red-700 font-bold transition-all"
       >
         <div className="p-1 rounded-xl hover:bg-red-50">

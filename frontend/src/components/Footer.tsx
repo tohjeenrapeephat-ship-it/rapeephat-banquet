@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             <div className="text-sm font-black text-slate-900 mb-2">ติดต่อเจ้าหน้าที่</div>
             <div className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-red-600" />
-              <a href="tel:0830872257" className="text-slate-900 hover:text-red-700 font-black font-mono text-sm">083-087-2257 (คุณแป้ง)</a>
+              <a href="tel:0813311646" className="text-slate-900 hover:text-red-700 font-black font-mono text-sm">081-331-1646 (คุณแป้ง)</a>
             </div>
             <div className="flex items-center gap-2">
               <MessageCircle className="w-3.5 h-3.5 text-[#06C755]" />
