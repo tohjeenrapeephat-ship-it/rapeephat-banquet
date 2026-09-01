@@ -120,21 +120,21 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
           {/* Exact Full A4 Printable Sheet (210mm x 297mm Standard) */}
           <div
             ref={printRef}
-            className="print-a4-page bg-white w-full max-w-[794px] min-h-[1123px] p-7 sm:p-9 text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-5 print:border-none print:shadow-none"
+            className="print-a4-page bg-white w-full max-w-[794px] min-h-[1123px] p-6 sm:p-7 text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-5 print:border-none print:shadow-none print:min-h-0"
             style={{ fontFamily: "'Sarabun', 'Noto Sans Thai', sans-serif" }}
           >
             {/* Background Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none select-none">
-              <img src="/images/brand/logo.png" alt="" className="w-[450px] h-[450px] object-contain" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+              <img src="/images/brand/logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
             </div>
 
-            <div className="space-y-3.5 relative z-10 flex-1 flex flex-col justify-between">
+            <div className="space-y-2.5 relative z-10 flex-1 flex flex-col justify-between">
               
-              {/* 1. Header Section with Brand Logo & Royal Title */}
-              <div className="flex items-center justify-between pb-3 border-b-2 border-emerald-600 gap-4">
-                <div className="flex items-center gap-3.5">
-                  {/* Majestic Brand Logo (20% Larger) */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center shrink-0">
+              {/* 1. Header Section with Brand Logo & Royal Title (Top Aligned) */}
+              <div className="flex items-start justify-between pb-2.5 border-b-2 border-emerald-600 gap-3">
+                <div className="flex items-start gap-3">
+                  {/* Majestic Brand Logo (Moved Up to Top) */}
+                  <div className="w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center shrink-0 -mt-1">
                     <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
                   </div>
                   <div>
@@ -142,14 +142,14 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                       <h1 className="text-xl sm:text-2xl font-black text-emerald-900 tracking-tight leading-tight">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)
                       </h1>
-                      <span className="px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full border border-emerald-300 shadow-2xs">
+                      <span className="px-2 py-0.5 text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full border border-emerald-300 shadow-2xs">
                         OFFICIAL RECEIPT
                       </span>
                     </div>
-                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
+                    <p className="text-[10.5px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
                       RAPEEPHAT BANQUET CATERING • ใบเสร็จรับเงิน / ใบรับเงินมัดจำจัดเลี้ยง
                     </p>
-                    <div className="text-[10px] text-slate-700 pt-0.5 space-y-0.5 font-medium leading-tight">
+                    <div className="text-[9.5px] text-slate-700 pt-0.5 space-y-0.5 font-medium leading-tight">
                       <div>
                         <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                       </div>
@@ -157,7 +157,7 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                         <strong className="text-slate-900 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                       </div>
                       <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
-                        <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black">081-331-1646</strong> (คุณแป้ง)</span>
+                        <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black font-mono">081-331-1646</strong> (คุณแป้ง)</span>
                         <span><strong className="text-slate-900 font-bold">LINE:</strong> pang_baichaa</span>
                       </div>
                       <div>
@@ -167,7 +167,7 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                   </div>
                 </div>
 
-                <div className="text-right shrink-0 bg-gradient-to-br from-emerald-50 to-teal-50 p-2.5 px-4 rounded-2xl border-2 border-emerald-200 shadow-2xs">
+                <div className="text-right shrink-0 bg-gradient-to-br from-emerald-50 to-teal-50 p-2 px-3.5 rounded-2xl border-2 border-emerald-200 shadow-2xs -mt-1">
                   <div className="text-xs font-black text-emerald-800 flex items-center justify-end gap-1 uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                     <span>ใบเสร็จรับเงินมัดจำ</span>
