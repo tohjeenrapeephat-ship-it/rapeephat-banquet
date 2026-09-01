@@ -200,29 +200,34 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenBuilder }) => {
           {/* ========================================================================= */}
           <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
             
-            {/* Prominent Official Logo Display with Gold Rim */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <div className="p-2 rounded-3xl bg-white shadow-2xl border-2 border-amber-400 ring-4 ring-amber-300/30 flex items-center justify-center transform hover:scale-105 transition-all shrink-0">
+            {/* Prominent Official Logo Display (Frameless) & Modern Trust Badge */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-5">
+              <div className="flex items-center justify-center transform hover:scale-105 transition-all shrink-0">
                 <img
                   src="/images/brand/logo.png"
                   alt="โต๊ะจีน รพีพัฒน์ RAPEEPHAT"
-                  className="w-28 sm:w-32 h-auto object-contain"
+                  className="w-24 sm:w-28 h-auto object-contain drop-shadow-sm"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border-2 border-amber-300/80 shadow-xs backdrop-blur-md">
-                  <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+              <div className="space-y-2 text-center sm:text-left">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-50 via-white to-amber-50 border border-amber-300 shadow-2xs">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                   </span>
-                  <span className="text-xs font-black text-slate-900 tracking-wide flex items-center gap-1.5">
+                  <span className="text-[11.5px] sm:text-xs font-semibold text-slate-900 tracking-tight flex items-center gap-1.5">
                     <Crown className="w-3.5 h-3.5 text-amber-600" />
                     <span>ประสบการณ์ 35+ ปี • จัดเลี้ยงกว่า 6,500+ งาน</span>
                   </span>
                 </div>
-                <div className="text-xs font-black text-amber-800 tracking-wider">
-                  ★ มาตรฐานภัตตาคารพรีเมียม สด สะอาด ตรงเวลา 100% ★
+
+                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-medium text-amber-900/90 tracking-tight">
+                  <span className="text-amber-500 font-bold">★</span>
+                  <span>มาตรฐานภัตตาคารพรีเมียม</span>
+                  <span className="text-amber-300">•</span>
+                  <span>สด สะอาด ตรงเวลา 100%</span>
+                  <span className="text-amber-500 font-bold">★</span>
                 </div>
               </div>
             </div>

@@ -29,7 +29,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Prompt', 'Kanit', 'sans-serif'],
+        sans: ['"IBM Plex Sans Thai"', '"Plus Jakarta Sans"', 'Prompt', 'sans-serif'],
         serif: ['Noto Serif Thai', 'serif'],
       },
       boxShadow: {
