@@ -131,38 +131,36 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
             <div className="space-y-2.5 relative z-10 flex-1 flex flex-col justify-between">
               
               {/* 1. Header Section with Brand Logo & Royal Title (Top Aligned) */}
-              <div className="flex items-start justify-between pb-2.5 border-b-2 border-emerald-600 gap-3">
-                <div className="flex items-start gap-3">
-                  {/* Majestic Brand Logo (Moved Up to Top) */}
-                  <div className="w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center shrink-0 -mt-1">
-                    <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-xl sm:text-2xl font-black text-emerald-900 tracking-tight leading-tight">
-                        โต๊ะจีน รพีพัฒน์ พรีเมียม (นครปฐม)
-                      </h1>
-                      <span className="px-2 py-0.5 text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full border border-emerald-300 shadow-2xs">
-                        OFFICIAL RECEIPT
-                      </span>
+              <div className="flex items-start justify-between pb-2 border-b-2 border-emerald-600 gap-3">
+                <div className="space-y-1 flex-1 min-w-0">
+                  <div className="flex items-center gap-3">
+                    {/* Brand Logo */}
+                    <div className="flex items-center justify-center shrink-0">
+                      <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="h-16 sm:h-18 w-auto object-contain" />
                     </div>
-                    <p className="text-[10.5px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
-                      RAPEEPHAT BANQUET CATERING • ใบเสร็จรับเงิน / ใบรับเงินมัดจำจัดเลี้ยง
-                    </p>
-                    <div className="text-[9.5px] text-slate-700 pt-0.5 space-y-0.5 font-medium leading-tight">
-                      <div>
-                        <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                    <div>
+                      <h1 className="text-2xl sm:text-[26px] font-black text-emerald-900 tracking-tight leading-none">
+                        โต๊ะจีน รพีพัฒน์ พรีเมียม
+                      </h1>
+                      <div className="text-[11px] sm:text-xs font-black text-amber-800 uppercase tracking-wide mt-1">
+                        RAPEEPHAT BANQUET CATERING • ประสบการณ์จัดเลี้ยงภัตตาคาร 35+ ปี
                       </div>
-                      <div>
-                        <strong className="text-slate-900 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
-                        <span><strong className="text-slate-900 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black font-mono">081-331-1646</strong> (คุณแป้ง)</span>
-                        <span><strong className="text-slate-900 font-bold">LINE:</strong> pang_baichaa</span>
-                      </div>
-                      <div>
-                        <strong className="text-slate-900 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
-                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-[11px] text-slate-800 pt-0.5 space-y-0.5 font-medium leading-snug">
+                    <div>
+                      <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                    </div>
+                    <div>
+                      <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 pt-0.5">
+                      <span><strong className="text-slate-950 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black font-mono text-[12px]">081-331-1646</strong> (คุณแป้ง)</span>
+                      <span><strong className="text-slate-950 font-bold">LINE:</strong> pang_baichaa</span>
+                    </div>
+                    <div>
+                      <strong className="text-slate-950 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                     </div>
                   </div>
                 </div>
