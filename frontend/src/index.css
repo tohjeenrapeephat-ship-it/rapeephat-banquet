@@ -5,6 +5,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-size: 17.5px; /* Enhanced font readability for senior hosts & customers */
   }
   body {
     background-color: #FFFDF9;
@@ -13,6 +14,8 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: "IBM Plex Sans Thai", "Plus Jakarta Sans", Prompt, -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.65;
   }
 }
 

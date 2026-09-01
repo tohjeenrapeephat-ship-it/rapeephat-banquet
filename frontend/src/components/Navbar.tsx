@@ -56,12 +56,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
               <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-none">
                 โต๊ะจีน<span className="text-red-700 ml-0.5 font-black">รพีพัฒน์</span>
               </span>
-              <span className="px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 text-white rounded-full shadow-xs border border-amber-300">
+              <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 text-white rounded-full shadow-xs border border-amber-300">
                 PREMIUM
               </span>
             </div>
-            <span className="text-[10.5px] text-amber-800 font-bold tracking-wide flex items-center gap-1 mt-0.5">
-              <Crown className="w-3 h-3 text-amber-600 inline shrink-0" /> จัดเลี้ยงภัตตาคาร 35+ ปี ทั่วไทย
+            <span className="text-xs text-amber-900 font-bold tracking-tight flex items-center gap-1 mt-0.5">
+              <Crown className="w-3.5 h-3.5 text-amber-600 inline shrink-0" /> จัดเลี้ยงภัตตาคาร 35+ ปี ทั่วไทย
             </span>
           </div>
         </a>
@@ -69,12 +69,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
         {/* ========================================================================= */}
         {/* 🧭 CENTER: MODERN PILL NAVIGATION BAR */}
         {/* ========================================================================= */}
-        <div className="hidden lg:flex items-center gap-0.5 bg-amber-50/70 p-1 rounded-2xl border border-amber-200/80 shadow-2xs">
+        <div className="hidden lg:flex items-center gap-1 bg-amber-50/70 p-1.5 rounded-2xl border border-amber-200/80 shadow-2xs">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="px-2.5 xl:px-3 py-1.5 rounded-xl text-[12px] font-bold text-slate-800 hover:text-red-700 hover:bg-white hover:shadow-xs transition-all whitespace-nowrap"
+              className="px-3 xl:px-3.5 py-1.5 rounded-xl text-xs xl:text-sm font-bold text-slate-800 hover:text-red-700 hover:bg-white hover:shadow-xs transition-all whitespace-nowrap"
             >
               {link.label}
             </a>
