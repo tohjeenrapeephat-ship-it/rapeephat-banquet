@@ -120,54 +120,54 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
           {/* Exact Full A4 Printable Sheet (210mm x 297mm Standard) */}
           <div
             ref={printRef}
-            className="print-a4-page bg-white w-full max-w-[794px] min-h-[1123px] p-6 sm:p-7 text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-5 print:border-none print:shadow-none print:min-h-0"
+            className="print-a4-page bg-white w-full max-w-[760px] p-6 sm:p-8 text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-6 print:border-none print:shadow-none print:w-full print:max-w-none print:h-auto"
             style={{ fontFamily: "'Sarabun', 'Noto Sans Thai', sans-serif" }}
           >
             {/* Background Watermark */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-              <img src="/images/brand/logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
+              <img src="/images/brand/logo.png" alt="" className="w-[400px] h-[400px] object-contain" />
             </div>
 
             <div className="space-y-2.5 relative z-10 flex-1 flex flex-col justify-between">
               
               {/* 1. Header Section with Brand Logo & Royal Title (Top Aligned) */}
-              <div className="flex items-start justify-between pb-2 border-b-2 border-emerald-600 gap-2">
-                <div className="flex items-start gap-2.5 sm:gap-3 -ml-1">
-                  {/* Brand Logo (Shifted Left) */}
-                  <div className="w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center shrink-0 -mt-1">
+              <div className="flex items-start justify-between pb-2 border-b-2 border-emerald-600 gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  {/* Brand Logo */}
+                  <div className="w-16 h-16 sm:w-18 sm:h-18 flex items-center justify-center shrink-0">
                     <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h1 className="text-xl sm:text-2xl font-black text-emerald-900 tracking-tight leading-none whitespace-nowrap">
+                      <h1 className="text-lg sm:text-xl font-black text-emerald-900 tracking-tight leading-none">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม
                       </h1>
-                      <span className="px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full border border-emerald-300 shadow-2xs whitespace-nowrap">
+                      <span className="px-2 py-0.5 text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full border border-emerald-300 shadow-2xs">
                         RECEIPT
                       </span>
                     </div>
-                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide mt-0.5 whitespace-nowrap">
+                    <p className="text-[10px] font-black text-amber-800 uppercase tracking-wide mt-0.5">
                       RAPEEPHAT BANQUET CATERING • ใบเสร็จรับเงิน / ใบรับเงินมัดจำจัดเลี้ยง
                     </p>
-                    <div className="text-xs sm:text-[12px] text-slate-800 pt-1 space-y-0.5 font-medium leading-snug">
-                      <div className="whitespace-nowrap">
-                        <strong className="text-slate-950 font-black">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                    <div className="text-[11px] text-slate-800 pt-0.5 space-y-0.5 font-medium leading-snug">
+                      <div>
+                        <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                       </div>
-                      <div className="whitespace-nowrap">
-                        <strong className="text-slate-950 font-black">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                      <div>
+                        <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5 whitespace-nowrap">
-                        <span><strong className="text-slate-950 font-black">โทร:</strong> <strong className="text-emerald-800 font-black font-mono text-[12.5px]">081-331-1646</strong> (คุณแป้ง)</span>
-                        <span><strong className="text-slate-950 font-black">LINE:</strong> pang_baichaa</span>
+                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
+                        <span><strong className="text-slate-950 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black font-mono text-[11.5px]">081-331-1646</strong> (คุณแป้ง)</span>
+                        <span><strong className="text-slate-950 font-bold">LINE:</strong> pang_baichaa</span>
                       </div>
-                      <div className="whitespace-nowrap">
-                        <strong className="text-slate-950 font-black">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <div>
+                        <strong className="text-slate-950 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="text-right shrink-0 bg-gradient-to-br from-emerald-50 to-teal-50 p-1.5 px-3 rounded-2xl border-2 border-emerald-200 shadow-2xs -mt-1 min-w-[140px]">
+                <div className="text-right shrink-0 bg-gradient-to-br from-emerald-50 to-teal-50 p-2 px-3 rounded-2xl border-2 border-emerald-200 shadow-2xs">
                   <div className="text-[11px] font-black text-emerald-800 flex items-center justify-end gap-1 uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                     <span>ใบเสร็จรับเงินมัดจำ</span>
