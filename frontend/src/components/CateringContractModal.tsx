@@ -130,9 +130,9 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
             <div className="space-y-2.5 relative z-10 flex-1 flex flex-col justify-between">
               
               {/* 1. Header Section with Brand Logo & Royal Title (Aligned to Top) */}
-              <div className="flex items-start justify-between pb-2.5 border-b-2 border-red-600 gap-3">
-                <div className="flex items-start gap-3.5">
-                  {/* Brand Logo */}
+              <div className="flex items-start justify-between pb-2 border-b-2 border-red-600 gap-2">
+                <div className="flex items-start gap-2.5 sm:gap-3 -ml-1">
+                  {/* Brand Logo (Shifted Left) */}
                   <div className="w-18 h-18 sm:w-20 sm:h-20 flex items-center justify-center shrink-0 -mt-1">
                     <img src="/images/brand/logo.png" alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์" className="w-full h-full object-contain" />
                   </div>
@@ -141,34 +141,34 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                       <h1 className="text-xl sm:text-2xl font-black text-red-700 tracking-tight leading-none whitespace-nowrap">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม
                       </h1>
-                      <span className="px-2 py-0.5 text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-full border border-amber-300 shadow-2xs whitespace-nowrap">
+                      <span className="px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-full border border-amber-300 shadow-2xs whitespace-nowrap">
                         35 YEARS
                       </span>
                     </div>
-                    <p className="text-[10.5px] font-black text-amber-800 uppercase tracking-wide mt-0.5 whitespace-nowrap">
+                    <p className="text-[11px] font-black text-amber-800 uppercase tracking-wide mt-0.5 whitespace-nowrap">
                       RAPEEPHAT BANQUET CATERING • สัญญาว่าจ้างบริการจัดเลี้ยงระดับภัตตาคาร
                     </p>
-                    <div className="text-[11px] text-slate-800 pt-1 space-y-0.5 font-medium leading-tight">
-                      <div>
-                        <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                    <div className="text-xs sm:text-[12px] text-slate-800 pt-1 space-y-0.5 font-medium leading-snug">
+                      <div className="whitespace-nowrap">
+                        <strong className="text-slate-950 font-black">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                       </div>
-                      <div>
-                        <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                      <div className="whitespace-nowrap">
+                        <strong className="text-slate-950 font-black">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5">
-                        <span><strong className="text-slate-950 font-bold">โทร:</strong> <strong className="text-red-700 font-black font-mono text-[11.5px]">081-331-1646</strong> (คุณแป้ง)</span>
-                        <span><strong className="text-slate-950 font-bold">LINE:</strong> pang_baichaa</span>
+                      <div className="flex flex-wrap items-center gap-x-3 pt-0.5 whitespace-nowrap">
+                        <span><strong className="text-slate-950 font-black">โทร:</strong> <strong className="text-red-700 font-black font-mono text-[12.5px]">081-331-1646</strong> (คุณแป้ง)</span>
+                        <span><strong className="text-slate-950 font-black">LINE:</strong> pang_baichaa</span>
                       </div>
-                      <div>
-                        <strong className="text-slate-950 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <div className="whitespace-nowrap">
+                        <strong className="text-slate-950 font-black">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Contract No & Date Badge (Moved Up to Top) */}
-                <div className="text-right shrink-0 bg-gradient-to-br from-red-50 to-amber-50 p-2 px-3.5 rounded-2xl border-2 border-red-200 shadow-2xs -mt-1">
-                  <div className="text-xs font-black text-red-700 flex items-center justify-end gap-1 uppercase tracking-wider">
+                {/* Contract No & Date Badge (Moved Up to Top & Compact) */}
+                <div className="text-right shrink-0 bg-gradient-to-br from-red-50 to-amber-50 p-1.5 px-3 rounded-2xl border-2 border-red-200 shadow-2xs -mt-1 min-w-[140px]">
+                  <div className="text-[11px] font-black text-red-700 flex items-center justify-end gap-1 uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                     <span>สัญญาจ้างจัดเลี้ยง</span>
                   </div>
