@@ -12,7 +12,8 @@ export interface BlockedDateEntry {
   date: string; // "YYYY-MM-DD"
   tableCount?: number | string; // e.g. 80, 120, "120 โต๊ะ"
   note: string;
-  reason: "fully_booked" | "maintenance" | "holiday" | "custom";
+  reason: "fully_booked" | "available_capacity" | "maintenance" | "holiday" | "custom";
+  statusType?: "fully_booked" | "available_capacity"; // "fully_booked" = คิวเต็ม, "available_capacity" = งานไม่เต็ม รับได้ตามจำนวนที่ระบุ
   createdAt: number;
 }
 
@@ -48,7 +49,7 @@ const DEFAULT_BOOKING_POLICY: BookingPolicy = {
   updatedAt: Date.now(),
 };
 
-// Default initial blocked dates (high season auspicious dates)
+// Default initial blocked dates
 const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
   {
     id: "blk-2026-03-01",
@@ -56,6 +57,7 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 60,
     note: "งานฉลองมงคลสมรสหอประชุมใหญ่ (รับเต็ม 60 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000 * 10,
   },
   {
@@ -64,7 +66,17 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 25,
     note: "งานทำบุญขึ้นบ้านใหม่ ม.ภัสสร (รับเต็ม 25 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000 * 8,
+  },
+  {
+    id: "blk-2026-03-10",
+    date: "2026-03-10",
+    tableCount: 40,
+    note: "คิวงานยังไม่เต็ม ยังเปิดรับจัดเลี้ยงได้ตามจำนวน 40 โต๊ะค่ะ",
+    reason: "available_capacity",
+    statusType: "available_capacity",
+    createdAt: Date.now() - 86400000 * 6,
   },
   {
     id: "blk-2026-03-14",
@@ -72,6 +84,7 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 50,
     note: "งานอุปสมบทมงคล ลานโดมวัดใหญ่ (รับเต็ม 50 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000 * 5,
   },
   {
@@ -80,7 +93,17 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 100,
     note: "งานเลี้ยงสังสรรค์สมาคมศิษย์เก่า (รับเต็ม 100 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000 * 3,
+  },
+  {
+    id: "blk-2026-03-25",
+    date: "2026-03-25",
+    tableCount: 60,
+    note: "งานไม่เต็มค่ะ พร้อมเปิดรับจัดเลี้ยงได้ตามจำนวน 60 โต๊ะ",
+    reason: "available_capacity",
+    statusType: "available_capacity",
+    createdAt: Date.now() - 86400000 * 2,
   },
   {
     id: "blk-2026-03-28",
@@ -88,6 +111,7 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 120,
     note: "งานแต่งงานระดับ VIP แกรนด์บอลรูม (รับเต็ม 120 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000 * 2,
   },
   {
@@ -96,6 +120,7 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 50,
     note: "งานทำบุญรวมญาติสงกรานต์ (รับเต็ม 50 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000,
   },
   {
@@ -104,6 +129,7 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
     tableCount: 80,
     note: "งานมงคลสมรสช่วงเทศกาล (รับเต็ม 80 โต๊ะ)",
     reason: "fully_booked",
+    statusType: "fully_booked",
     createdAt: Date.now() - 86400000,
   },
 ];
@@ -160,7 +186,7 @@ export const QueueService = {
     }
   },
 
-  // Get list of all blocked dates
+  // Get list of all blocked / managed dates
   getBlockedDates(): BlockedDateEntry[] {
     try {
       const stored = localStorage.getItem(BLOCKED_DATES_KEY);
@@ -188,14 +214,18 @@ export const QueueService = {
     date: string,
     note?: string,
     reason: BlockedDateEntry["reason"] = "fully_booked",
-    tableCount?: number | string
+    tableCount?: number | string,
+    statusType?: "fully_booked" | "available_capacity"
   ): BlockedDateEntry {
     const list = this.getBlockedDates();
     const cleanDate = date.split("T")[0];
+    const resolvedStatus = statusType || (reason === "available_capacity" ? "available_capacity" : "fully_booked");
+
     const existing = list.find((item) => item.date === cleanDate);
     if (existing) {
-      existing.note = note || "คิวงานเต็มทุกช่วงเวลา";
+      existing.note = note || (resolvedStatus === "available_capacity" ? `คิวงานไม่เต็มค่ะ (รับได้ตามจำนวน ${tableCount || 50} โต๊ะ)` : "คิวงานเต็มทุกช่วงเวลา");
       existing.reason = reason;
+      existing.statusType = resolvedStatus;
       if (tableCount !== undefined && tableCount !== "") {
         existing.tableCount = tableCount;
       }
@@ -207,8 +237,9 @@ export const QueueService = {
       id: `blk-${cleanDate}-${Date.now()}`,
       date: cleanDate,
       tableCount: tableCount !== undefined && tableCount !== "" ? tableCount : undefined,
-      note: note || "คิวงานเต็มทุกช่วงเวลา (งดรับจอง)",
+      note: note || (resolvedStatus === "available_capacity" ? `คิวงานไม่เต็มค่ะ (รับได้ตามจำนวน ${tableCount || 50} โต๊ะ)` : "คิวงานเต็มทุกช่วงเวลา (งดรับจอง)"),
       reason,
+      statusType: resolvedStatus,
       createdAt: Date.now(),
     };
 
@@ -224,9 +255,11 @@ export const QueueService = {
     this.saveBlockedDates(filtered);
   },
 
-  // Check if a specific date is full or blocked
+  // Check if a specific date is full, available with capacity, or open
   isDateBlocked(dateStr: string): {
     isBlocked: boolean;
+    isAvailableCapacity?: boolean;
+    availableTables?: number | string;
     note?: string;
     reason?: string;
     isPaidBooking?: boolean;
@@ -235,15 +268,27 @@ export const QueueService = {
     if (!dateStr) return { isBlocked: false };
     const cleanDate = dateStr.split("T")[0];
 
-    // 1. Check manually blocked dates
+    // 1. Check manually managed dates
     const blockedList = this.getBlockedDates();
-    const foundBlocked = blockedList.find((b) => b.date === cleanDate);
-    if (foundBlocked) {
+    const found = blockedList.find((b) => b.date === cleanDate);
+    if (found) {
+      if (found.statusType === "available_capacity" || found.reason === "available_capacity") {
+        return {
+          isBlocked: false,
+          isAvailableCapacity: true,
+          availableTables: found.tableCount,
+          tableCount: found.tableCount,
+          note: found.note || `คิวงานไม่เต็มค่ะ พร้อมเปิดรับจัดเลี้ยงได้ตามจำนวน ${found.tableCount || 50} โต๊ะ`,
+          reason: "available_capacity",
+        };
+      }
+
       return {
         isBlocked: true,
-        note: foundBlocked.note,
-        reason: foundBlocked.reason,
-        tableCount: foundBlocked.tableCount,
+        isAvailableCapacity: false,
+        note: found.note,
+        reason: found.reason,
+        tableCount: found.tableCount,
         isPaidBooking: false,
       };
     }
@@ -262,7 +307,8 @@ export const QueueService = {
           const totalT = paidQuote.tableCount + (paidQuote.freeTableCount || 0);
           return {
             isBlocked: true,
-            note: `คิวงานเต็ม ยืนยันแล้ว (${paidQuote.customer.eventType || "งานจัดเลี้ยง"} ${totalT} โต๊ะ)`,
+            isAvailableCapacity: false,
+            note: `คิวงานเต็ม ยืนยันแล้วค่ะ (${paidQuote.customer.eventType || "งานจัดเลี้ยง"} ${totalT} โต๊ะ)`,
             reason: "fully_booked",
             tableCount: totalT,
             isPaidBooking: true,
@@ -358,12 +404,12 @@ export const QueueService = {
       });
     });
 
-    // 2. Add manual Blocked Dates that don't already have quotation events
-    blockedDates.forEach((blocked) => {
-      const alreadyHas = events.some((e) => e.fullDate === blocked.date);
+    // 2. Add manual Managed Dates that don't already have quotation events
+    blockedDates.forEach((managed) => {
+      const alreadyHas = events.some((e) => e.fullDate === managed.date);
       if (alreadyHas) return;
 
-      const d = new Date(blocked.date);
+      const d = new Date(managed.date);
       if (isNaN(d.getTime())) return;
 
       const m = d.getMonth();
@@ -376,26 +422,49 @@ export const QueueService = {
       const monthsThai = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       const monthLabel = `${monthsThai[m]} ${d.getFullYear() + 543}`;
 
-      const formattedTables = blocked.tableCount ? `รับบริการเต็ม ${blocked.tableCount} โต๊ะ` : "เต็มทุกช่วงเวลา";
+      const isAvailable = managed.statusType === "available_capacity" || managed.reason === "available_capacity";
 
-      events.push({
-        id: blocked.id,
-        dateStr: formatThaiDateShort(blocked.date),
-        fullDate: blocked.date,
-        dayOfWeek: getDayOfWeekThai(blocked.date),
-        monthKey,
-        monthLabel,
-        ceremonyType: "wedding",
-        ceremonyName: "คิวงานจัดเลี้ยงเต็ม 🔒",
-        hostName: "ล็อกคิวจัดเลี้ยงเรียบร้อย",
-        tableCount: formattedTables,
-        location: blocked.note || "งดรับจองในวันดังกล่าว",
-        province: "กทม. & ปริมณฑล / ต่างจังหวัด",
-        status: "confirmed",
-        statusText: blocked.tableCount ? `คิวเต็ม (${blocked.tableCount} โต๊ะ) 🔴` : "คิวเต็ม ปิดรับจอง 🔴",
-        statusBadgeClass: "bg-red-100 text-red-800 border-red-300 font-black",
-        availableSlotsRemaining: 0,
-      });
+      if (isAvailable) {
+        events.push({
+          id: managed.id,
+          dateStr: formatThaiDateShort(managed.date),
+          fullDate: managed.date,
+          dayOfWeek: getDayOfWeekThai(managed.date),
+          monthKey,
+          monthLabel,
+          ceremonyType: "available",
+          ceremonyName: "คิวงานไม่เต็ม เปิดรับจอง 🟢",
+          hostName: managed.tableCount ? `พร้อมรับจัดเลี้ยง ${managed.tableCount} โต๊ะ` : "คิวว่างพร้อมบริการ",
+          tableCount: managed.tableCount ? `รับได้ตามจำนวน ${managed.tableCount} โต๊ะ` : "รับได้ตามจำนวนที่ต้องการ",
+          location: managed.note || "ทีมครัวและเชฟพร้อมบริการหน้างาน",
+          province: "กทม. & ปริมณฑล / ทั่วประเทศ",
+          status: "available",
+          statusText: managed.tableCount ? `งานไม่เต็ม (รับได้ ${managed.tableCount} โต๊ะ) 🟢` : "คิวว่างพร้อมบริการ 🟢",
+          statusBadgeClass: "bg-emerald-100 text-emerald-900 border-emerald-400 font-black",
+          availableSlotsRemaining: 1,
+        });
+      } else {
+        const formattedTables = managed.tableCount ? `รับบริการเต็ม ${managed.tableCount} โต๊ะ` : "เต็มทุกช่วงเวลา";
+
+        events.push({
+          id: managed.id,
+          dateStr: formatThaiDateShort(managed.date),
+          fullDate: managed.date,
+          dayOfWeek: getDayOfWeekThai(managed.date),
+          monthKey,
+          monthLabel,
+          ceremonyType: "wedding",
+          ceremonyName: "คิวงานจัดเลี้ยงเต็ม 🔒",
+          hostName: "ล็อกคิวจัดเลี้ยงเรียบร้อย",
+          tableCount: formattedTables,
+          location: managed.note || "งดรับจองในวันดังกล่าว",
+          province: "กทม. & ปริมณฑล / ต่างจังหวัด",
+          status: "confirmed",
+          statusText: managed.tableCount ? `คิวเต็ม (${managed.tableCount} โต๊ะ) 🔴` : "คิวเต็ม ปิดรับจอง 🔴",
+          statusBadgeClass: "bg-red-100 text-red-800 border-red-300 font-black",
+          availableSlotsRemaining: 0,
+        });
+      }
     });
 
     // Sort chronologically

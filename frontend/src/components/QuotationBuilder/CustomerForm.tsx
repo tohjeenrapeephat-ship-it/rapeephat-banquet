@@ -277,6 +277,40 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
 
       </div>
 
+      {/* Date Available Capacity Banner (งานไม่เต็ม รับได้ตามจำนวน) */}
+      {blockedCheck.isAvailableCapacity && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-emerald-50 border-2 border-emerald-400 shadow-md space-y-3 animate-fadeIn text-slate-900">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase">
+                  คิวงานไม่เต็ม 🟢
+                </span>
+                <span className="text-xs sm:text-sm font-black text-emerald-950">
+                  ยินดีต้อนรับค่ะ! วันที่ {formatThaiDateShort(formData.eventDate || '')} คิวงานยังไม่เต็ม พร้อมรับจัดเลี้ยงได้ตามจำนวนที่ระบุค่ะ
+                </span>
+                {blockedCheck.availableTables && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-950 text-[10.5px] font-black border border-amber-300">
+                    🎪 รับได้ {blockedCheck.availableTables} โต๊ะ
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                ทีมเชฟและขบวนรถครัวสัญจรพร้อมบริการปรุงอาหารสุกร้อนสดๆ หน้างานอย่างเต็มที่ค่ะ ท่านสามารถระบุเมนูอาหารและออกใบเสนอราคาเพื่อล็อกคิวงานได้ทันทีนะคะ
+              </p>
+              {blockedCheck.note && (
+                <div className="text-xs font-bold text-emerald-900">
+                  • {blockedCheck.note}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Blocked Date Alert Notice */}
       {blockedCheck.isBlocked && (
         <div className="p-4 sm:p-5 rounded-3xl bg-red-50 border-2 border-red-400 shadow-md space-y-3 animate-fadeIn text-slate-900">

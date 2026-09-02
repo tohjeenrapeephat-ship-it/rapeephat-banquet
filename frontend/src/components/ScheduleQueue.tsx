@@ -608,6 +608,11 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
       return;
     }
 
+    if (blockedCheck.isAvailableCapacity) {
+      setSearchResult(`🟢 ข่าวดีค่ะ! วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังไม่เต็ม พร้อมเปิดรับจองจัดเลี้ยงได้ตามจำนวน ${blockedCheck.availableTables || 50} โต๊ะค่ะ (สามารถออกใบเสนอราคาและล็อกคิวได้ทันทีนะคะ)`);
+      return;
+    }
+
     const found = allQueueEvents.find((q) => q.fullDate === searchDate);
     if (found) {
       if (found.status === 'available') {

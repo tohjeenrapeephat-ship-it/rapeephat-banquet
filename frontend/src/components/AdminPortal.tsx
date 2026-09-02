@@ -68,6 +68,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [policyReason, setPolicyReason] = useState<string>(() => QueueService.getBookingPolicy().closedReason || '');
   const [blockedDates, setBlockedDates] = useState<BlockedDateEntry[]>(() => QueueService.getBlockedDates());
   const [newBlockedDate, setNewBlockedDate] = useState('');
+  const [newBlockedStatusType, setNewBlockedStatusType] = useState<'fully_booked' | 'available_capacity'>('fully_booked');
   const [newBlockedTableCount, setNewBlockedTableCount] = useState<string>('80');
   const [newBlockedNote, setNewBlockedNote] = useState('');
   const [newBlockedReason, setNewBlockedReason] = useState<BlockedDateEntry['reason']>('fully_booked');
@@ -419,21 +420,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const handleAddBlockedDate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBlockedDate) {
-      alert('กรุณาเลือกวันที่ต้องการระบุว่าคิวเต็มค่ะ');
+      alert('กรุณาเลือกวันที่ต้องการระบุค่ะ');
       return;
     }
     const tableNum = newBlockedTableCount ? parseInt(newBlockedTableCount) : undefined;
-    const defaultNote = tableNum ? `คิวงานเต็ม (รับจัดเลี้ยง ${tableNum} โต๊ะ เต็มกำลัง)` : 'คิวงานเต็มทุกช่วงเวลา (งดรับจอง)';
+    const defaultNote = newBlockedStatusType === 'available_capacity'
+      ? `คิวงานยังไม่เต็มค่ะ (รับได้ตามจำนวน ${tableNum || 50} โต๊ะ)`
+      : tableNum ? `คิวงานเต็ม (รับจัดเลี้ยง ${tableNum} โต๊ะ เต็มกำลัง)` : 'คิวงานเต็มทุกช่วงเวลา (งดรับจอง)';
+
     const entry = QueueService.addBlockedDate(
       newBlockedDate,
       newBlockedNote.trim() || defaultNote,
       newBlockedReason,
-      tableNum
+      tableNum,
+      newBlockedStatusType
     );
     setBlockedDates([...QueueService.getBlockedDates()]);
     setNewBlockedDate('');
     setNewBlockedNote('');
-    setQueueSuccessMsg(`✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} ${entry.tableCount ? `(รับ ${entry.tableCount} โต๊ะ)` : ''} เป็นวันคิวงานเต็มเรียบร้อยแล้วค่ะ (แสดงผลหน้าเว็บทันที) 🔴`);
+    const msg = newBlockedStatusType === 'available_capacity'
+      ? `✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} แจ้งว่า "งานไม่เต็ม รับได้ ${entry.tableCount || 50} โต๊ะ" เรียบร้อยแล้วค่ะ 🟢`
+      : `✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} ${entry.tableCount ? `(รับ ${entry.tableCount} โต๊ะ)` : ''} เป็นวันคิวงานเต็มเรียบร้อยแล้วค่ะ 🔴`;
+    setQueueSuccessMsg(msg);
     setTimeout(() => setQueueSuccessMsg(''), 4000);
   };
 
@@ -1562,16 +1570,57 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                     <AlertCircle className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-base font-black text-slate-900">ใส่วันที่คิวงานเต็ม / งดรับจอง</h4>
-                    <p className="text-[11px] text-slate-500 font-medium">ลูกค้าที่เลือกวันนี้จะได้รับข้อความแจ้งเตือนอย่างสุภาพทันที</p>
+                    <h4 className="text-base font-black text-slate-900">จัดการวันที่คิวงาน & ความพร้อมรับงาน</h4>
+                    <p className="text-[11px] text-slate-500 font-medium">ระบุวันคิวเต็ม หรือระบุวันพิเศษที่ยังรับงานได้ตามจำนวนโต๊ะที่กำหนด</p>
                   </div>
                 </div>
 
                 <form onSubmit={handleAddBlockedDate} className="space-y-3.5">
+                  {/* Status Mode Selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800">
+                      เลือกสถานะที่จะแสดงบนหน้าเว็บ:
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewBlockedStatusType('fully_booked');
+                          setNewBlockedReason('fully_booked');
+                        }}
+                        className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                          newBlockedStatusType === 'fully_booked'
+                            ? 'bg-red-600 text-white border-red-600 shadow-sm'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>🔴 คิวงานเต็ม</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewBlockedStatusType('available_capacity');
+                          setNewBlockedReason('available_capacity');
+                          if (!newBlockedTableCount || newBlockedTableCount === '80') setNewBlockedTableCount('50');
+                        }}
+                        className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                          newBlockedStatusType === 'available_capacity'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>🟢 งานไม่เต็ม (รับได้)</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-red-600" />
-                      <span>เลือกวันที่คิวเต็ม <span className="text-red-600">*</span></span>
+                      <span>เลือกวันที่ต้องการจัดการ <span className="text-red-600">*</span></span>
                     </label>
                     <input
                       type="date"
@@ -1587,10 +1636,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                         <Utensils className="w-3.5 h-3.5 text-red-600" />
-                        <span>จำนวนโต๊ะที่รับจัดเลี้ยงในวันนี้:</span>
+                        <span>{newBlockedStatusType === 'available_capacity' ? 'จำนวนโต๊ะที่ยังเปิดรับได้ในวันนี้:' : 'จำนวนโต๊ะที่รับจัดเลี้ยงในวันนี้:'}</span>
                       </label>
-                      <span className="text-[10px] text-red-700 font-bold bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
-                        ระบุเพื่อแสดงบนหน้าเว็บ
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                        newBlockedStatusType === 'available_capacity'
+                          ? 'text-emerald-800 bg-emerald-50 border-emerald-300'
+                          : 'text-red-700 bg-red-50 border-red-200'
+                      }`}>
+                        {newBlockedStatusType === 'available_capacity' ? 'ระบุว่ารับได้กี่โต๊ะ' : 'ระบุจำนวนที่รับเต็ม'}
                       </span>
                     </div>
                     <div className="relative">
@@ -1600,7 +1653,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                         max={500}
                         value={newBlockedTableCount}
                         onChange={(e) => setNewBlockedTableCount(e.target.value)}
-                        placeholder="เช่น 50, 80, 100, 150"
+                        placeholder="เช่น 30, 50, 80, 100"
                         className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-black focus:outline-none focus:border-red-600 pr-12"
                       />
                       <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">
@@ -1617,7 +1670,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                           onClick={() => setNewBlockedTableCount(t.toString())}
                           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border ${
                             newBlockedTableCount === t.toString()
-                              ? 'bg-red-600 text-white border-red-600 shadow-xs'
+                              ? (newBlockedStatusType === 'available_capacity' ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-red-600 text-white border-red-600 shadow-xs')
                               : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
                           }`}
                         >
@@ -1627,41 +1680,55 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-800">
-                      เหตุผล / ประเภทการล็อกคิว:
-                    </label>
-                    <select
-                      value={newBlockedReason}
-                      onChange={(e) => setNewBlockedReason(e.target.value as any)}
-                      className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-bold focus:outline-none focus:border-red-600 cursor-pointer"
-                    >
-                      <option value="fully_booked">🔴 คิวงานเต็มทุกช่วงเวลา (งานแต่ง/งานใหญ่)</option>
-                      <option value="maintenance">🛠️ ซ่อมบำรุงอุปกรณ์ / ปรับปรุงโรงครัว</option>
-                      <option value="holiday">🏖️ วันหยุดเทศกาล / ประจำปี</option>
-                      <option value="custom">🔒 ล็อกคิวเฉพาะกิจ</option>
-                    </select>
-                  </div>
+                  {newBlockedStatusType === 'fully_booked' && (
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800">
+                        เหตุผล / ประเภทการล็อกคิว:
+                      </label>
+                      <select
+                        value={newBlockedReason}
+                        onChange={(e) => setNewBlockedReason(e.target.value as any)}
+                        className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-bold focus:outline-none focus:border-red-600 cursor-pointer"
+                      >
+                        <option value="fully_booked">🔴 คิวงานเต็มทุกช่วงเวลา (งานแต่ง/งานใหญ่)</option>
+                        <option value="maintenance">🛠️ ซ่อมบำรุงอุปกรณ์ / ปรับปรุงโรงครัว</option>
+                        <option value="holiday">🏖️ วันหยุดเทศกาล / ประจำปี</option>
+                        <option value="custom">🔒 ล็อกคิวเฉพาะกิจ</option>
+                      </select>
+                    </div>
+                  )}
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-800">
-                      หมายเหตุเพิ่มเติม (แสดงเป็นข้อมูลอ้างอิง):
+                      หมายเหตุเพิ่มเติม (แสดงบนหน้าเว็บ):
                     </label>
                     <input
                       type="text"
                       value={newBlockedNote}
                       onChange={(e) => setNewBlockedNote(e.target.value)}
-                      placeholder="เช่น งานมงคลสมรสหอประชุมใหญ่ หรือ งานทำบุญขึ้นบ้านใหม่"
+                      placeholder={
+                        newBlockedStatusType === 'available_capacity'
+                          ? `เช่น คิวงานไม่เต็มค่ะ พร้อมเปิดรับจัดเลี้ยงได้ตามจำนวน ${newBlockedTableCount || 50} โต๊ะ`
+                          : 'เช่น งานมงคลสมรสหอประชุมใหญ่ หรือ งานทำบุญขึ้นบ้านใหม่'
+                      }
                       className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-red-600 font-medium"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                    className={`w-full py-3 px-4 rounded-xl text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer ${
+                      newBlockedStatusType === 'available_capacity'
+                        ? 'bg-emerald-600 hover:bg-emerald-700'
+                        : 'bg-red-600 hover:bg-red-700'
+                    }`}
                   >
                     <Save className="w-4 h-4" />
-                    <span>+ บันทึกวันคิวงานเต็ม (อัปเดตหน้าเว็บทันที)</span>
+                    <span>
+                      {newBlockedStatusType === 'available_capacity'
+                        ? '+ บันทึกแจ้ง "งานไม่เต็ม รับได้ตามจำนวน" (อัปเดตทันที)'
+                        : '+ บันทึกวันคิวงานเต็ม (อัปเดตหน้าเว็บทันที)'}
+                    </span>
                   </button>
                 </form>
               </div>
@@ -1674,56 +1741,73 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                       <FileCheck className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-base font-black text-slate-900">รายการวันที่คิวเต็มทั้งหมด ({blockedDates.length} วัน)</h4>
-                      <p className="text-[11px] text-slate-500 font-medium">วันที่เหล่านี้จะถูกปิดรับจองและแสดงสถานะคิวเต็มพร้อมจำนวนโต๊ะบนหน้าเว็บ</p>
+                      <h4 className="text-base font-black text-slate-900">รายการวันที่ควบคุมคิวงานทั้งหมด ({blockedDates.length} วัน)</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">วันที่เหล่านี้จะแสดงสถานะคิวเต็มหรือสถานะรับได้ตามจำนวนบนหน้าเว็บ</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="max-h-[420px] overflow-y-auto space-y-2.5 pr-1">
+                <div className="max-h-[440px] overflow-y-auto space-y-2.5 pr-1">
                   {blockedDates.length === 0 ? (
                     <div className="text-center py-10 text-slate-400 text-xs">
-                      ยังไม่มีการระบุวันคิวเต็ม สามารถเพิ่มวันที่ได้จากฟอร์มด้านซ้าย
+                      ยังไม่มีการระบุวันคิวงาน สามารถเพิ่มวันที่ได้จากฟอร์มด้านซ้าย
                     </div>
                   ) : (
-                    blockedDates.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-red-300 transition-colors flex items-center justify-between gap-3"
-                      >
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md bg-red-100 text-red-800 font-mono font-black text-xs border border-red-200">
-                              {item.date}
-                            </span>
-                            <span className="text-xs font-black text-slate-900">
-                              {getDayOfWeekThai(item.date)}ที่ {formatThaiDateShort(item.date)}
-                            </span>
-                            <span className="px-2 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-bold">
-                              คิวเต็ม 🔴
-                            </span>
-                            {item.tableCount && (
-                              <span className="px-2 py-0.2 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300">
-                                🎪 รับแล้ว {item.tableCount} โต๊ะ (เต็มกำลัง)
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-xs text-slate-600 font-medium">
-                            • {item.note || 'คิวงานเต็มทุกช่วงเวลา'}
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveBlockedDate(item.id, item.date)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-red-100 hover:text-red-700 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
-                          title="ปลดล็อกคิวเพื่อเปิดรับจอง"
+                    blockedDates.map((item) => {
+                      const isAvail = item.statusType === 'available_capacity' || item.reason === 'available_capacity';
+                      return (
+                        <div
+                          key={item.id}
+                          className={`p-3.5 rounded-2xl border transition-colors flex items-center justify-between gap-3 ${
+                            isAvail
+                              ? 'bg-emerald-50/70 border-emerald-200 hover:border-emerald-400'
+                              : 'bg-slate-50 border-slate-200 hover:border-red-300'
+                          }`}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>ปลดล็อก</span>
-                        </button>
-                      </div>
-                    ))
+                          <div className="space-y-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded-md font-mono font-black text-xs border ${
+                                isAvail ? 'bg-emerald-100 text-emerald-950 border-emerald-300' : 'bg-red-100 text-red-800 border-red-200'
+                              }`}>
+                                {item.date}
+                              </span>
+                              <span className="text-xs font-black text-slate-900">
+                                {getDayOfWeekThai(item.date)}ที่ {formatThaiDateShort(item.date)}
+                              </span>
+                              {isAvail ? (
+                                <span className="px-2 py-0.2 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center gap-1">
+                                  <span>งานไม่เต็ม 🟢</span>
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-bold">
+                                  คิวเต็ม 🔴
+                                </span>
+                              )}
+                              {item.tableCount && (
+                                <span className={`px-2 py-0.2 rounded-full text-[10px] font-black border ${
+                                  isAvail ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-amber-100 text-amber-900 border-amber-300'
+                                }`}>
+                                  {isAvail ? `🎪 รับได้ ${item.tableCount} โต๊ะ` : `🎪 รับแล้ว ${item.tableCount} โต๊ะ (เต็มกำลัง)`}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-slate-600 font-medium">
+                              • {item.note || (isAvail ? `งานไม่เต็มค่ะ (รับได้ ${item.tableCount || 50} โต๊ะ)` : 'คิวงานเต็มทุกช่วงเวลา')}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveBlockedDate(item.id, item.date)}
+                            className="px-3 py-1.5 rounded-xl bg-white hover:bg-red-100 hover:text-red-700 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs border border-slate-200"
+                            title="ลบรายการเพื่อกลับเป็นคิวปกติ"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>ลบ</span>
+                          </button>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
