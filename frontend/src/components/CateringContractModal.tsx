@@ -242,9 +242,8 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
 
               {/* 5. Financial Terms Breakdown */}
               <div className="bg-gradient-to-br from-amber-50 via-slate-50 to-red-50 p-2.5 rounded-xl border-2 border-amber-300 text-xs space-y-1.5">
-                <div className="font-black text-red-800 text-[11px] border-b border-amber-300 pb-0.5 flex items-center justify-between">
+                <div className="font-black text-red-800 text-[11px] border-b border-amber-300 pb-0.5">
                   <span>มูลค่าสัญญาและการชำระเงิน (Financial Agreement)</span>
-                  <span className="text-[9.5px] font-mono text-slate-600">ราคารวมภาษีและค่าบริการครบถ้วน</span>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 pt-0.5 text-center">
