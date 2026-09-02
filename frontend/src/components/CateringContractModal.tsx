@@ -141,8 +141,11 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                       <h1 className="text-2xl sm:text-[26px] font-black text-red-700 tracking-tight leading-none">
                         โต๊ะจีน รพีพัฒน์ พรีเมียม
                       </h1>
-                      <div className="text-[11px] sm:text-xs font-black text-amber-800 uppercase tracking-wide mt-1">
-                        RAPEEPHAT BANQUET CATERING • ประสบการณ์จัดเลี้ยงภัตตาคาร 35+ ปี
+                      <div className="text-[11px] sm:text-xs font-black text-amber-800 uppercase tracking-wide mt-0.5">
+                        RAPEEPHAT BANQUET CATERING
+                      </div>
+                      <div className="text-[10.5px] sm:text-[11px] font-bold text-amber-900 mt-0.5">
+                        • ประสบการณ์จัดเลี้ยงภัตตาคาร 35+ ปี
                       </div>
                     </div>
                   </div>
