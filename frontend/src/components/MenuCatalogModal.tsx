@@ -53,12 +53,13 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
     }
   }, [initialPackageId]);
 
-  // Compute scale to fit screen perfectly
+  // Compute scale to fit mobile & desktop screens without sideways overflow
   const getFitScale = () => {
     if (typeof window === 'undefined') return 1;
     const width = window.innerWidth;
     if (width < 850) {
-      return Math.max((width - 32) / 794, 0.35);
+      // Mobile screen: fit exact device width minus padding
+      return Math.max((width - 24) / 794, 0.32);
     }
     const height = window.innerHeight;
     const heightScale = (height - 180) / 1123;
@@ -96,7 +97,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
 
   const handleZoomOut = () => {
     setIsFitScreen(false);
-    setScale((prev) => Math.max(prev - 0.1, 0.35));
+    setScale((prev) => Math.max(prev - 0.1, 0.32));
   };
 
   // Close on Escape key
@@ -114,13 +115,13 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
 
   const currentPkg = BANQUET_PACKAGES.find((p) => p.id === selectedPkgId) || BANQUET_PACKAGES[0];
 
-  // Handle PDF Download
+  // Handle PDF Download (Standard A4 Format)
   const handleDownloadPdf = async () => {
     if (!printRef.current) return;
     try {
       setIsGeneratingPdf(true);
       const safeName = currentPkg.name.replace(/[^a-zA-Z0-9ก-๙]/g, '_');
-      const fileName = `รายการอาหาร_${safeName}_โต๊ะจีนรพีพัฒน์.pdf`;
+      const fileName = `รายการอาหาร_${safeName}_A4_โต๊ะจีนรพีพัฒน์.pdf`;
       await generateA4Pdf(printRef.current, fileName);
       setIsGeneratingPdf(false);
     } catch (err) {
@@ -130,14 +131,14 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
     }
   };
 
-  // Handle Direct Browser Print
+  // Handle Direct Browser Print (Standard A4 Format)
   const handleBrowserPrint = () => {
     window.print();
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-start overflow-y-auto p-2 sm:p-4 md:p-6 animate-fadeIn selection:bg-red-500 selection:text-white"
+      className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-start overflow-y-auto p-1.5 sm:p-4 md:p-6 animate-fadeIn selection:bg-red-500 selection:text-white"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -147,143 +148,153 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
       {/* ========================================================================= */}
       {/* 🧭 TOP CONTROLS & PACKAGE SELECTOR TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="w-full max-w-5xl bg-white rounded-3xl border-2 border-amber-300 shadow-2xl p-3 sm:p-4 mb-4 flex flex-col lg:flex-row items-center justify-between gap-3 shrink-0 z-10 sticky top-2">
+      <div className="w-full max-w-5xl bg-white rounded-2xl sm:rounded-3xl border-2 border-amber-300 shadow-2xl p-2.5 sm:p-4 mb-3 sm:mb-4 flex flex-col gap-2.5 shrink-0 z-10 sticky top-1 sm:top-2">
         
-        {/* Package Selector Dropdown */}
-        <div className="flex items-center gap-2.5 w-full lg:w-auto">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <UtensilsCrossed className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
-              เลือกดูรายการอาหารตามแพ็กเกจราคา:
-            </label>
-            <select
-              value={selectedPkgId}
-              onChange={(e) => setSelectedPkgId(e.target.value)}
-              aria-label="เลือกแพ็กเกจราคาโต๊ะจีน"
-              className="w-full bg-amber-50/80 border-2 border-amber-300 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-            >
-              {BANQUET_PACKAGES.map((pkg) => (
-                <option key={pkg.id} value={pkg.id}>
-                  {pkg.name} ({formatCurrency(pkg.price)} บ./โต๊ะ - {pkg.courses.length} จาน)
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Zoom & Fit Screen Toolbar Controls */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-300">
+        {/* Row 1: Package Selector Dropdown & Close Button */}
+        <div className="flex items-center justify-between gap-2">
           
-          {/* Fit to Screen Button (ปุ่มพอดีกับหน้าจอ) */}
-          <button
-            type="button"
-            onClick={handleToggleFitScreen}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
-              isFitScreen
-                ? 'bg-emerald-600 text-white shadow-sm border border-emerald-500'
-                : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
-            }`}
-            title="ปรับขนาดการแสดงผลให้พอดีกับหน้าจออัตโนมัติ"
-          >
-            <Maximize2 className="w-3.5 h-3.5" />
-            <span>พอดีกับหน้าจอ</span>
-          </button>
-
-          {/* 100% Size Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsFitScreen(false);
-              setScale(1);
-            }}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-              !isFitScreen && Math.abs(scale - 1) < 0.05
-                ? 'bg-red-700 text-white shadow-sm'
-                : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
-            }`}
-            title="แสดงผลขนาดจริง 100% (A4)"
-          >
-            <span>100%</span>
-          </button>
-
-          {/* Zoom In & Out */}
-          <div className="flex items-center gap-0.5 border-l border-slate-300 pl-1">
-            <button
-              type="button"
-              onClick={handleZoomOut}
-              className="p-1.5 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-              title="ย่อขนาด (-)"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <span className="text-[11px] font-mono font-bold text-slate-700 px-1 min-w-[38px] text-center">
-              {Math.round(scale * 100)}%
-            </span>
-            <button
-              type="button"
-              onClick={handleZoomIn}
-              className="p-1.5 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-              title="ขยายขนาด (+)"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-red-600 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-[9.5px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider block truncate">
+                เลือกดูรายการอาหารตามแพ็กเกจราคา:
+              </label>
+              <select
+                value={selectedPkgId}
+                onChange={(e) => setSelectedPkgId(e.target.value)}
+                aria-label="เลือกแพ็กเกจราคาโต๊ะจีน"
+                className="w-full bg-amber-50/90 border-2 border-amber-300 rounded-xl px-2.5 sm:px-3 py-1 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer truncate"
+              >
+                {BANQUET_PACKAGES.map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.name} ({formatCurrency(pkg.price)} บ./โต๊ะ - {pkg.courses.length} จาน)
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-
-        </div>
-
-        {/* Action Buttons (Print / Download PDF / Select for Quotation) */}
-        <div className="flex flex-wrap items-center justify-end gap-2 w-full lg:w-auto">
-          
-          {/* Direct Print Button */}
-          <button
-            type="button"
-            onClick={handleBrowserPrint}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1.5 shadow-xs transition-transform hover:scale-102 cursor-pointer"
-            title="พิมพ์ออกเครื่องพิมพ์ (Print)"
-          >
-            <Printer className="w-3.5 h-3.5 text-amber-300" />
-            <span>พิมพ์ (Print)</span>
-          </button>
-
-          {/* Download PDF Button */}
-          <button
-            type="button"
-            onClick={handleDownloadPdf}
-            disabled={isGeneratingPdf}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer disabled:opacity-50"
-            title="ดาวน์โหลดเป็นไฟล์ PDF คุณภาพสูง"
-          >
-            <Download className="w-3.5 h-3.5 text-amber-300" />
-            <span>{isGeneratingPdf ? 'กำลังประมวลผล PDF...' : 'ดาวน์โหลด PDF'}</span>
-          </button>
-
-          {/* Select for Quotation Builder */}
-          {onSelectForQuotation && (
-            <button
-              type="button"
-              onClick={() => {
-                onSelectForQuotation(currentPkg);
-                onClose();
-              }}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer"
-              title="นำเมนูนี้ไปเปิดในระบบคำนวณราคา & ออกใบเสนอราคา"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-              <span>ออกใบเสนอราคา</span>
-            </button>
-          )}
 
           {/* Close Modal Button */}
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer ml-1"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer shrink-0"
             title="ปิดหน้าต่าง"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
+
+        </div>
+
+        {/* Row 2: Zoom / Fit Screen Controls & Action Buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+          
+          {/* Zoom & Fit Screen Toolbar (ออกแบบพิเศษสำหรับมือถือ) */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl sm:rounded-2xl border border-slate-300">
+            
+            {/* Fit to Screen Button (ปุ่มพอดีกับหน้าจอ - เหมาะมากเวลามองบนมือถือ) */}
+            <button
+              type="button"
+              onClick={handleToggleFitScreen}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                isFitScreen
+                  ? 'bg-emerald-600 text-white shadow-sm border border-emerald-500'
+                  : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
+              }`}
+              title="ปรับขนาดการแสดงผลให้พอดีกับหน้าจอมือถือ/คอมพิวเตอร์อัตโนมัติ"
+            >
+              <Smartphone className="w-3.5 h-3.5 sm:hidden" />
+              <Maximize2 className="w-3.5 h-3.5 hidden sm:inline" />
+              <span>พอดีกับหน้าจอ</span>
+            </button>
+
+            {/* 100% Size Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsFitScreen(false);
+                setScale(1);
+              }}
+              className={`px-2 sm:px-2.5 py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
+                !isFitScreen && Math.abs(scale - 1) < 0.05
+                  ? 'bg-red-700 text-white shadow-sm'
+                  : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
+              }`}
+              title="แสดงผลขนาดจริง 100% (A4)"
+            >
+              <span>100%</span>
+            </button>
+
+            {/* Zoom In & Out */}
+            <div className="flex items-center gap-0.5 border-l border-slate-300 pl-1">
+              <button
+                type="button"
+                onClick={handleZoomOut}
+                className="p-1 sm:p-1.5 rounded-md sm:rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+                title="ย่อขนาด (-)"
+              >
+                <ZoomOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              </button>
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-700 px-1 min-w-[34px] sm:min-w-[38px] text-center">
+                {Math.round(scale * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={handleZoomIn}
+                className="p-1 sm:p-1.5 rounded-md sm:rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+                title="ขยายขนาด (+)"
+              >
+                <ZoomIn className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              </button>
+            </div>
+
+          </div>
+
+          {/* Action Buttons (Print / Download PDF / Select for Quotation) */}
+          <div className="flex items-center gap-1.5 ml-auto">
+            
+            {/* Direct Print Button */}
+            <button
+              type="button"
+              onClick={handleBrowserPrint}
+              className="px-3 py-1.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-black text-xs flex items-center gap-1.5 shadow-xs transition-transform hover:scale-102 cursor-pointer"
+              title="พิมพ์ออกเครื่องพิมพ์กระดาษ A4 (Print)"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-300" />
+              <span>พิมพ์ (A4)</span>
+            </button>
+
+            {/* Download PDF Button */}
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+              className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer disabled:opacity-50"
+              title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4 คุณภาพสูง"
+            >
+              <Download className="w-3.5 h-3.5 text-amber-300" />
+              <span>{isGeneratingPdf ? 'กำลังสร้าง...' : 'ดาวน์โหลด PDF A4'}</span>
+            </button>
+
+            {/* Select for Quotation Builder */}
+            {onSelectForQuotation && (
+              <button
+                type="button"
+                onClick={() => {
+                  onSelectForQuotation(currentPkg);
+                  onClose();
+                }}
+                className="hidden md:flex px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                title="นำเมนูนี้ไปเปิดในระบบคำนวณราคา & ออกใบเสนอราคา"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <span>ออกใบเสนอราคา</span>
+              </button>
+            )}
+
+          </div>
 
         </div>
 
@@ -293,14 +304,18 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
       {/* 📄 A4 PRINTABLE MENU SHEET PREVIEW (ROYAL THAI-CHINESE LUXURY) */}
       {/* ========================================================================= */}
       <div
-        className="w-full flex justify-center py-2 pb-16 overflow-x-auto"
-        style={{ minHeight: `${1123 * scale}px` }}
+        className="w-full flex justify-center py-1 pb-16 overflow-x-auto"
+        style={{ minHeight: `${1123 * scale + 40}px` }}
       >
         <div
           style={{
+            width: '794px',
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top center',
-            transition: 'transform 0.2s ease-out',
+            marginBottom: scale !== 1 ? `${(1123 * scale) - 1123}px` : undefined,
+            marginLeft: scale < 1 ? `${(794 * scale - 794) / 2}px` : undefined,
+            marginRight: scale < 1 ? `${(794 * scale - 794) / 2}px` : undefined,
+            transition: 'transform 0.15s ease-out',
           }}
         >
           <div
@@ -389,7 +404,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
                 </div>
 
                 <div className="text-right shrink-0 bg-white/10 backdrop-blur-xs px-4 py-2 rounded-xl border border-white/20">
-                  <div className="text-[11px] font-bold text-amber-200 uppercase">ราคาต่อโต๊ะ</div>
+                  <div className="text-[11px] font-bold text-amber-200 uppercase">ราคาต่อโต๊ะ (A4)</div>
                   <div className="text-2xl sm:text-3xl font-black text-amber-300 font-sans leading-none">
                     {formatCurrency(currentPkg.price)}.-
                   </div>
