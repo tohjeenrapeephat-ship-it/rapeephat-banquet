@@ -175,7 +175,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
     // Default Fallback
     return {
       text: isOwnerOnline
-        ? 'ขอบคุณสำหรับข้อความนะคะ ขณะนี้คุณแป้ง (เจ้าของร้าน) กำลังออนไลน์อยู่ กำลังอ่านข้อความและเตรียมพิมพ์ตอบกลับค่ะ หรือต้องการให้ออกใบเสนอราคาสามารถกดปุ่มด้านล่างได้เลยนะคะ 😊'
+        ? 'ขอบคุณสำหรับข้อความนะคะ ขณะนี้คุณแป้งกำลังออนไลน์อยู่ กำลังอ่านข้อความและเตรียมพิมพ์ตอบกลับค่ะ หรือต้องการให้ออกใบเสนอราคาสามารถกดปุ่มด้านล่างได้เลยนะคะ 😊'
         : 'ขอบคุณสำหรับข้อความนะคะ หากต้องการให้ออกใบเสนอราคาทางการ หรือต้องการคุยรายละเอียดเพิ่มเติม แป้งยินดีแนะนำให้ทันทีค่ะ สามารถเลือกเมนูด้านล่างหรือพิมพ์สอบถามเพิ่มเติมได้เลยนะคะ 😊',
     };
   };
@@ -272,7 +272,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
             <div className="text-xs">
               <span className="font-bold text-red-700">
-                {isOwnerOnline ? '👑 คุณแป้ง (เจ้าของร้าน) ออนไลน์อยู่' : '💬 แชทสด โต๊ะจีนรพีพัฒน์'}
+                {isOwnerOnline ? '👑 คุณแป้ง ออนไลน์พร้อมตอบค่ะ' : '💬 แชทสด โต๊ะจีนรพีพัฒน์'}
               </span>
               {' • '}
               <span className="text-emerald-700 font-extrabold">ออนไลน์ตลอด 24 ชม.</span>
@@ -334,12 +334,12 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                     {isOwnerOnline ? 'คุณแป้ง (โต๊ะจีนรพีพัฒน์)' : 'แชทสด โต๊ะจีนรพีพัฒน์'}
                   </h3>
                   <span className="px-1.5 py-0.2 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded text-[9px] font-black uppercase">
-                    {isOwnerOnline ? '👑 เจ้าของร้าน' : '24/7 ONLINE'}
+                    {isOwnerOnline ? '👑 ฝ่ายจัดเลี้ยง' : '24/7 ONLINE'}
                   </span>
                 </div>
                 <p className="text-[10.5px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {isOwnerOnline ? 'คุณแป้ง (เจ้าของร้าน) ร่วมสนทนาสด 🟢' : 'ออนไลน์ตลอด 24 ชม. (ไม่มีหลับ/พร้อมตอบทันที) 🟢'}
+                  {isOwnerOnline ? 'คุณแป้ง ร่วมสนทนาสด 🟢' : 'ออนไลน์ตลอด 24 ชม. (ไม่มีหลับ/พร้อมตอบทันที) 🟢'}
                 </p>
               </div>
             </div>
@@ -389,7 +389,7 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                       {msg.sender === 'owner' && (
                         <span className="text-amber-600 font-black flex items-center gap-0.5">
                           <Crown className="w-3 h-3 text-amber-600" />
-                          คุณแป้ง (เจ้าของร้าน):
+                          คุณแป้ง:
                         </span>
                       )}
                       {msg.sender === 'customer' && 'คุณ'}

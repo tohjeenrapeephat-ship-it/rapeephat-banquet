@@ -22,7 +22,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
 
   const navLinks = [
     { href: '#schedule-queue', label: '📅 ตารางคิวงาน' },
-    { href: '#heritage', label: '🏆 ต้นตำรับนครปฐมชนะเลิศ' },
+    { href: '#heritage', label: '🏆 ตำนานความอร่อย 35+ ปี' },
     { href: '#menu-showcase', label: 'เมนูอาหาร' },
     { href: '#packages', label: 'แพ็กเกจราคา' },
     { href: '#portfolio', label: 'ผลงานจัดเลี้ยง' },
@@ -84,49 +84,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
         {/* ========================================================================= */}
         {/* ⚡ RIGHT: ACTION BUTTONS (RED & GOLD LUXURY) */}
         {/* ========================================================================= */}
-        <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0">
+        <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           
           {/* History Button with Gold Rim & Red Badge */}
           <button
             onClick={onOpenHistory}
-            className="relative px-3 py-2 rounded-2xl bg-white hover:bg-amber-50/50 border border-amber-300 text-slate-800 hover:text-red-700 transition-all flex items-center gap-1.5 text-xs font-bold shadow-2xs whitespace-nowrap"
+            className="relative px-3.5 py-2.5 rounded-2xl bg-white hover:bg-amber-50 border-2 border-amber-300/80 text-slate-800 hover:text-red-700 transition-all flex items-center gap-2 text-xs xl:text-sm font-black shadow-2xs whitespace-nowrap cursor-pointer"
             title="ดูประวัติใบเสนอราคา"
           >
-            <FileText className="w-3.5 h-3.5 text-red-600" />
-            <span className="hidden xl:inline">ประวัติเอกสาร</span>
+            <FileText className="w-4 h-4 text-red-600" />
+            <span>ประวัติเอกสาร</span>
             {historyCount > 0 && (
-              <span className="bg-gradient-to-r from-red-600 to-red-700 text-white text-[10px] w-4 h-4 rounded-full font-bold flex items-center justify-center leading-none shadow-xs">
+              <span className="bg-gradient-to-r from-red-600 to-red-700 text-white text-[10px] w-4.5 h-4.5 rounded-full font-bold flex items-center justify-center leading-none shadow-xs">
                 {historyCount}
               </span>
             )}
           </button>
 
-          {/* Admin Shortcut Button */}
-          {onOpenAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              className="px-3 py-2 rounded-2xl bg-amber-100/80 hover:bg-red-50 text-slate-900 hover:text-red-700 font-extrabold text-xs flex items-center gap-1 border border-amber-300 shadow-2xs transition-all whitespace-nowrap"
-              title="เข้าสู่ระบบหลังบ้าน (Admin)"
-            >
-              <span>🔑 หลังบ้าน</span>
-            </button>
-          )}
-
           {/* Direct Phone Call Button */}
           <a
             href="tel:0813311646"
-            className="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs flex items-center gap-1.5 border border-amber-500/40 shadow-2xs transition-all whitespace-nowrap"
+            className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs xl:text-sm flex items-center gap-2 border border-amber-500/40 shadow-sm transition-all whitespace-nowrap"
           >
             <Phone className="w-3.5 h-3.5 animate-bounce text-amber-400" />
-            <span className="text-white">081-331-1646</span>
+            <span className="text-white font-extrabold">081-331-1646</span>
           </a>
 
           {/* Primary Action: Dedicated Quotation Builder Page Button */}
           <button
             onClick={onOpenBuilder}
-            className="px-4.5 py-2 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-xs flex items-center gap-1.5 shadow-red-glow border border-amber-300/60 transition-all transform hover:scale-102 active:scale-95 whitespace-nowrap"
+            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-xs xl:text-sm flex items-center gap-2 shadow-red-glow border-2 border-amber-300/70 transition-all transform hover:scale-103 active:scale-95 whitespace-nowrap cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-4 h-4 text-amber-300" />
             <span>คำนวณราคา</span>
           </button>
         </div>
@@ -185,18 +174,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>คำนวณราคา & ออกใบเสนอราคา A4</span>
             </button>
-
-            {onOpenAdmin && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenAdmin();
-                }}
-                className="w-full py-2.5 rounded-2xl bg-amber-100/90 hover:bg-amber-200 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-1.5 border border-amber-300 shadow-2xs"
-              >
-                <span>🔑 เข้าสู่ระบบหลังบ้าน (Admin Portal)</span>
-              </button>
-            )}
 
             <div className="grid grid-cols-2 gap-2">
               <a

@@ -168,7 +168,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
       id: `owner-${Date.now()}`,
       sessionId: targetSessionId,
       sender: 'owner',
-      senderName: 'คุณแป้ง (เจ้าของร้าน)',
+      senderName: 'คุณแป้ง',
       text,
       timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
       createdAt: Date.now(),
@@ -1203,7 +1203,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                                   {msg.sender === 'owner' && (
                                     <span className="text-amber-600 font-black flex items-center gap-0.5">
                                       <Crown className="w-3 h-3 text-amber-600" />
-                                      คุณแป้ง (เจ้าของร้าน):
+                                      คุณแป้ง:
                                     </span>
                                   )}
                                   {msg.sender === 'customer' && `ลูกค้า (${msg.senderName}):`}

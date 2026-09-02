@@ -79,7 +79,7 @@ export const OwnerMiniChatPortal: React.FC<OwnerMiniChatPortalProps> = ({ onExpa
       id: `owner-${Date.now()}`,
       sessionId: selectedSessionId,
       sender: 'owner',
-      senderName: 'คุณแป้ง (เจ้าของร้าน)',
+      senderName: 'คุณแป้ง',
       text,
       timestamp: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
       createdAt: Date.now(),
