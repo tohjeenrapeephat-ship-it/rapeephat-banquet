@@ -3,6 +3,7 @@ import { QuotationDoc } from "../types/quotation.js";
 export interface BlockedDateEntry {
   id: string;
   date: string; // "YYYY-MM-DD"
+  tableCount?: number | string; // e.g. 80, 120, "120 โต๊ะ"
   note: string;
   reason: "fully_booked" | "maintenance" | "holiday" | "custom";
   createdAt: number;
@@ -37,49 +38,56 @@ const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
   {
     id: "blk-2026-03-01",
     date: "2026-03-01",
-    note: "คิวงานเต็มทุกช่วงเวลา (งานฉลองมงคลสมรส 60 โต๊ะ)",
+    tableCount: 60,
+    note: "งานฉลองมงคลสมรสหอประชุมใหญ่ (รับเต็ม 60 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000 * 10,
   },
   {
     id: "blk-2026-03-05",
     date: "2026-03-05",
-    note: "คิวงานเต็ม (งานทำบุญขึ้นบ้านใหม่ 25 โต๊ะ)",
+    tableCount: 25,
+    note: "งานทำบุญขึ้นบ้านใหม่ ม.ภัสสร (รับเต็ม 25 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000 * 8,
   },
   {
     id: "blk-2026-03-14",
     date: "2026-03-14",
-    note: "คิวงานเต็ม (งานอุปสมบทมงคล 50 โต๊ะ)",
+    tableCount: 50,
+    note: "งานอุปสมบทมงคล ลานโดมวัดใหญ่ (รับเต็ม 50 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000 * 5,
   },
   {
     id: "blk-2026-03-21",
     date: "2026-03-21",
-    note: "คิวงานเต็ม (งานเลี้ยงสังสรรค์สมาคม 100 โต๊ะ)",
+    tableCount: 100,
+    note: "งานเลี้ยงสังสรรค์สมาคมศิษย์เก่า (รับเต็ม 100 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000 * 3,
   },
   {
     id: "blk-2026-03-28",
     date: "2026-03-28",
-    note: "คิวงานเต็ม (งานแต่งงานระดับ VIP 120 โต๊ะ)",
+    tableCount: 120,
+    note: "งานแต่งงานระดับ VIP แกรนด์บอลรูม (รับเต็ม 120 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000 * 2,
   },
   {
     id: "blk-2026-04-04",
     date: "2026-04-04",
-    note: "คิวงานเต็ม (งานทำบุญรวมญาติสงกรานต์ 50 โต๊ะ)",
+    tableCount: 50,
+    note: "งานทำบุญรวมญาติสงกรานต์ (รับเต็ม 50 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000,
   },
   {
     id: "blk-2026-04-11",
     date: "2026-04-11",
-    note: "คิวงานเต็ม (งานมงคลสมรส 80 โต๊ะ)",
+    tableCount: 80,
+    note: "งานมงคลสมรสช่วงเทศกาล (รับเต็ม 80 โต๊ะ)",
     reason: "fully_booked",
     createdAt: Date.now() - 86400000,
   },
@@ -138,13 +146,21 @@ export const QueueService = {
     }
   },
 
-  addBlockedDate(date: string, note?: string, reason: BlockedDateEntry["reason"] = "fully_booked"): BlockedDateEntry {
+  addBlockedDate(
+    date: string,
+    note?: string,
+    reason: BlockedDateEntry["reason"] = "fully_booked",
+    tableCount?: number | string
+  ): BlockedDateEntry {
     const list = this.getBlockedDates();
     const cleanDate = date.split("T")[0];
     const existing = list.find((item) => item.date === cleanDate);
     if (existing) {
       existing.note = note || "คิวงานเต็มทุกช่วงเวลา";
       existing.reason = reason;
+      if (tableCount !== undefined && tableCount !== "") {
+        existing.tableCount = tableCount;
+      }
       this.saveBlockedDates(list);
       return existing;
     }
@@ -152,6 +168,7 @@ export const QueueService = {
     const newEntry: BlockedDateEntry = {
       id: `blk-${cleanDate}-${Date.now()}`,
       date: cleanDate,
+      tableCount: tableCount !== undefined && tableCount !== "" ? tableCount : undefined,
       note: note || "คิวงานเต็มทุกช่วงเวลา (งดรับจอง)",
       reason,
       createdAt: Date.now(),
@@ -170,7 +187,13 @@ export const QueueService = {
   },
 
   // Check if a specific date is full or blocked
-  isDateBlocked(dateStr: string): { isBlocked: boolean; note?: string; reason?: string; isPaidBooking?: boolean } {
+  isDateBlocked(dateStr: string): {
+    isBlocked: boolean;
+    note?: string;
+    reason?: string;
+    isPaidBooking?: boolean;
+    tableCount?: number | string;
+  } {
     if (!dateStr) return { isBlocked: false };
     const cleanDate = dateStr.split("T")[0];
 
@@ -182,6 +205,7 @@ export const QueueService = {
         isBlocked: true,
         note: foundBlocked.note,
         reason: foundBlocked.reason,
+        tableCount: foundBlocked.tableCount,
         isPaidBooking: false,
       };
     }
@@ -197,10 +221,12 @@ export const QueueService = {
             (q.status === "deposit_paid" || q.status === "confirmed" || q.status === "completed")
         );
         if (paidQuote) {
+          const totalT = paidQuote.tableCount + (paidQuote.freeTableCount || 0);
           return {
             isBlocked: true,
-            note: `คิวงานเต็ม ยืนยันแล้ว (${paidQuote.customer.eventType || "งานจัดเลี้ยง"} ${paidQuote.tableCount} โต๊ะ)`,
+            note: `คิวงานเต็ม ยืนยันแล้ว (${paidQuote.customer.eventType || "งานจัดเลี้ยง"} ${totalT} โต๊ะ)`,
             reason: "fully_booked",
+            tableCount: totalT,
             isPaidBooking: true,
           };
         }
@@ -312,6 +338,8 @@ export const QueueService = {
       const monthsThai = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       const monthLabel = `${monthsThai[m]} ${d.getFullYear() + 543}`;
 
+      const formattedTables = blocked.tableCount ? `รับบริการเต็ม ${blocked.tableCount} โต๊ะ` : "เต็มทุกช่วงเวลา";
+
       events.push({
         id: blocked.id,
         dateStr: formatThaiDateShort(blocked.date),
@@ -322,11 +350,11 @@ export const QueueService = {
         ceremonyType: "wedding",
         ceremonyName: "คิวงานจัดเลี้ยงเต็ม 🔒",
         hostName: "ล็อกคิวจัดเลี้ยงเรียบร้อย",
-        tableCount: "เต็มทุกช่วงเวลา",
+        tableCount: formattedTables,
         location: blocked.note || "งดรับจองในวันดังกล่าว",
         province: "กทม. & ปริมณฑล / ต่างจังหวัด",
         status: "confirmed",
-        statusText: "คิวเต็ม ปิดรับจอง 🔴",
+        statusText: blocked.tableCount ? `คิวเต็ม (${blocked.tableCount} โต๊ะ) 🔴` : "คิวเต็ม ปิดรับจอง 🔴",
         statusBadgeClass: "bg-red-100 text-red-800 border-red-300 font-black",
         availableSlotsRemaining: 0,
       });

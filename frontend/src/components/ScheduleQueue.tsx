@@ -520,7 +520,7 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
   const [searchDate, setSearchDate] = useState<string>('');
   const [searchProvince, setSearchProvince] = useState<string>('all');
   const [searchResult, setSearchResult] = useState<string | null>(null);
-  const [blockedModalInfo, setBlockedModalInfo] = useState<{ date: string; note?: string; reason?: string } | null>(null);
+  const [blockedModalInfo, setBlockedModalInfo] = useState<{ date: string; note?: string; reason?: string; tableCount?: number | string } | null>(null);
   const [allQueueEvents, setAllQueueEvents] = useState<QueueEvent[]>(QUEUE_DATA);
 
   // Load dynamic bookings from quotations and blocked dates
@@ -602,8 +602,9 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
         date: searchDate,
         note: blockedCheck.note,
         reason: blockedCheck.reason,
+        tableCount: blockedCheck.tableCount,
       });
-      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} คิวงานจัดเลี้ยงเต็มแล้วครับ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
+      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} ${blockedCheck.tableCount ? `(รับจัดเลี้ยงเต็ม ${blockedCheck.tableCount} โต๊ะ)` : 'คิวงานจัดเลี้ยงเต็มแล้วครับ'} (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       return;
     }
 
@@ -618,6 +619,7 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
           date: searchDate,
           note: found.location || 'คิวงานเต็มทุกช่วงเวลา',
           reason: 'fully_booked',
+          tableCount: found.tableCount,
         });
         setSearchResult(`🔴 วันที่ ${found.dateStr} คิวงานเต็มแล้วครับ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       }
@@ -1278,15 +1280,22 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
 
               {/* Title & Designed Apology */}
               <div className="text-center space-y-2">
-                <span className="text-xs font-black text-red-700 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-200 inline-block">
-                  👑 แจ้งสถานะคิวงานจัดเลี้ยง
-                </span>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <span className="text-xs font-black text-red-700 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-200 inline-block">
+                    👑 แจ้งสถานะคิวงานจัดเลี้ยง
+                  </span>
+                  {blockedModalInfo.tableCount && (
+                    <span className="text-xs font-black text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1 shadow-2xs">
+                      🎪 รับบริการเต็มจำนวน {blockedModalInfo.tableCount} โต๊ะ
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-lg sm:text-xl font-black text-slate-950 leading-snug">
                   กราบขออภัยเป็นอย่างยิ่งครับ<br />
                   <span className="text-red-700">วันที่ {formatThaiDateShort(blockedModalInfo.date)} คิวงานจัดเลี้ยงเต็มแล้วครับ</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
-                  เพื่อรักษามาตรฐานคุณภาพความสดใหม่ของวัตถุดิบ การปรุงอาหารสุกร้อนสดๆ หน้างาน และการบริการระดับภัตตาคารอย่างดีที่สุด ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
+                  เพื่อรักษามาตรฐานคุณภาพความสดใหม่ของวัตถุดิบ การปรุงอาหารสุกร้อนสดๆ หน้างาน และการบริการระดับภัตตาคารอย่างดีที่สุด {blockedModalInfo.tableCount ? `(ทีมเชฟและบริกรรองรับเต็มกำลัง ${blockedModalInfo.tableCount} โต๊ะ)` : ''} ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
                 </p>
                 {blockedModalInfo.note && (
                   <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">
