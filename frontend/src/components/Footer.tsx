@@ -51,12 +51,41 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               <Phone className="w-4 h-4 text-red-600 shrink-0" />
               <a href="tel:0813311646" className="text-slate-900 hover:text-red-700 font-black font-mono text-base">081-331-1646 (คุณแป้ง)</a>
             </div>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-[#06C755] shrink-0" />
-              <a href="https://line.me/ti/p/~pang_baichaa" target="_blank" rel="noopener noreferrer" className="text-slate-800 hover:text-green-600 font-bold text-sm">
-                LINE: pang_baichaa
+            
+            {/* Social Follow Links */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+              <a
+                href="https://www.facebook.com/search/top?q=โต๊ะจีน%20รพีพัฒน์"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 font-black text-xs border border-blue-200 transition-colors shadow-2xs"
+                title="ติดตามเพจ Facebook โต๊ะจีน รพีพัฒน์"
+              >
+                <span>📘 Facebook (128K+)</span>
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@rapeephat_catering"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-950 font-black text-xs border border-pink-200 transition-colors shadow-2xs"
+                title="ติดตาม TikTok โต๊ะจีน รพีพัฒน์"
+              >
+                <span>🎵 TikTok (85K+)</span>
+              </a>
+
+              <a
+                href="https://line.me/ti/p/~pang_baichaa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-black text-xs border border-emerald-200 transition-colors shadow-2xs"
+                title="เพิ่มเพื่อน LINE"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-[#06C755]" />
+                <span>LINE (45K+)</span>
               </a>
             </div>
+
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-red-600 shrink-0" />
               <div className="flex flex-col text-xs font-semibold">

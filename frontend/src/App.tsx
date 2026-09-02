@@ -15,6 +15,7 @@ import { ScheduleQueue } from './components/ScheduleQueue.js';
 import { QuotationPage } from './components/QuotationPage.js';
 import { QuotationHistory } from './components/QuotationHistory.js';
 import { Testimonials } from './components/Testimonials.js';
+import { SocialFollowSection } from './components/SocialFollowSection.js';
 import { FAQSection } from './components/FAQSection.js';
 import { ContactSection } from './components/ContactSection.js';
 import { Footer } from './components/Footer.js';
@@ -205,6 +206,7 @@ export const App: React.FC = () => {
         <CateringFeatures />
         <FleetLogistics />
         <Testimonials />
+        <SocialFollowSection />
         <FAQSection />
         <ContactSection />
       </main>
