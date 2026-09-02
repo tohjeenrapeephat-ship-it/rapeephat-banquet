@@ -6,7 +6,7 @@ import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
 import { CateringContractModal } from './CateringContractModal.js';
-import { CateringReceiptModal } from './CateringReceiptModal.js';
+import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
 import { EditQuotationModal } from './EditQuotationModal.js';
 import {
   LayoutDashboard,
@@ -38,7 +38,8 @@ import {
   Receipt,
   Printer,
   FileSpreadsheet,
-  Download
+  Download,
+  CreditCard
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -54,6 +55,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [activeQuote, setActiveQuote] = useState<QuotationDoc | null>(null);
   const [contractQuote, setContractQuote] = useState<QuotationDoc | null>(null);
   const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
+  const [receiptType, setReceiptType] = useState<ReceiptType>('deposit_30');
   const [editingQuote, setEditingQuote] = useState<QuotationDoc | null>(null);
   const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
@@ -784,18 +786,34 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                                 <span className="hidden xl:inline">สัญญาจ้าง</span>
                               </button>
 
-                              {/* Print Receipt Button */}
+                              {/* Print 30% Deposit Receipt Button */}
                               <button
-                                onClick={() => setReceiptQuote(quote)}
-                                className={`px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${
+                                onClick={() => {
+                                  setReceiptType('deposit_30');
+                                  setReceiptQuote(quote);
+                                }}
+                                className={`px-2 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${
                                   quote.status === 'deposit_paid' || quote.status === 'confirmed'
                                     ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-900 hover:text-white border-emerald-300 shadow-2xs'
                                     : 'bg-slate-50 hover:bg-slate-200 text-slate-700 border-slate-200'
                                 }`}
-                                title="พิมพ์ใบเสร็จรับเงินมัดจำ (A4)"
+                                title="พิมพ์ใบเสร็จรับเงินมัดจำ 30% (A4)"
                               >
                                 <Receipt className="w-3.5 h-3.5 text-emerald-600" />
-                                <span className="hidden xl:inline">ใบเสร็จ</span>
+                                <span className="hidden xl:inline">ใบเสร็จ 30%</span>
+                              </button>
+
+                              {/* Print 70% Final Settlement Receipt Button */}
+                              <button
+                                onClick={() => {
+                                  setReceiptType('final_70');
+                                  setReceiptQuote(quote);
+                                }}
+                                className="px-2 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-900 hover:text-white font-bold text-xs flex items-center gap-1 transition-all border border-blue-300 shadow-2xs"
+                                title="พิมพ์ใบเสร็จรับเงินยอดคงเหลือ 70% / ปิดงาน (A4)"
+                              >
+                                <CreditCard className="w-3.5 h-3.5 text-blue-600" />
+                                <span className="hidden xl:inline">ใบเสร็จ 70%</span>
                               </button>
 
                               {/* Edit Quotation & Re-generate PDF Button */}
@@ -1423,11 +1441,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
         />
       )}
 
-      {/* Official A4 Catering Deposit Receipt Modal */}
+      {/* Official A4 Catering Receipt Modal (Supports 30%, 70%, 100%) */}
       {receiptQuote && (
         <CateringReceiptModal
           quotation={receiptQuote}
           isOpen={!!receiptQuote}
+          initialType={receiptType}
           onClose={() => setReceiptQuote(null)}
         />
       )}
