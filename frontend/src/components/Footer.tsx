@@ -59,9 +59,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-red-600 shrink-0" />
-              <div className="flex flex-col text-xs font-mono font-bold">
-                <a href="mailto:info@rapeephat-catering.com" className="text-slate-800 hover:text-red-700">info@rapeephat-catering.com</a>
-                <a href="mailto:baicha@rapeephat-catering.com" className="text-slate-800 hover:text-red-700">baicha@rapeephat-catering.com</a>
+              <div className="flex flex-col text-xs font-semibold">
+                <a href="mailto:info@rapeephat-catering.com" className="text-slate-800 hover:text-red-700">info<span className="text-red-700 font-bold px-0.5">@</span>rapeephat-catering.com</a>
+                <a href="mailto:baicha@rapeephat-catering.com" className="text-slate-800 hover:text-red-700">baicha<span className="text-red-700 font-bold px-0.5">@</span>rapeephat-catering.com</a>
               </div>
             </div>
             <div className="space-y-2 pt-2 text-xs text-slate-700 font-medium">

@@ -240,7 +240,14 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                       <span><strong className="text-slate-950 font-bold">LINE:</strong> pang_baichaa</span>
                     </div>
                     <div>
-                      <strong className="text-slate-950 font-bold">อีเมล:</strong> <strong className="font-mono text-slate-900">info@rapeephat-catering.com, baicha@rapeephat-catering.com</strong>
+                      <strong className="text-slate-950 font-bold">อีเมล:</strong>{' '}
+                      <span className="font-sans font-semibold text-slate-900 tracking-normal">
+                        info<span className="font-sans text-[13px] font-bold text-emerald-800 px-0.5">@</span>rapeephat-catering.com
+                      </span>
+                      <span className="text-slate-400 mx-2 font-light">|</span>
+                      <span className="font-sans font-semibold text-slate-900 tracking-normal">
+                        baicha<span className="font-sans text-[13px] font-bold text-emerald-800 px-0.5">@</span>rapeephat-catering.com
+                      </span>
                     </div>
                   </div>
                 </div>

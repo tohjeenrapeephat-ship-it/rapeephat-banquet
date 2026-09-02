@@ -284,15 +284,15 @@ export const ContactSection: React.FC = () => {
                   <div className="space-y-1.5 pt-0.5">
                     <a
                       href="mailto:info@rapeephat-catering.com"
-                      className="block text-base sm:text-lg font-black text-red-700 hover:text-red-900 transition-colors font-mono tracking-tight bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
+                      className="block text-base sm:text-lg font-bold text-red-700 hover:text-red-900 transition-colors tracking-normal bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
                     >
-                      info@rapeephat-catering.com
+                      info<span className="font-bold text-red-800 px-0.5">@</span>rapeephat-catering.com
                     </a>
                     <a
                       href="mailto:baicha@rapeephat-catering.com"
-                      className="block text-base sm:text-lg font-black text-red-700 hover:text-red-900 transition-colors font-mono tracking-tight bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
+                      className="block text-base sm:text-lg font-bold text-red-700 hover:text-red-900 transition-colors tracking-normal bg-red-50/70 hover:bg-red-100/70 px-3 py-1.5 rounded-xl border border-red-200/80"
                     >
-                      baicha@rapeephat-catering.com
+                      baicha<span className="font-bold text-red-800 px-0.5">@</span>rapeephat-catering.com
                     </a>
                   </div>
 
