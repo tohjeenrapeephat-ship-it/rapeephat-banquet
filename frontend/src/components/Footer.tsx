@@ -68,8 +68,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               <div className="flex items-start gap-2 bg-amber-50/60 p-2.5 rounded-xl border border-amber-200/80">
                 <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-slate-900 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong><br />
-                  50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี
+                  <strong className="text-slate-900 font-bold">สำนักงานใหญ่:</strong><br />
+                  50/8 ม. 4 ต. คลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                 </div>
               </div>
               <div className="flex items-start gap-2 bg-red-50/60 p-2.5 rounded-xl border border-red-200/80">

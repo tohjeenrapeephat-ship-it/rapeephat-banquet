@@ -36,8 +36,8 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
 
   if (!isOpen || !quotation) return null;
 
-  const displayQuoteNo = quotation.quoteNo || `Q-${Date.now().toString().slice(-6)}`;
-  const contractNo = `CTR-${displayQuoteNo.replace(/^Q-/, '')}`;
+  const rawNo = (quotation.quoteNo || quotation.id || Date.now().toString()).replace(/^(QT|Q)-?/i, '');
+  const contractNo = `CTR-${rawNo}`;
   const totalTables = (quotation.tableCount || 0) + (quotation.freeTableCount || 0);
   const remainingBalance = (quotation.grandTotal || 0) - (quotation.depositAmount || 0);
 
@@ -72,7 +72,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                 สัญญาจ้างบริการจัดเลี้ยงโต๊ะจีน (A4 Catering Contract)
               </h3>
               <p className="text-[10.5px] text-slate-400 font-mono">
-                เลขที่สัญญา: {contractNo} • อ้างอิงใบเสนอราคา: {displayQuoteNo}
+                เลขที่สัญญา: {contractNo}
               </p>
             </div>
           </div>
@@ -152,7 +152,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                   
                   <div className="text-[11px] text-slate-800 pt-0.5 space-y-0.5 font-medium leading-snug">
                     <div>
-                      <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                      <strong className="text-slate-950 font-bold">สำนักงานใหญ่:</strong> 50/8 ม. 4 ต. คลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                     </div>
                     <div>
                       <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
@@ -185,7 +185,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
               {/* 2. Contract Description & Parties */}
               <div className="text-[11px] leading-relaxed text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-0.5">
                 <p>
-                  สัญญาฉบับนี้ทำขึ้นระหว่าง <strong>โต๊ะจีน รพีพัฒน์ พรีเมียม</strong> (โดย นางสาวทัศวรรณ จันทร์หอม) ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้รับจ้าง"</strong> ฝ่ายหนึ่ง กับ
+                  สัญญาฉบับนี้ทำขึ้นระหว่าง <strong>โต๊ะจีน รพีพัฒน์ พรีเมียม</strong> (โดย นางสาวใบชา สุขอยู่) ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้รับจ้าง"</strong> ฝ่ายหนึ่ง กับ
                 </p>
                 <p>
                   <strong>{quotation.customer?.name || 'ลูกค้าผู้ว่าจ้าง'}</strong> โทรศัพท์: <strong className="font-mono text-red-700 text-xs font-black">{quotation.customer?.phone || '-'}</strong> ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้ว่าจ้าง"</strong> อีกฝ่ายหนึ่ง
@@ -245,8 +245,11 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
 
               {/* 5. Financial Terms Breakdown */}
               <div className="bg-gradient-to-br from-amber-50 via-slate-50 to-red-50 p-2.5 rounded-xl border-2 border-amber-300 text-xs space-y-1.5">
-                <div className="font-black text-red-800 text-[11px] border-b border-amber-300 pb-0.5">
-                  <span>มูลค่าสัญญาและการชำระเงิน (Financial Agreement)</span>
+                <div className="border-b border-amber-300 pb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                  <span className="font-black text-red-800 text-[11px]">มูลค่าสัญญาและการชำระเงิน</span>
+                  <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-800">
+                    ชำระโดยการโอนเข้าบัญชีฝ่ายบัญชี และการผลิตหลัก(โรงครัวกลาง) ชื่อบัญชี นางสาวทัศวรรณ จันทร์หอม
+                  </span>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 pt-0.5 text-center">
@@ -292,7 +295,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                 </div>
 
                 <div className="text-center space-y-2 relative">
-                  <div className="text-xs font-bold text-slate-700">ลงชื่อ ผู้รับจ้าง (โต๊ะจีน รพีพัฒน์)</div>
+                  <div className="text-xs font-bold text-slate-700">ลงชื่อ ................................... ผู้รับจ้าง (โต๊ะจีนรพีพัฒน์)</div>
                   
                   {/* Auspicious Signature and Seal */}
                   <div className="relative h-9 flex items-center justify-center">
@@ -309,8 +312,8 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                   </div>
 
                   <div className="space-y-0.5">
-                    <div className="text-xs font-black text-red-700">( นางสาวทัศวรรณ จันทร์หอม )</div>
-                    <div className="text-[9.5px] text-slate-500 font-medium">ผู้จัดการฝ่ายจัดเลี้ยง • โต๊ะจีน รพีพัฒน์ พรีเมียม</div>
+                    <div className="text-xs font-black text-red-700">( นางสาวใบชา สุขอยู่ )</div>
+                    <div className="text-[10px] text-slate-900 font-bold">ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม</div>
                   </div>
                 </div>
               </div>

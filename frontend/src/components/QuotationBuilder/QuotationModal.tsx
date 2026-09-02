@@ -368,7 +368,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                   </div>
                   <div className="text-[11px] text-slate-800 pt-0.5 font-medium space-y-0.5 leading-snug">
                     <div>
-                      <strong className="text-slate-950 font-bold">สำนักงานหลัก (ออกเอกสาร):</strong> 50/8 ม.4 ถ.เลียบคลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
+                      <strong className="text-slate-950 font-bold">สำนักงานใหญ่:</strong> 50/8 ม. 4 ต. คลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                     </div>
                     <div>
                       <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
