@@ -29,14 +29,14 @@ export const SocialFollowSection: React.FC = () => {
       id: 'facebook',
       name: 'Facebook Page',
       handle: 'โต๊ะจีน รพีพัฒน์ นครปฐม',
-      followers: '128,500+ ผู้ติดตาม',
+      followers: 'แฟนเพจโต๊ะจีนอันดับ 1',
       color: 'from-blue-600 to-blue-800',
       bgColor: 'bg-blue-50 border-blue-200',
-      badge: '👍 ยอดนิยมอันดับ 1',
+      badge: '👍 เพจทางการ Official',
       icon: '📘',
       desc: 'อัปเดตภาพผลงานจัดเลี้ยงจริงทั่วไทยทุกวัน และโปรโมชันพิเศษ',
       ctaText: 'กดถูกใจ & ติดตามเพจ',
-      url: 'https://www.facebook.com/search/top?q=โต๊ะจีน%20รพีพัฒน์',
+      url: 'https://www.facebook.com/profile.php?id=61593868896647',
     },
     {
       id: 'tiktok',
@@ -177,7 +177,7 @@ export const SocialFollowSection: React.FC = () => {
 
             <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
               <a
-                href="https://www.facebook.com/search/top?q=โต๊ะจีน%20รพีพัฒน์"
+                href="https://www.facebook.com/profile.php?id=61593868896647"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-all transform hover:scale-105 border border-blue-300"

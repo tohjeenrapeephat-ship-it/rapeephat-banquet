@@ -55,13 +55,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             {/* Social Follow Links */}
             <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
               <a
-                href="https://www.facebook.com/search/top?q=โต๊ะจีน%20รพีพัฒน์"
+                href="https://www.facebook.com/profile.php?id=61593868896647"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 font-black text-xs border border-blue-200 transition-colors shadow-2xs"
                 title="ติดตามเพจ Facebook โต๊ะจีน รพีพัฒน์"
               >
-                <span>📘 Facebook (128K+)</span>
+                <span>📘 Facebook เพจทางการ</span>
               </a>
 
               <a

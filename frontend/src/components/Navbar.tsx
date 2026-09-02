@@ -101,6 +101,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
             )}
           </button>
 
+          {/* Direct Facebook Page Link */}
+          <a
+            href="https://www.facebook.com/profile.php?id=61593868896647"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3.5 py-2.5 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-900 border-2 border-blue-300 font-black text-xs xl:text-sm flex items-center gap-1.5 shadow-2xs transition-all whitespace-nowrap"
+            title="ติดตามเพจ Facebook โต๊ะจีน รพีพัฒน์"
+          >
+            <span>📘 เพจ Facebook</span>
+          </a>
+
           {/* Direct Phone Call Button */}
           <a
             href="tel:0813311646"
