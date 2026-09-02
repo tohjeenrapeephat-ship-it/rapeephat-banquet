@@ -50,6 +50,15 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   const [eventType, setEventType] = useState(quotation.customer?.eventType || 'งานเลี้ยงทั่วไป');
   const [notes, setNotes] = useState(quotation.customer?.notes || '');
 
+  const [locationZone, setLocationZone] = useState<'bkk_metro' | 'upcountry'>(
+    quotation.customer?.locationZone || 'bkk_metro'
+  );
+  const [travelFeeAmount, setTravelFeeAmount] = useState<number>(() => {
+    if (quotation.travelFee?.amount !== undefined) return quotation.travelFee.amount;
+    const isBkk = (quotation.customer?.locationZone || 'bkk_metro') !== 'upcountry';
+    return (quotation.tableCount || 10) < 20 && isBkk ? 1500 : 0;
+  });
+
   const [selectedPackageId, setSelectedPackageId] = useState(quotation.package?.id || 'pkg-1400');
   const [packagePrice, setPackagePrice] = useState<number>(quotation.package?.price || 1400);
   const [packageName, setPackageName] = useState(quotation.package?.name || '');
@@ -77,8 +86,10 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   });
 
   // Calculate prices dynamically
-  const subtotal = tableCount * packagePrice;
-  const grandTotal = Math.max(0, subtotal - discount);
+  const beverageTotal = quotation.beverage?.total || 0;
+  const floorServiceTotal = quotation.floorService?.total || 0;
+  const subtotal = tableCount * packagePrice + beverageTotal + floorServiceTotal;
+  const grandTotal = Math.max(0, subtotal + travelFeeAmount - discount);
   const depositAmount = Math.round(grandTotal * 0.3);
   const finalAmount = grandTotal - depositAmount;
 
@@ -110,6 +121,17 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
     // Automatic Free Table promotion rule: 1 free table per 20 tables
     const autoFree = Math.floor(count / 20);
     setFreeTableCount(autoFree);
+    // Auto adjust travel fee if in BKK zone
+    if (locationZone === 'bkk_metro') {
+      setTravelFeeAmount(count < 20 ? 1500 : 0);
+    }
+  };
+
+  const handleZoneChange = (zone: 'bkk_metro' | 'upcountry') => {
+    setLocationZone(zone);
+    if (zone === 'bkk_metro') {
+      setTravelFeeAmount(tableCount < 20 ? 1500 : 0);
+    }
   };
 
   // Dish Handlers
@@ -163,6 +185,8 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
     e.preventDefault();
 
     const selectedPkg = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || quotation.package;
+    const isBkk = locationZone !== 'upcountry';
+    const isFree = tableCount >= 20 && isBkk;
 
     const updated: QuotationDoc = {
       ...quotation,
@@ -175,6 +199,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
         eventTime,
         eventLocation,
         eventType,
+        locationZone,
         notes,
       },
       package: {
@@ -190,6 +215,16 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
       })),
       tableCount,
       freeTableCount,
+      travelFee: {
+        amount: travelFeeAmount,
+        description: isFree
+          ? 'ฟรีค่าเดินทางขนส่งในกรุงเทพฯ และปริมณฑล (โปรโมชั่นสั่งครบ 20 โต๊ะขึ้นไป)'
+          : isBkk
+          ? 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (กทม. และปริมณฑล - สั่งไม่ถึง 20 โต๊ะ)'
+          : 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด - คำนวณตามระยะทางจริง ประสานงานคุณแป้ง)',
+        zone: locationZone,
+        isFree,
+      },
       subtotal,
       discount,
       grandTotal,
@@ -375,6 +410,38 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
               </div>
 
               <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">โซนพื้นที่จัดงาน</label>
+                <select
+                  value={locationZone}
+                  onChange={(e) => handleZoneChange(e.target.value as any)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-bold text-slate-900 outline-none"
+                >
+                  <option value="bkk_metro">กรุงเทพฯ และปริมณฑล</option>
+                  <option value="upcountry">ต่างจังหวัด (นอกเขตปริมณฑล)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  ค่าเดินทางขนส่ง (บาท)
+                  {locationZone === 'bkk_metro' && tableCount < 20 && (
+                    <span className="text-[10.5px] text-red-600 font-bold ml-1">(ไม่ถึง 20 โต๊ะ = 1,500)</span>
+                  )}
+                  {locationZone === 'bkk_metro' && tableCount >= 20 && (
+                    <span className="text-[10.5px] text-emerald-600 font-bold ml-1">(20 โต๊ะขึ้นไป = ฟรี 0.-)</span>
+                  )}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={travelFeeAmount}
+                  onChange={(e) => setTravelFeeAmount(Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-mono font-bold text-slate-900 outline-none"
+                />
+              </div>
+
+              <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">จำนวนโต๊ะที่สั่ง (โต๊ะ)</label>
                 <input
                   type="number"
@@ -424,10 +491,16 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
             </div>
 
             {/* Calculated Financial Summary */}
-            <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-red-50 border border-amber-300 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-red-50 border border-amber-300 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
               <div className="p-2 bg-white rounded-lg border border-slate-200">
                 <div className="text-[10px] text-slate-500 font-bold">รวมโต๊ะจัดเสิร์ฟ</div>
                 <div className="text-base font-black text-slate-900">{tableCount + freeTableCount} โต๊ะ</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg border border-slate-200">
+                <div className="text-[10px] text-slate-500 font-bold">ค่าเดินทาง</div>
+                <div className="text-base font-black text-slate-900 font-mono">
+                  {travelFeeAmount > 0 ? `${formatCurrency(travelFeeAmount)}.-` : 'ฟรี (0.-)'}
+                </div>
               </div>
               <div className="p-2 bg-white rounded-lg border border-slate-200">
                 <div className="text-[10px] text-slate-500 font-bold">ยอดรวมสุทธิ</div>

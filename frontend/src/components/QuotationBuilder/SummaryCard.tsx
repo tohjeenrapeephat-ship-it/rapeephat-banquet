@@ -13,7 +13,8 @@ import {
   Clock,
   CupSoda,
   Award,
-  Utensils
+  Utensils,
+  Truck
 } from 'lucide-react';
 
 interface SummaryCardProps {
@@ -22,6 +23,7 @@ interface SummaryCardProps {
   selectedBeverage: BeverageSet;
   onBeverageSelect?: (beverage: BeverageSet) => void;
   floorServiceEnabled: boolean;
+  locationZone?: 'bkk_metro' | 'upcountry';
   onGenerateQuotation: () => void;
   isValid: boolean;
 }
@@ -32,6 +34,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   selectedBeverage,
   onBeverageSelect,
   floorServiceEnabled,
+  locationZone = 'bkk_metro',
   onGenerateQuotation,
   isValid,
 }) => {
@@ -41,7 +44,13 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   const beverageTotal = (selectedBeverage?.pricePerTable || 0) * tableCount;
   const floorServiceTotal = floorServiceEnabled ? 100 * tableCount : 0;
   
-  const grandTotal = packageTotal + beverageTotal + floorServiceTotal;
+  // Travel Fee Calculation:
+  // If < 20 tables: 1,500 THB in Bangkok & Metro, or distance-based quote for upcountry
+  // If >= 20 tables: Free in Bangkok & Metro
+  const isBkkMetro = locationZone !== 'upcountry';
+  const travelFeeAmount = tableCount < 20 && isBkkMetro ? 1500 : 0;
+  
+  const grandTotal = packageTotal + beverageTotal + floorServiceTotal + travelFeeAmount;
 
   const depositAmount = Math.round(grandTotal * 0.30); // 30% Deposit
   const finalAmount = grandTotal - depositAmount;       // 70% Final
@@ -74,7 +83,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
             <li>โต๊ะ เก้าอี้ ผ้าปูโต๊ะ ผ้าคลุมเก้าอี้ ผูกโบว์</li>
             <li>อุปกรณ์ทานอาหารครบชุด (จาน ชาม ช้อน แก้ว ตะเกียบ)</li>
             <li>บริการพนักงานเสิร์ฟดูแลตลอดงาน</li>
-            <li>ฟรีค่าเดินทาง (กทม. / นครปฐม / นนทบุรี / ปริมณฑล)</li>
+            <li>ฟรีค่าเดินทาง (สำหรับงาน 20 โต๊ะขึ้นไป ในกทม.และปริมณฑล)</li>
           </ul>
         </div>
 
@@ -88,9 +97,10 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
           </div>
           <ul className="space-y-2 pl-6 list-disc text-sm sm:text-base text-slate-800 font-bold leading-relaxed">
             <li className="font-black text-red-700">สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะ (ราคาเดียวกัน)</li>
+            <li className="font-black text-emerald-800">สั่ง 20 โต๊ะขึ้นไป ฟรีค่าเดินทางขนส่งในกทม.และปริมณฑล</li>
+            <li>สั่งไม่ถึง 20 โต๊ะ ค่าเดินทาง 1,500 บาท (กทม.และปริมณฑล)</li>
+            <li>ต่างจังหวัด มีค่าเดินทางคำนวณตามระยะทางจริง (ประสานงานคุณแป้ง)</li>
             <li>ฟรี ผ้าปูโต๊ะ ผ้าคลุมเก้าอี้ ผูกโบว์ (ทุกราคา)</li>
-            <li>ฟรี แก้วน้ำ ถังน้ำแข็ง (กรณีไม่รับชุดน้ำดื่ม)</li>
-            <li>ต่างจังหวัด มีค่าเดินทางตามระยะทาง (ฟรีหากยอดสั่งถึงกำหนด)</li>
           </ul>
         </div>
 
@@ -183,6 +193,40 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
             </div>
           )}
 
+          {floorServiceTotal > 0 && (
+            <div className="flex justify-between items-baseline text-slate-700">
+              <span className="text-xs sm:text-sm font-bold">บริการยกขึ้นอาคาร (100.-/โต๊ะ):</span>
+              <span className="text-sm font-bold font-mono">+{formatCurrency(floorServiceTotal)}</span>
+            </div>
+          )}
+
+          {/* Travel / Transportation Fee Row */}
+          {travelFeeAmount > 0 ? (
+            <div className="flex justify-between items-baseline text-red-700 font-bold bg-red-50/80 p-2 px-3 rounded-xl border border-red-200">
+              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                <Truck className="w-4 h-4 text-red-600 shrink-0" />
+                <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่งไม่ถึง 20 โต๊ะ):</span>
+              </span>
+              <span className="text-sm font-black font-mono">+{formatCurrency(travelFeeAmount)}</span>
+            </div>
+          ) : isBkkMetro ? (
+            <div className="flex justify-between items-baseline text-emerald-900 font-bold bg-emerald-50/80 p-2 px-3 rounded-xl border border-emerald-200">
+              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่ง 20 โต๊ะขึ้นไป):</span>
+              </span>
+              <span className="text-xs sm:text-sm font-black text-emerald-700 font-mono">ฟรี 0 บาท (ประหยัด 1,500.-)</span>
+            </div>
+          ) : (
+            <div className="flex justify-between items-baseline text-amber-900 font-bold bg-amber-50/80 p-2 px-3 rounded-xl border border-amber-200">
+              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                <Truck className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>ค่าเดินทางขนส่ง (ต่างจังหวัด):</span>
+              </span>
+              <span className="text-xs font-black text-amber-800">ตามระยะทาง (ติดต่อคุณแป้ง)</span>
+            </div>
+          )}
+
           {freeTableCount > 0 && (
             <div className="flex justify-between items-baseline text-emerald-900 font-bold bg-emerald-50/90 p-3 rounded-xl border-2 border-emerald-300">
               <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
@@ -201,6 +245,18 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
             <span className="text-2xl sm:text-3xl font-black text-red-600 font-mono tracking-tight">
               {formatCurrency(grandTotal)}
             </span>
+          </div>
+
+          {/* Deposit & Final Split Preview */}
+          <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-bold border-t border-red-100">
+            <div className="bg-white/80 p-2 rounded-xl border border-red-200">
+              <span className="text-slate-600 block">มัดจำล็อกคิว (30%):</span>
+              <strong className="text-red-700 font-mono text-sm font-black">{formatCurrency(depositAmount)}.-</strong>
+            </div>
+            <div className="bg-white/80 p-2 rounded-xl border border-red-200">
+              <span className="text-slate-600 block">ยอดคงเหลือวันงาน (70%):</span>
+              <strong className="text-slate-900 font-mono text-sm font-black">{formatCurrency(finalAmount)}.-</strong>
+            </div>
           </div>
         </div>
 

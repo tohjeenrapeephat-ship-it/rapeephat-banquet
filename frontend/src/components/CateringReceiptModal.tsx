@@ -300,6 +300,11 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                         </div>
                         <div className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                           • แพ็กเกจอาหาร: <strong className="text-emerald-900">{quotation.package?.name}</strong> (@{formatCurrency(quotation.package?.price || 0)}.-/โต๊ะ)<br />
+                          {quotation.travelFee && quotation.travelFee.amount > 0 ? (
+                            <>• รวมค่าเดินทางขนส่ง: <strong className="font-mono text-slate-800">{formatCurrency(quotation.travelFee.amount)}.-</strong> (สั่งไม่ถึง 20 โต๊ะ)<br /></>
+                          ) : quotation.tableCount >= 20 ? (
+                            <>• สิทธิประโยชน์: <strong className="text-emerald-700">ฟรีค่าเดินทางขนส่ง 100%</strong> (สั่งครบ 20 โต๊ะขึ้นไป)<br /></>
+                          ) : null}
                           {receiptType === 'final_70' && (
                             <>
                               • หักยอดเงินมัดจำล็อกคิว 30% ที่ชำระแล้ว: <strong className="font-mono text-slate-700">{formatCurrency(depositAmount)}.-</strong><br />

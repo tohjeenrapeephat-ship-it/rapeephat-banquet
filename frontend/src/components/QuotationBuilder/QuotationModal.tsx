@@ -482,7 +482,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
 
                     {quotation.floorService?.enabled && (
                       <tr className="hover:bg-slate-50/50">
-                        <td className="py-2 px-2.5 text-center font-black text-slate-500">3</td>
+                        <td className="py-2 px-2.5 text-center font-black text-slate-500">
+                          {2 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0)}
+                        </td>
                         <td className="py-2 px-2.5 font-bold text-slate-950 text-xs">บริการยกขึ้นอาคารชั้น 2 ขึ้นไป (ไม่มีลิฟต์)</td>
                         <td className="py-2 px-2.5 text-center font-black text-slate-950">{quotation.tableCount} โต๊ะ</td>
                         <td className="py-2 px-2.5 text-right font-black text-slate-950">100</td>
@@ -491,6 +493,64 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                         </td>
                       </tr>
                     )}
+
+                    {/* Travel / Transportation Fee Row */}
+                    {quotation.travelFee && quotation.travelFee.amount > 0 ? (
+                      <tr className="hover:bg-slate-50/50">
+                        <td className="py-2 px-2.5 text-center font-black text-slate-500">
+                          {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
+                        </td>
+                        <td className="py-2 px-2.5">
+                          <div className="font-black text-slate-950 text-xs sm:text-sm">
+                            ค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (กทม. และปริมณฑล)
+                          </div>
+                          <div className="text-[10.5px] text-slate-500 font-medium mt-0.5">
+                            • บริการขนส่งโต๊ะ เก้าอี้ ผ้าคลุม จานชาม อุปกรณ์ครัวกลาง และทีมงาน (สั่งไม่ถึง 20 โต๊ะ)
+                          </div>
+                        </td>
+                        <td className="py-2 px-2.5 text-center font-black text-slate-950">1 งาน</td>
+                        <td className="py-2 px-2.5 text-right font-black text-slate-950">{formatCurrency(quotation.travelFee.amount)}</td>
+                        <td className="py-2 px-2.5 text-right font-black text-slate-950">
+                          {formatCurrency(quotation.travelFee.amount)}
+                        </td>
+                      </tr>
+                    ) : quotation.customer?.locationZone === 'upcountry' ? (
+                      <tr className="hover:bg-slate-50/50">
+                        <td className="py-2 px-2.5 text-center font-black text-slate-500">
+                          {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
+                        </td>
+                        <td className="py-2 px-2.5">
+                          <div className="font-black text-slate-950 text-xs sm:text-sm">
+                            ค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด)
+                          </div>
+                          <div className="text-[10.5px] text-amber-800 font-bold mt-0.5">
+                            • คำนวณตามระยะทางจริง (ตกลงประสานงานโดยตรงกับคุณแป้ง 081-331-1646)
+                          </div>
+                        </td>
+                        <td className="py-2 px-2.5 text-center font-black text-slate-950">1 งาน</td>
+                        <td className="py-2 px-2.5 text-right font-bold text-slate-600 text-xs">ตามระยะทาง</td>
+                        <td className="py-2 px-2.5 text-right font-bold text-amber-800 text-xs">
+                          {quotation.travelFee?.amount ? `${formatCurrency(quotation.travelFee.amount)}` : 'ตามตกลงคุณแป้ง'}
+                        </td>
+                      </tr>
+                    ) : quotation.tableCount >= 20 ? (
+                      <tr className="bg-emerald-50/50 text-emerald-950 font-medium">
+                        <td className="py-2 px-2.5 text-center text-emerald-700 font-black text-xs">✓</td>
+                        <td className="py-2 px-2.5">
+                          <div className="font-black text-emerald-900 text-xs">
+                            ฟรีค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (กทม. และปริมณฑล)
+                          </div>
+                          <div className="text-[10.5px] text-emerald-700 font-bold mt-0.5">
+                            • สิทธิพิเศษโปรโมชันสั่งจัดเลี้ยงตั้งแต่ 20 โต๊ะขึ้นไป ฟรีค่าจัดส่งและขนส่งอุปกรณ์ 100% (ประหยัด 1,500.-)
+                          </div>
+                        </td>
+                        <td className="py-2 px-2.5 text-center font-black text-emerald-900">1 งาน</td>
+                        <td className="py-2 px-2.5 text-right font-black text-emerald-700 text-xs">ฟรี</td>
+                        <td className="py-2 px-2.5 text-right font-black text-emerald-700 text-xs sm:text-sm">
+                          ฟรี (0 บาท)
+                        </td>
+                      </tr>
+                    ) : null}
 
                     {/* Free Table Promotion Row */}
                     {quotation.freeTableCount > 0 && (
@@ -593,6 +653,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                     </li>
                     <li>
                       <strong className="text-slate-950">ยอดคงเหลือ 70%:</strong> <span className="font-black text-slate-950 text-xs">{formatCurrency(quotation.finalAmount)} บาท</span> ชำระในวันจัดงานจริง
+                    </li>
+                    <li>
+                      <strong>ค่าเดินทาง:</strong> สั่ง 20 โต๊ะขึ้นไป ฟรีในกทม./ปริมณฑล (ไม่ถึง 20 โต๊ะ คิด 1,500.- / ต่างจังหวัดตามระยะทางจริง)
                     </li>
                     <li>
                       <strong>บริการรวมฟรี:</strong> โต๊ะ เก้าอี้พร้อมผ้าคลุมผูกโบว์ จานชาม และทีมบริกร

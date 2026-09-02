@@ -1,7 +1,7 @@
 import React from 'react';
 import { BeverageSet } from '../../types/quotation.js';
 import { BEVERAGE_SETS } from '../../data/beverages.js';
-import { Users, Wine, Building2, Gift, Plus, Minus, Check, Crown, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Users, Wine, Building2, Gift, Plus, Minus, Check, Crown, Sparkles, CheckCircle2, Truck } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency.js';
 
 interface TableCalculatorProps {
@@ -99,7 +99,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
           </div>
 
           {/* Promotion Notification Banner */}
-          <div className="sm:col-span-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-red-50 via-amber-50/70 to-red-50 border-2 border-amber-300 space-y-2 shadow-2xs">
+          <div className="sm:col-span-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-red-50 via-amber-50/70 to-red-50 border-2 border-amber-300 space-y-2.5 shadow-2xs">
             <div className="flex items-center gap-2 text-red-700 font-black text-sm sm:text-base">
               <Gift className="w-5 h-5 text-amber-600 animate-bounce shrink-0" />
               <span>โปรโมชันฉลอง 35 ปี: สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะ!</span>
@@ -111,13 +111,20 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                   <span>ได้รับโต๊ะแถมฟรี {freeTableCount} โต๊ะ! (ประหยัด {(freeTableCount * packagePrice).toLocaleString()} บาท)</span>
                 </div>
-                <div className="text-xs sm:text-sm text-slate-700 font-bold">
-                  คิดเงินเพียง {tableCount - freeTableCount} โต๊ะ (ได้อาหารครบ {tableCount} โต๊ะ)
+                <div className="text-xs sm:text-sm text-emerald-900 font-bold flex items-center gap-1">
+                  <Truck className="w-4 h-4 text-emerald-700" />
+                  <span>ฟรีค่าเดินทางขนส่งในกทม./ปริมณฑล 100%!</span>
                 </div>
               </div>
             ) : (
-              <div className="text-xs sm:text-sm text-slate-800 font-bold">
-                สั่งเพิ่มอีก <strong className="text-red-700 font-black">{tablesUntilNextFree} โต๊ะ</strong> จะได้รับโต๊ะแถมฟรี 1 โต๊ะทันที!
+              <div className="space-y-1 text-xs sm:text-sm text-slate-800 font-bold">
+                <div>
+                  สั่งเพิ่มอีก <strong className="text-red-700 font-black">{tablesUntilNextFree} โต๊ะ</strong> จะได้รับโต๊ะแถมฟรี 1 โต๊ะ + ฟรีค่าเดินทางทันที!
+                </div>
+                <div className="text-xs text-slate-600 flex items-center gap-1 font-medium">
+                  <Truck className="w-3.5 h-3.5 text-amber-700" />
+                  <span>สั่งไม่ถึง 20 โต๊ะ มีค่าเดินทาง 1,500.- (กทม./ปริมณฑล)</span>
+                </div>
               </div>
             )}
           </div>

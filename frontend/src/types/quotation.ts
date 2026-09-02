@@ -45,6 +45,7 @@ export interface CustomerInfo {
   eventTime: string;
   eventLocation: string;
   eventType: string;
+  locationZone?: 'bkk_metro' | 'upcountry';
   notes?: string;
 }
 
@@ -79,6 +80,12 @@ export interface QuotationDoc {
     enabled: boolean;
     pricePerTable: number;
     total: number;
+  };
+  travelFee?: {
+    amount: number;
+    description: string;
+    zone: 'bkk_metro' | 'upcountry';
+    isFree: boolean;
   };
   subtotal: number;
   discount: number;

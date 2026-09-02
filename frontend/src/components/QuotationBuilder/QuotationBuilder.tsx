@@ -102,9 +102,19 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     const beverageTotal = selectedBeverage.pricePerTable * tableCount;
     const floorServiceTotal = floorServiceEnabled ? 100 * tableCount : 0;
     
+    // Travel fee calculation: 1,500 THB in BKK/Metro if < 20 tables, Free if >= 20 tables, distance based if upcountry
+    const isBkkMetro = (customerData.locationZone || 'bkk_metro') !== 'upcountry';
+    const isFree = tableCount >= 20;
+    const travelFeeAmount = tableCount < 20 && isBkkMetro ? 1500 : 0;
+    const travelFeeDesc = isFree
+      ? 'ฟรีค่าเดินทางขนส่งในกรุงเทพฯ และปริมณฑล (โปรโมชั่นสั่งครบ 20 โต๊ะขึ้นไป)'
+      : isBkkMetro
+      ? 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (กทม. และปริมณฑล - สั่งไม่ถึง 20 โต๊ะ)'
+      : 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด - คำนวณตามระยะทางจริง ประสานงานคุณแป้ง)';
+
     const subtotal = packageTotal + beverageTotal + floorServiceTotal;
     const discount = 0;
-    const grandTotal = subtotal; // Free tables are complimentary (0 THB), not subtracted from ordered tables
+    const grandTotal = subtotal + travelFeeAmount; // Free tables are complimentary (0 THB), not subtracted from ordered tables
 
     const depositAmount = Math.round(grandTotal * 0.30);
     const finalAmount = grandTotal - depositAmount;
@@ -137,6 +147,12 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
         enabled: floorServiceEnabled,
         pricePerTable: 100,
         total: floorServiceTotal,
+      },
+      travelFee: {
+        amount: travelFeeAmount,
+        description: travelFeeDesc,
+        zone: customerData.locationZone || 'bkk_metro',
+        isFree,
       },
       subtotal,
       discount,
@@ -309,6 +325,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
               selectedBeverage={selectedBeverage}
               onBeverageSelect={setSelectedBeverage}
               floorServiceEnabled={floorServiceEnabled}
+              locationZone={customerData.locationZone || 'bkk_metro'}
               onGenerateQuotation={handleGenerateQuotation}
               isValid={isValid}
             />

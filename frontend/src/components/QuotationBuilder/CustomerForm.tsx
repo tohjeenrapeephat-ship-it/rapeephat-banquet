@@ -1,6 +1,6 @@
 import React from 'react';
 import { CustomerInfo } from '../../types/quotation.js';
-import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText } from 'lucide-react';
+import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText, Truck, Building2, Navigation, CheckCircle2 } from 'lucide-react';
 
 interface CustomerFormProps {
   formData: CustomerInfo;
@@ -8,6 +8,8 @@ interface CustomerFormProps {
 }
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }) => {
+  const currentZone = formData.locationZone || 'bkk_metro';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 pb-3 border-b-2 border-slate-200">
@@ -129,6 +131,86 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           </select>
         </div>
 
+      </div>
+
+      {/* Modern Transportation & Region Zone Selector */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-50/90 via-white to-amber-50/70 border-2 border-amber-300 space-y-3 shadow-2xs">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Truck className="w-5 h-5 text-amber-700 shrink-0" />
+            <span className="text-sm sm:text-base font-black text-slate-950">
+              พื้นที่จัดงาน & นโยบายค่าเดินทางขนส่ง
+            </span>
+          </div>
+          <span className="text-xs font-bold text-amber-900 bg-amber-100/90 px-3 py-0.5 rounded-full border border-amber-300">
+            ระบบคำนวณอัตโนมัติ
+          </span>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3.5">
+          {/* Option 1: BKK & Greater Bangkok */}
+          <div
+            onClick={() => onChange({ locationZone: 'bkk_metro' })}
+            className={`p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+              currentZone === 'bkk_metro'
+                ? 'bg-amber-100/90 border-amber-500 shadow-xs'
+                : 'bg-white hover:bg-slate-50 border-slate-200'
+            }`}
+          >
+            <input
+              type="radio"
+              checked={currentZone === 'bkk_metro'}
+              onChange={() => onChange({ locationZone: 'bkk_metro' })}
+              className="mt-1 w-4 h-4 text-amber-600 accent-amber-600"
+            />
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Building2 className="w-4 h-4 text-amber-800" />
+                <strong className="text-sm sm:text-base text-slate-950 font-black">
+                  กรุงเทพฯ และ ปริมณฑล
+                </strong>
+              </div>
+              <p className="text-xs text-slate-700 font-medium">
+                ครอบคลุม กทม., นครปฐม, นนทบุรี, ปทุมธานี, สมุทรปราการ, สมุทรสาคร
+              </p>
+              <div className="pt-1 text-xs font-bold text-amber-950">
+                • สั่งไม่ถึง 20 โต๊ะ: <span className="text-red-700 font-black">ค่าเดินทาง 1,500.-</span><br />
+                • สั่ง 20 โต๊ะขึ้นไป: <span className="text-emerald-700 font-black">ฟรีค่าเดินทาง 100%!</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Option 2: Upcountry */}
+          <div
+            onClick={() => onChange({ locationZone: 'upcountry' })}
+            className={`p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+              currentZone === 'upcountry'
+                ? 'bg-amber-100/90 border-amber-500 shadow-xs'
+                : 'bg-white hover:bg-slate-50 border-slate-200'
+            }`}
+          >
+            <input
+              type="radio"
+              checked={currentZone === 'upcountry'}
+              onChange={() => onChange({ locationZone: 'upcountry' })}
+              className="mt-1 w-4 h-4 text-amber-600 accent-amber-600"
+            />
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Navigation className="w-4 h-4 text-amber-800" />
+                <strong className="text-sm sm:text-base text-slate-950 font-black">
+                  ต่างจังหวัด (นอกเขตปริมณฑล)
+                </strong>
+              </div>
+              <p className="text-xs text-slate-700 font-medium">
+                จัดเลี้ยงทุกจังหวัดทั่วประเทศ พร้อมรถครัวกลางและทีมบริกร
+              </p>
+              <div className="pt-1 text-xs font-bold text-amber-950">
+                • <span className="text-red-700 font-black">คำนวณตามระยะทางจริง</span> (ตกลงประสานงานโดยตรงกับคุณแป้ง 081-331-1646)
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Location & Special Notes (Full Width Grid with strict equalized heights) */}
