@@ -13,11 +13,13 @@ import { formatCurrency } from '../../utils/currency.js';
 
 interface QuotationBuilderProps {
   initialPackage?: PackageTier;
+  initialDate?: string;
   onQuotationGenerated?: (quote: QuotationDoc) => void;
 }
 
 export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
   initialPackage,
+  initialDate,
   onQuotationGenerated,
 }) => {
   // State
@@ -43,12 +45,19 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     name: '',
     phone: '',
     email: '',
-    eventDate: '',
+    eventDate: initialDate || '',
     eventTime: 'ช่วงเย็น (17:00 - 19:00 น.)',
     eventLocation: '',
     eventType: 'งานมงคลสมรส (งานแต่งงาน)',
     notes: '',
   });
+
+  // Effect to update eventDate if initialDate changes
+  React.useEffect(() => {
+    if (initialDate) {
+      setCustomerData((prev) => ({ ...prev, eventDate: initialDate }));
+    }
+  }, [initialDate]);
 
   // Generated Quotation Modal State
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationDoc | null>(null);

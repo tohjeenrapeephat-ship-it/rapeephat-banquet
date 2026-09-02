@@ -52,7 +52,7 @@ router.get('/', async (req: Request, res: Response) => {
 // GET quotation by ID
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const quotation = await prisma.quotation.findUnique({
       where: { id },
     });
@@ -161,7 +161,7 @@ router.post('/', async (req: Request, res: Response) => {
 // PATCH update status or Google Drive URL
 router.patch('/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { status, pdfDriveUrl, notes } = req.body;
 
     const updated = await prisma.quotation.update({
@@ -189,7 +189,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
 // DELETE quotation
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     await prisma.quotation.delete({ where: { id } });
     return res.json({ success: true, message: 'Quotation deleted successfully' });
   } catch (error: any) {

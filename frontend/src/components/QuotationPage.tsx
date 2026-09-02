@@ -5,6 +5,7 @@ import { ArrowLeft, Phone, MessageCircle, FileText, Sparkles, Home, ShieldCheck,
 
 interface QuotationPageProps {
   initialPackage?: PackageTier;
+  initialDate?: string;
   onBackToHome: () => void;
   onQuotationGenerated: (quote: QuotationDoc) => void;
   onOpenHistory: () => void;
@@ -13,6 +14,7 @@ interface QuotationPageProps {
 
 export const QuotationPage: React.FC<QuotationPageProps> = ({
   initialPackage,
+  initialDate,
   onBackToHome,
   onQuotationGenerated,
   onOpenHistory,
@@ -109,6 +111,7 @@ export const QuotationPage: React.FC<QuotationPageProps> = ({
         {/* Builder Container */}
         <QuotationBuilder
           initialPackage={initialPackage}
+          initialDate={initialDate}
           onQuotationGenerated={onQuotationGenerated}
         />
 

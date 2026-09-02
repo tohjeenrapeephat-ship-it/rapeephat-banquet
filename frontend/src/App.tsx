@@ -53,6 +53,7 @@ export const App: React.FC = () => {
     return 'site';
   });
   const [selectedPkgForBuilder, setSelectedPkgForBuilder] = useState<PackageTier | undefined>(undefined);
+  const [selectedDateForBuilder, setSelectedDateForBuilder] = useState<string | undefined>(undefined);
   const [historyOpen, setHistoryOpen] = useState<boolean>(false);
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
@@ -115,9 +116,12 @@ export const App: React.FC = () => {
   }, []);
 
   // Handlers to open dedicated Quotation Page
-  const handleOpenBuilder = (pkg?: PackageTier) => {
+  const handleOpenBuilder = (pkg?: PackageTier, date?: string) => {
     if (pkg) {
       setSelectedPkgForBuilder(pkg);
+    }
+    if (date) {
+      setSelectedDateForBuilder(date);
     }
     setCurrentView('quotation');
     window.location.hash = '#quotation';
@@ -149,6 +153,7 @@ export const App: React.FC = () => {
       <div className="pb-20 sm:pb-0 min-h-screen">
         <QuotationPage
           initialPackage={selectedPkgForBuilder}
+          initialDate={selectedDateForBuilder}
           onBackToHome={handleNavigateToHome}
           onQuotationGenerated={handleQuotationGenerated}
           onOpenHistory={() => setHistoryOpen(true)}
@@ -191,7 +196,7 @@ export const App: React.FC = () => {
       <main>
         <HeroSection onOpenBuilder={() => handleOpenBuilder()} />
         <StatsSection />
-        <ScheduleQueue onOpenBuilder={() => handleOpenBuilder()} />
+        <ScheduleQueue onOpenBuilder={(date) => handleOpenBuilder(undefined, date)} />
         <NakhonPathomHeritageSection onOpenBuilder={() => handleOpenBuilder()} />
         <MenuShowcase />
         <PackageSection onSelectPackage={handleSelectPackageFromCards} />

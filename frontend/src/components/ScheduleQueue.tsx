@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QuotationApi } from '../services/api.js';
 import { QueueService, DynamicQueueEvent, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
+import { AvailableQueueModal } from './AvailableQueueModal.js';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -506,7 +507,7 @@ const QUEUE_DATA: QueueEvent[] = [
 ];
 
 interface ScheduleQueueProps {
-  onOpenBuilder?: () => void;
+  onOpenBuilder?: (date?: string) => void;
 }
 
 export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) => {
@@ -521,7 +522,13 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
   const [searchProvince, setSearchProvince] = useState<string>('all');
   const [searchResult, setSearchResult] = useState<string | null>(null);
   const [blockedModalInfo, setBlockedModalInfo] = useState<{ date: string; note?: string; reason?: string; tableCount?: number | string } | null>(null);
-  const [availableModalInfo, setAvailableModalInfo] = useState<{ date: string; note?: string; availableTables?: number | string } | null>(null);
+  const [availableModalInfo, setAvailableModalInfo] = useState<{
+    date: string;
+    note?: string;
+    availableTables?: number | string;
+    province?: string;
+    isAvailableCapacity?: boolean;
+  } | null>(null);
   const [allQueueEvents, setAllQueueEvents] = useState<QueueEvent[]>(QUEUE_DATA);
 
   // Load dynamic bookings from quotations and blocked dates
@@ -590,44 +597,62 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
     return matchMonth && matchStatus && matchProvince;
   });
 
-  const handleCheckDate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchDate) {
+  // Unified trigger date check function (opens popup modal immediately)
+  const triggerDateCheck = (dateVal: string, provVal?: string) => {
+    if (!dateVal) {
       setSearchResult('กรุณาเลือกวันที่ท่านต้องการจัดงานค่ะ');
       return;
     }
 
-    const blockedCheck = QueueService.isDateBlocked(searchDate);
+    const currentProv = provVal || searchProvince;
+    const blockedCheck = QueueService.isDateBlocked(dateVal);
+
     if (blockedCheck.isBlocked) {
       setBlockedModalInfo({
-        date: searchDate,
+        date: dateVal,
         note: blockedCheck.note,
         reason: blockedCheck.reason,
         tableCount: blockedCheck.tableCount,
       });
-      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} ${blockedCheck.tableCount ? `(รับจัดเลี้ยงเต็ม ${blockedCheck.tableCount} โต๊ะ)` : 'คิวงานจัดเลี้ยงเต็มแล้วค่ะ'} (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
+      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(dateVal)} ${blockedCheck.tableCount ? `(รับจัดเลี้ยงเต็ม ${blockedCheck.tableCount} โต๊ะ)` : 'คิวงานจัดเลี้ยงเต็มแล้วค่ะ'} (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       return;
     }
 
     if (blockedCheck.isAvailableCapacity) {
       setAvailableModalInfo({
-        date: searchDate,
+        date: dateVal,
         availableTables: blockedCheck.availableTables,
         note: blockedCheck.note,
+        province: currentProv,
+        isAvailableCapacity: true,
       });
-      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังไม่เต็มค่ะ พร้อมเปิดรับจองจัดเลี้ยงได้ตามจำนวน ${blockedCheck.availableTables || 50} โต๊ะ (คลิกเพื่อดูรายละเอียดและล็อกคิว)`);
+      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(dateVal)} คิวงานยังไม่เต็มค่ะ พร้อมเปิดรับจองจัดเลี้ยงได้ตามจำนวน ${blockedCheck.availableTables || 50} โต๊ะ (คลิกเพื่อดูรายละเอียดและล็อกคิว)`);
       return;
     }
 
-    const found = allQueueEvents.find((q) => q.fullDate === searchDate);
+    const found = allQueueEvents.find((q) => q.fullDate === dateVal);
     if (found) {
       if (found.status === 'available') {
+        setAvailableModalInfo({
+          date: found.fullDate,
+          availableTables: found.tableCount,
+          note: found.location,
+          province: found.province,
+          isAvailableCapacity: Boolean(found.tableCount),
+        });
         setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิวค่ะ! พร้อมรับจัดเลี้ยงทันที (รับสิทธิ์ 20 แถม 1)`);
       } else if (found.status === 'filling_fast') {
+        setAvailableModalInfo({
+          date: found.fullDate,
+          availableTables: found.tableCount,
+          note: `คิวเหลือน้อย ${found.availableSlotsRemaining} คิวสุดท้าย รีบติดต่อล็อกคิว`,
+          province: found.province,
+          isAvailableCapacity: true,
+        });
         setSearchResult(`🟡 วันที่ ${found.dateStr} มีการจองแล้ว แต่ยังมีทีมเสริมรองรับได้อีก ${found.availableSlotsRemaining} คิวสุดท้ายค่ะ! รีบติดต่อจอง`);
       } else {
         setBlockedModalInfo({
-          date: searchDate,
+          date: dateVal,
           note: found.location || 'คิวงานเต็มทุกช่วงเวลา',
           reason: 'fully_booked',
           tableCount: found.tableCount,
@@ -635,8 +660,20 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
         setSearchResult(`🔴 วันที่ ${found.dateStr} คิวงานเต็มแล้วค่ะ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       }
     } else {
-      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังว่างพร้อมให้บริการเต็มรูปแบบค่ะ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันทีนะคะ`);
+      setAvailableModalInfo({
+        date: dateVal,
+        availableTables: undefined,
+        note: 'คิวว่างพร้อมบริการเต็มรูปแบบ (ปรุงสุกสดใหม่หน้างาน 100%)',
+        province: currentProv,
+        isAvailableCapacity: false,
+      });
+      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(dateVal)} คิวงานยังว่างพร้อมให้บริการเต็มรูปแบบค่ะ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันทีนะคะ`);
     }
+  };
+
+  const handleCheckDate = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerDateCheck(searchDate, searchProvince);
   };
 
   return (
@@ -768,19 +805,7 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                   type="button"
                   onClick={() => {
                     setSearchDate(chip.date);
-                    // trigger search
-                    const found = QUEUE_DATA.find((q) => q.fullDate === chip.date);
-                    if (found) {
-                      if (found.status === 'available') {
-                        setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิว! พร้อมรับจัดเลี้ยงทันที`);
-                      } else if (found.status === 'filling_fast') {
-                        setSearchResult(`🟡 วันที่ ${found.dateStr} มีการจองแล้ว แต่ยังมีทีมเสริมรองรับได้อีก ${found.availableSlotsRemaining} คิวสุดท้าย! รีบติดต่อจอง`);
-                      } else {
-                        setSearchResult(`🔴 วันที่ ${found.dateStr} ทีมหลักเต็มแล้ว แต่สามารถเปิดทีมเชฟสำรองพิเศษได้ (กรุณาโทรสอบถามด่วน)`);
-                      }
-                    } else {
-                      setSearchResult(`🟢 วันที่เลือก ยังมีคิวว่างพร้อมให้บริการเต็มรูปแบบ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันที`);
-                    }
+                    triggerDateCheck(chip.date, searchProvince);
                   }}
                   className={`px-3 py-1 rounded-xl font-black text-[11px] transition-all cursor-pointer border ${
                     searchDate === chip.date
@@ -802,14 +827,20 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                 <span>{searchResult}</span>
               </div>
               
-              <a
-                href="#quotation"
-                onClick={onOpenBuilder}
-                className="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white font-black text-xs shadow-md shrink-0 flex items-center gap-1.5 transition-all transform hover:scale-105"
+              <button
+                type="button"
+                onClick={() => {
+                  if (searchDate) {
+                    triggerDateCheck(searchDate, searchProvince);
+                  } else if (onOpenBuilder) {
+                    onOpenBuilder();
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white font-black text-xs shadow-md shrink-0 flex items-center gap-1.5 transition-all transform hover:scale-105 cursor-pointer"
               >
-                <span>ล็อกคิว & ออกใบเสนอราคา</span>
+                <span>ล็อกคิว & ดูรายละเอียดโต๊ะ</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </a>
+              </button>
             </div>
           )}
         </div>
@@ -1097,14 +1128,14 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               <span>ว่างรับได้อีก {item.availableSlotsRemaining} คิว</span>
                             </div>
-                            <a
-                              href="#quotation"
-                              onClick={onOpenBuilder}
-                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs shadow-sm inline-flex items-center gap-1 transition-all transform hover:scale-105"
+                            <button
+                              type="button"
+                              onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs shadow-sm inline-flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer"
                             >
-                              <span>จองคิววันนี้</span>
+                              <span>เช็คคิว & ล็อกวัน</span>
                               <ArrowRight className="w-3 h-3" />
-                            </a>
+                            </button>
                           </div>
                         ) : isFast ? (
                           <div className="space-y-1 text-left lg:text-right w-full sm:w-auto">
@@ -1112,27 +1143,28 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                               <span>เหลือเพียง {item.availableSlotsRemaining} คิวสุดท้าย!</span>
                             </div>
-                            <a
-                              href="#quotation"
-                              onClick={onOpenBuilder}
-                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-sm inline-flex items-center gap-1 transition-all transform hover:scale-105"
+                            <button
+                              type="button"
+                              onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-sm inline-flex items-center gap-1 transition-all transform hover:scale-105 cursor-pointer"
                             >
-                              <span>ล็อกคิวด่วน</span>
+                              <span>เช็คคิวด่วน</span>
                               <ArrowRight className="w-3 h-3" />
-                            </a>
+                            </button>
                           </div>
                         ) : (
                           <div className="space-y-1 text-left lg:text-right w-full sm:w-auto">
                             <div className="text-[11px] font-bold text-slate-500">
                               ทีมหลักลงพื้นที่เรียบร้อย
                             </div>
-                            <a
-                              href="tel:0813311646"
-                              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1"
+                            <button
+                              type="button"
+                              onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
                             >
                               <Phone className="w-3 h-3 text-red-600" />
-                              <span>โทรสอบถามทีมเสริม</span>
-                            </a>
+                              <span>เช็คทีมเสริม / วันอื่น</span>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1195,25 +1227,29 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
 
                       <div className="pt-3 border-t border-slate-100">
                         {isAvail ? (
-                          <a
-                            href="#quotation"
-                            onClick={onOpenBuilder}
-                            className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs text-center block transition-all"
+                          <button
+                            type="button"
+                            onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                            className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs text-center block transition-all cursor-pointer shadow-xs hover:scale-102"
                           >
-                            จองคิวว่างวันนี้ ({item.availableSlotsRemaining} คิว)
-                          </a>
+                            เช็คคิว & จองว่างวันนี้ ({item.availableSlotsRemaining} คิว)
+                          </button>
                         ) : isFast ? (
-                          <a
-                            href="#quotation"
-                            onClick={onOpenBuilder}
-                            className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs text-center block transition-all"
+                          <button
+                            type="button"
+                            onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                            className="w-full py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs text-center block transition-all cursor-pointer shadow-xs hover:scale-102"
                           >
-                            รีบล็อกคิวด่วน ({item.availableSlotsRemaining} คิว)
-                          </a>
+                            เช็คคิว & ล็อกคิวด่วน ({item.availableSlotsRemaining} คิว)
+                          </button>
                         ) : (
-                          <div className="w-full py-2 rounded-xl bg-slate-100 text-slate-500 font-bold text-[11px] text-center">
-                            ยืนยันทีมบริการแล้ว
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => triggerDateCheck(item.fullDate, item.province)}
+                            className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] text-center cursor-pointer"
+                          >
+                            คิวเต็ม (คลิกเพื่อดูรายละเอียด)
+                          </button>
                         )}
                       </div>
                     </div>
@@ -1358,96 +1394,23 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
           </div>
         )}
 
-        {/* Modal: Auspicious & Celebratory Notice when Date is Available with Capacity (งานไม่เต็ม) */}
-        {availableModalInfo && (
-          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-            <div className="relative w-full max-w-lg bg-white rounded-3xl border-2 border-emerald-500 shadow-2xl p-6 sm:p-7 space-y-5 text-slate-900">
-              
-              {/* Icon */}
-              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border-4 border-emerald-200 shadow-inner">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600" />
-              </div>
-
-              {/* Title & Designed Announcement */}
-              <div className="text-center space-y-2">
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="text-xs font-black text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300 inline-block">
-                    👑 แจ้งสถานะคิวงานจัดเลี้ยง
-                  </span>
-                  {availableModalInfo.availableTables && (
-                    <span className="text-xs font-black text-emerald-950 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1 shadow-2xs">
-                      🎪 พร้อมรับจัดเลี้ยง {availableModalInfo.availableTables} โต๊ะ
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-lg sm:text-xl font-black text-slate-950 leading-snug">
-                  ยินดีต้อนรับค่ะ! 🎉<br />
-                  <span className="text-emerald-700">วันที่ {formatThaiDateShort(availableModalInfo.date)} คิวงานยังไม่เต็มค่ะ</span>
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
-                  ทีมเชฟมืออาชีพและขบวนรถครัวสัญจรพร้อมบริการปรุงอาหารสุกร้อนสดๆ หน้างาน และดูแลแขกผู้มีเกียรติของท่านอย่างสมเกียรติระดับภัตตาคาร 35+ ปีค่ะ
-                </p>
-                {availableModalInfo.note && (
-                  <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs font-bold text-emerald-900">
-                    • {availableModalInfo.note}
-                  </div>
-                )}
-              </div>
-
-              {/* Special Privileges Box */}
-              <div className="p-4 bg-gradient-to-br from-amber-50 to-emerald-50 rounded-2xl border border-emerald-200 text-xs text-slate-800 font-medium space-y-1.5">
-                <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
-                  <Sparkles className="w-4 h-4 text-amber-600" />
-                  <span>สิทธิพิเศษ & การบริการที่ท่านจะได้รับ:</span>
-                </div>
-                <p>• <strong>โปรโมชัน 35 ปี:</strong> สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะทันที (สั่ง 40 แถม 2)</p>
-                <p>• <strong>ฟรีอุปกรณ์ครบชุด:</strong> โต๊ะ เก้าอี้เบาะนุ่มผูกโบว์หรูหรา และทีมบริกรประจำโต๊ะ</p>
-                <p>• <strong>รสชาติภัตตาคาร:</strong> ปรุงสดใหม่หน้างาน 100% วัตถุดิบเกรดพรีเมียม</p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <a
-                  href="tel:0813311646"
-                  className="py-3 px-4 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
-                >
-                  <Phone className="w-4 h-4 text-amber-300" />
-                  <span>โทรล็อกคิว 081-331-1646</span>
-                </a>
-                <a
-                  href="https://line.me/ti/p/~pang_baichaa"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-4 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>ทัก LINE: คุณแป้ง</span>
-                </a>
-              </div>
-
-              {/* Quotation Link & Close Buttons */}
-              <div className="space-y-2">
-                <a
-                  href="#quotation-builder"
-                  onClick={() => setAvailableModalInfo(null)}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer border border-amber-300"
-                >
-                  <Crown className="w-4 h-4 text-amber-300" />
-                  <span>ไปที่ฟอร์มเลือกอาหาร & ออกใบเสนอราคา (ฟรี)</span>
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => setAvailableModalInfo(null)}
-                  className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                >
-                  ปิดหน้าต่าง
-                </button>
-              </div>
-
-            </div>
-          </div>
-        )}
+        {/* Modern & Luxury Available Queue Modal Popup */}
+        <AvailableQueueModal
+          isOpen={Boolean(availableModalInfo)}
+          onClose={() => setAvailableModalInfo(null)}
+          date={availableModalInfo?.date || ''}
+          availableTables={availableModalInfo?.availableTables}
+          isAvailableCapacity={availableModalInfo?.isAvailableCapacity}
+          note={availableModalInfo?.note}
+          province={availableModalInfo?.province || searchProvince}
+          onProceedToBuilder={(selectedDate) => {
+            if (onOpenBuilder) {
+              onOpenBuilder(selectedDate);
+            } else {
+              window.location.hash = '#quotation';
+            }
+          }}
+        />
 
       </div>
     </section>

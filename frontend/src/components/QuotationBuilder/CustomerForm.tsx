@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CustomerInfo } from '../../types/quotation.js';
 import { QueueService, formatThaiDateShort } from '../../services/queueService.js';
+import { AvailableQueueModal } from '../AvailableQueueModal.js';
 import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText, Truck, Building2, Navigation, CheckCircle2, AlertCircle, MessageCircle, Crown } from 'lucide-react';
 
 interface CustomerFormProps {
@@ -18,12 +19,12 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
     onChange({ eventDate: dateVal });
     if (dateVal) {
       const check = QueueService.isDateBlocked(dateVal);
-      if (check.isAvailableCapacity) {
-        setShowAvailablePopup(true);
-        setShowBlockedPopup(false);
-      } else if (check.isBlocked) {
+      if (check.isBlocked) {
         setShowBlockedPopup(true);
         setShowAvailablePopup(false);
+      } else {
+        setShowAvailablePopup(true);
+        setShowBlockedPopup(false);
       }
     }
   };
@@ -395,86 +396,17 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         </div>
       )}
 
-      {/* Modal: Auspicious & Celebratory Notice when Date is Available with Capacity (งานไม่เต็ม) */}
-      {showAvailablePopup && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="relative w-full max-w-lg bg-white rounded-3xl border-2 border-emerald-500 shadow-2xl p-6 sm:p-7 space-y-5 text-slate-900">
-            
-            {/* Icon */}
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border-4 border-emerald-200 shadow-inner">
-              <CheckCircle2 className="w-8 h-8 text-emerald-600" />
-            </div>
-
-            {/* Title & Designed Announcement */}
-            <div className="text-center space-y-2">
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                <span className="text-xs font-black text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300 inline-block">
-                  👑 แจ้งสถานะคิวงานจัดเลี้ยง
-                </span>
-                {blockedCheck.availableTables && (
-                  <span className="text-xs font-black text-emerald-950 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1 shadow-2xs">
-                    🎪 พร้อมรับจัดเลี้ยง {blockedCheck.availableTables} โต๊ะ
-                  </span>
-                )}
-              </div>
-              <h3 className="text-lg sm:text-xl font-black text-slate-950 leading-snug">
-                ยินดีต้อนรับค่ะ! 🎉<br />
-                <span className="text-emerald-700">วันที่ {formatThaiDateShort(formData.eventDate || '')} คิวงานยังไม่เต็มค่ะ</span>
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
-                ทีมเชฟมืออาชีพและขบวนรถครัวสัญจรพร้อมบริการปรุงอาหารสุกร้อนสดๆ หน้างาน และดูแลแขกผู้มีเกียรติของท่านอย่างสมเกียรติระดับภัตตาคาร 35+ ปีค่ะ
-              </p>
-              {blockedCheck.note && (
-                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs font-bold text-emerald-900">
-                  • {blockedCheck.note}
-                </div>
-              )}
-            </div>
-
-            {/* Special Privileges Box */}
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-emerald-50 rounded-2xl border border-emerald-200 text-xs text-slate-800 font-medium space-y-1.5">
-              <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>สิทธิพิเศษ & การบริการที่ท่านจะได้รับ:</span>
-              </div>
-              <p>• <strong>โปรโมชัน 35 ปี:</strong> สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะทันที (สั่ง 40 แถม 2)</p>
-              <p>• <strong>ฟรีอุปกรณ์ครบชุด:</strong> โต๊ะ เก้าอี้เบาะนุ่มผูกโบว์หรูหรา และทีมบริกรประจำโต๊ะ</p>
-              <p>• <strong>รสชาติภัตตาคาร:</strong> ปรุงสดใหม่หน้างาน 100% วัตถุดิบเกรดพรีเมียม</p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <a
-                href="tel:0813311646"
-                className="py-3 px-4 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
-              >
-                <Phone className="w-4 h-4 text-amber-300" />
-                <span>โทรล็อกคิว 081-331-1646</span>
-              </a>
-              <a
-                href="https://line.me/ti/p/~pang_baichaa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-3 px-4 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>ทัก LINE: คุณแป้ง</span>
-              </a>
-            </div>
-
-            {/* Close / Proceed Button */}
-            <button
-              type="button"
-              onClick={() => setShowAvailablePopup(false)}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer border border-emerald-300"
-            >
-              <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-              <span>ดำเนินการเลือกเมนูอาหารต่อ</span>
-            </button>
-
-          </div>
-        </div>
-      )}
+      {/* Modern & Luxury Available Queue Modal Popup */}
+      <AvailableQueueModal
+        isOpen={showAvailablePopup}
+        onClose={() => setShowAvailablePopup(false)}
+        date={formData.eventDate || ''}
+        availableTables={blockedCheck.availableTables}
+        isAvailableCapacity={blockedCheck.isAvailableCapacity}
+        note={blockedCheck.note}
+        province={formData.locationZone === 'bkk_metro' ? 'กรุงเทพฯ และปริมณฑล' : formData.eventLocation || 'ต่างจังหวัด / ทั่วประเทศ'}
+        onProceedToBuilder={() => setShowAvailablePopup(false)}
+      />
 
       {/* Modal: Auspicious & Polite Notice when Date is Fully Booked (คิวเต็ม) */}
       {showBlockedPopup && (
