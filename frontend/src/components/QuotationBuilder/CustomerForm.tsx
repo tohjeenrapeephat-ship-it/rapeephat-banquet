@@ -96,17 +96,18 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         <div className="flex flex-col justify-end h-full space-y-2">
           <label className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-red-600 shrink-0" />
-            <span>เวลาเสิร์ฟอาหาร</span>
+            <span>เวลาเสิร์ฟอาหาร (บริการ 4 ชม.)</span>
           </label>
           <select
             value={formData.eventTime}
             onChange={(e) => onChange({ eventTime: e.target.value })}
-            className="w-full h-13 bg-white border-2 border-slate-300 hover:border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100 rounded-2xl px-4 text-base sm:text-lg text-slate-900 font-bold shadow-2xs transition-all cursor-pointer"
+            className="w-full h-13 bg-white border-2 border-slate-300 hover:border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100 rounded-2xl px-4 text-sm sm:text-base text-slate-900 font-bold shadow-2xs transition-all cursor-pointer"
           >
-            <option value="ช่วงเช้า (07:00 - 09:00 น.)">ช่วงเช้า (07:00 - 09:00 น.) - เลี้ยงพระ</option>
-            <option value="ช่วงเพล (11:00 - 13:00 น.)">ช่วงเพล (11:00 - 13:00 น.) - เลี้ยงเพล</option>
-            <option value="ช่วงเย็น (17:00 - 19:00 น.)">ช่วงเย็น (17:00 - 19:00 น.) - งานแต่ง/สังสรรค์</option>
-            <option value="ช่วงค่ำ (19:00 - 21:00 น.)">ช่วงค่ำ (19:00 - 21:00 น.)</option>
+            <option value="ช่วงเช้า (07:00 - 11:00 น. รวม 4 ชม.)">ช่วงเช้า (07:00 - 11:00 น.) - เลี้ยงพระ/พิธีเช้า (4 ชม.)</option>
+            <option value="ช่วงเพล (11:00 - 15:00 น. รวม 4 ชม.)">ช่วงเพล (11:00 - 15:00 น.) - เลี้ยงเพล/กลางวัน (4 ชม.)</option>
+            <option value="ช่วงบ่าย (14:00 - 18:00 น. รวม 4 ชม.)">ช่วงบ่าย (14:00 - 18:00 น.) - งานบ่าย (4 ชม.)</option>
+            <option value="ช่วงเย็น (17:00 - 21:00 น. รวม 4 ชม.)">ช่วงเย็น (17:00 - 21:00 น.) - งานแต่ง/สังสรรค์ค่ำ (4 ชม.)</option>
+            <option value="ช่วงค่ำ (18:00 - 22:00 น. รวม 4 ชม.)">ช่วงค่ำ (18:00 - 22:00 น.) - งานสังสรรค์ค่ำ (4 ชม.)</option>
           </select>
         </div>
 
@@ -183,32 +184,55 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           {/* Option 2: Upcountry */}
           <div
             onClick={() => onChange({ locationZone: 'upcountry' })}
-            className={`p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+            className={`p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all space-y-2.5 ${
               currentZone === 'upcountry'
                 ? 'bg-amber-100/90 border-amber-500 shadow-xs'
                 : 'bg-white hover:bg-slate-50 border-slate-200'
             }`}
           >
-            <input
-              type="radio"
-              checked={currentZone === 'upcountry'}
-              onChange={() => onChange({ locationZone: 'upcountry' })}
-              className="mt-1 w-4 h-4 text-amber-600 accent-amber-600"
-            />
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <Navigation className="w-4 h-4 text-amber-800" />
-                <strong className="text-sm sm:text-base text-slate-950 font-black">
-                  ต่างจังหวัด (นอกเขตปริมณฑล)
-                </strong>
-              </div>
-              <p className="text-xs text-slate-700 font-medium">
-                จัดเลี้ยงทุกจังหวัดทั่วประเทศ พร้อมรถครัวกลางและทีมบริกร
-              </p>
-              <div className="pt-1 text-xs font-bold text-amber-950">
-                • <span className="text-red-700 font-black">คำนวณตามระยะทางจริง</span> (ตกลงประสานงานโดยตรงกับคุณแป้ง 081-331-1646)
+            <div className="flex items-start gap-3">
+              <input
+                type="radio"
+                checked={currentZone === 'upcountry'}
+                onChange={() => onChange({ locationZone: 'upcountry' })}
+                className="mt-1 w-4 h-4 text-amber-600 accent-amber-600"
+              />
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Navigation className="w-4 h-4 text-amber-800" />
+                  <strong className="text-sm sm:text-base text-slate-950 font-black">
+                    ต่างจังหวัด (นอกเขตปริมณฑล)
+                  </strong>
+                </div>
+                <p className="text-xs text-slate-700 font-medium">
+                  จัดเลี้ยงทั่วประเทศ คำนวณตามระยะทางจริง (ตกลงประสานงานคุณแป้ง 081-331-1646)
+                </p>
               </div>
             </div>
+
+            {/* Direct Custom Travel Fee Input Box for Customer */}
+            {currentZone === 'upcountry' && (
+              <div className="pt-2 border-t border-amber-300/80 space-y-1.5" onClick={(e) => e.stopPropagation()}>
+                <label className="text-xs font-black text-slate-900 flex items-center justify-between">
+                  <span>ระบุค่าเดินทางต่างจังหวัดตามที่ตกลง (บาท):</span>
+                  <span className="text-[11px] text-red-700 font-bold">*คำนวณในใบเสนอราคาทันที</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    placeholder="เช่น 2,000 หรือใส่ 0 หากตามตกลง"
+                    value={formData.customTravelFee !== undefined ? formData.customTravelFee : ''}
+                    onChange={(e) => onChange({ customTravelFee: e.target.value === '' ? undefined : Number(e.target.value) })}
+                    className="w-full h-11 bg-white border-2 border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100 rounded-xl px-3.5 pr-12 text-sm sm:text-base font-mono font-bold text-slate-950 shadow-inner"
+                  />
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-600">
+                    บาท
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

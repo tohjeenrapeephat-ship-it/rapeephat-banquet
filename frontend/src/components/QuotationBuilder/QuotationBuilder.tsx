@@ -102,14 +102,18 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     const beverageTotal = selectedBeverage.pricePerTable * tableCount;
     const floorServiceTotal = floorServiceEnabled ? 100 * tableCount : 0;
     
-    // Travel fee calculation: 1,500 THB in BKK/Metro if < 20 tables, Free if >= 20 tables, distance based if upcountry
+    // Travel fee calculation: 1,500 THB in BKK/Metro if < 20 tables, Free if >= 20 tables, customTravelFee if upcountry
     const isBkkMetro = (customerData.locationZone || 'bkk_metro') !== 'upcountry';
-    const isFree = tableCount >= 20;
-    const travelFeeAmount = tableCount < 20 && isBkkMetro ? 1500 : 0;
+    const isFree = tableCount >= 20 && isBkkMetro;
+    const travelFeeAmount = isBkkMetro 
+      ? (tableCount < 20 ? 1500 : 0)
+      : (customerData.customTravelFee || 0);
     const travelFeeDesc = isFree
       ? 'ฟรีค่าเดินทางขนส่งในกรุงเทพฯ และปริมณฑล (โปรโมชั่นสั่งครบ 20 โต๊ะขึ้นไป)'
       : isBkkMetro
       ? 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (กทม. และปริมณฑล - สั่งไม่ถึง 20 โต๊ะ)'
+      : travelFeeAmount > 0
+      ? `ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด - ตามตกลง ${travelFeeAmount.toLocaleString()} บาท)`
       : 'ค่าเดินทาง & ค่าขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด - คำนวณตามระยะทางจริง ประสานงานคุณแป้ง)';
 
     const subtotal = packageTotal + beverageTotal + floorServiceTotal;
@@ -326,6 +330,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
               onBeverageSelect={setSelectedBeverage}
               floorServiceEnabled={floorServiceEnabled}
               locationZone={customerData.locationZone || 'bkk_metro'}
+              customTravelFee={customerData.customTravelFee}
               onGenerateQuotation={handleGenerateQuotation}
               isValid={isValid}
             />

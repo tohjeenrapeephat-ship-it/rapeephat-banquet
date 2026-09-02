@@ -470,7 +470,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                         <td className="py-2 px-2.5 text-center font-black text-slate-500">2</td>
                         <td className="py-2 px-2.5">
                           <div className="font-black text-slate-950 text-xs">{quotation.beverage.name}</div>
-                          <div className="text-[10.5px] text-slate-500 font-medium">น้ำอัดลม น้ำดื่ม 1500ml น้ำแข็งเสิร์ฟตลอดงาน</div>
+                          <div className="text-[10.5px] text-slate-500 font-medium">
+                            น้ำอัดลม น้ำดื่ม 1500ml น้ำแข็งเสิร์ฟตลอดงาน (ประมาณ 4 ชม. นับจากอาหารจานแรก)
+                          </div>
                         </td>
                         <td className="py-2 px-2.5 text-center font-black text-slate-950">{quotation.tableCount} โต๊ะ</td>
                         <td className="py-2 px-2.5 text-right font-black text-slate-950">{formatCurrency(quotation.beverage.pricePerTable)}</td>
@@ -495,7 +497,47 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                     )}
 
                     {/* Travel / Transportation Fee Row */}
-                    {quotation.travelFee && quotation.travelFee.amount > 0 ? (
+                    {quotation.customer?.locationZone === 'upcountry' ? (
+                      quotation.travelFee && quotation.travelFee.amount > 0 ? (
+                        <tr className="hover:bg-slate-50/50">
+                          <td className="py-2 px-2.5 text-center font-black text-slate-500">
+                            {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
+                          </td>
+                          <td className="py-2 px-2.5">
+                            <div className="font-black text-slate-950 text-xs sm:text-sm">
+                              ค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด)
+                            </div>
+                            <div className="text-[10.5px] text-amber-900 font-bold mt-0.5">
+                              • บริการขนส่งโต๊ะ เก้าอี้ อุปกรณ์ครัว และทีมงาน (ตามตกลง {formatCurrency(quotation.travelFee.amount)} บาท)
+                            </div>
+                          </td>
+                          <td className="py-2 px-2.5 text-center font-black text-slate-950">1 งาน</td>
+                          <td className="py-2 px-2.5 text-right font-black text-slate-950">{formatCurrency(quotation.travelFee.amount)}</td>
+                          <td className="py-2 px-2.5 text-right font-black text-slate-950">
+                            {formatCurrency(quotation.travelFee.amount)}
+                          </td>
+                        </tr>
+                      ) : (
+                        <tr className="hover:bg-slate-50/50">
+                          <td className="py-2 px-2.5 text-center font-black text-slate-500">
+                            {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
+                          </td>
+                          <td className="py-2 px-2.5">
+                            <div className="font-black text-slate-950 text-xs sm:text-sm">
+                              ค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด)
+                            </div>
+                            <div className="text-[10.5px] text-amber-800 font-bold mt-0.5">
+                              • คำนวณตามระยะทางจริง (ตกลงประสานงานโดยตรงกับคุณแป้ง 081-331-1646)
+                            </div>
+                          </td>
+                          <td className="py-2 px-2.5 text-center font-black text-slate-950">1 งาน</td>
+                          <td className="py-2 px-2.5 text-right font-bold text-slate-600 text-xs">ตามระยะทาง</td>
+                          <td className="py-2 px-2.5 text-right font-bold text-amber-800 text-xs">
+                            ตามตกลงคุณแป้ง
+                          </td>
+                        </tr>
+                      )
+                    ) : quotation.travelFee && quotation.travelFee.amount > 0 ? (
                       <tr className="hover:bg-slate-50/50">
                         <td className="py-2 px-2.5 text-center font-black text-slate-500">
                           {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
@@ -512,25 +554,6 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                         <td className="py-2 px-2.5 text-right font-black text-slate-950">{formatCurrency(quotation.travelFee.amount)}</td>
                         <td className="py-2 px-2.5 text-right font-black text-slate-950">
                           {formatCurrency(quotation.travelFee.amount)}
-                        </td>
-                      </tr>
-                    ) : quotation.customer?.locationZone === 'upcountry' ? (
-                      <tr className="hover:bg-slate-50/50">
-                        <td className="py-2 px-2.5 text-center font-black text-slate-500">
-                          {1 + (quotation.beverage && quotation.beverage.pricePerTable > 0 ? 1 : 0) + (quotation.floorService?.enabled ? 1 : 0) + 1}
-                        </td>
-                        <td className="py-2 px-2.5">
-                          <div className="font-black text-slate-950 text-xs sm:text-sm">
-                            ค่าเดินทาง & ขนส่งอุปกรณ์จัดเลี้ยง (ต่างจังหวัด)
-                          </div>
-                          <div className="text-[10.5px] text-amber-800 font-bold mt-0.5">
-                            • คำนวณตามระยะทางจริง (ตกลงประสานงานโดยตรงกับคุณแป้ง 081-331-1646)
-                          </div>
-                        </td>
-                        <td className="py-2 px-2.5 text-center font-black text-slate-950">1 งาน</td>
-                        <td className="py-2 px-2.5 text-right font-bold text-slate-600 text-xs">ตามระยะทาง</td>
-                        <td className="py-2 px-2.5 text-right font-bold text-amber-800 text-xs">
-                          {quotation.travelFee?.amount ? `${formatCurrency(quotation.travelFee.amount)}` : 'ตามตกลงคุณแป้ง'}
                         </td>
                       </tr>
                     ) : quotation.tableCount >= 20 ? (

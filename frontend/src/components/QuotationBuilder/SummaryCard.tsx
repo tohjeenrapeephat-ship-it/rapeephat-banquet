@@ -24,6 +24,7 @@ interface SummaryCardProps {
   onBeverageSelect?: (beverage: BeverageSet) => void;
   floorServiceEnabled: boolean;
   locationZone?: 'bkk_metro' | 'upcountry';
+  customTravelFee?: number;
   onGenerateQuotation: () => void;
   isValid: boolean;
 }
@@ -35,6 +36,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   onBeverageSelect,
   floorServiceEnabled,
   locationZone = 'bkk_metro',
+  customTravelFee,
   onGenerateQuotation,
   isValid,
 }) => {
@@ -45,10 +47,12 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   const floorServiceTotal = floorServiceEnabled ? 100 * tableCount : 0;
   
   // Travel Fee Calculation:
-  // If < 20 tables: 1,500 THB in Bangkok & Metro, or distance-based quote for upcountry
-  // If >= 20 tables: Free in Bangkok & Metro
+  // If BKK & Metro: < 20 tables = 1,500 THB, >= 20 tables = Free 0 THB
+  // If Upcountry: customTravelFee (inputted by customer or 0)
   const isBkkMetro = locationZone !== 'upcountry';
-  const travelFeeAmount = tableCount < 20 && isBkkMetro ? 1500 : 0;
+  const travelFeeAmount = isBkkMetro 
+    ? (tableCount < 20 ? 1500 : 0)
+    : (customTravelFee || 0);
   
   const grandTotal = packageTotal + beverageTotal + floorServiceTotal + travelFeeAmount;
 
@@ -201,30 +205,42 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
           )}
 
           {/* Travel / Transportation Fee Row */}
-          {travelFeeAmount > 0 ? (
-            <div className="flex justify-between items-baseline text-red-700 font-bold bg-red-50/80 p-2 px-3 rounded-xl border border-red-200">
-              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
-                <Truck className="w-4 h-4 text-red-600 shrink-0" />
-                <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่งไม่ถึง 20 โต๊ะ):</span>
-              </span>
-              <span className="text-sm font-black font-mono">+{formatCurrency(travelFeeAmount)}</span>
-            </div>
-          ) : isBkkMetro ? (
-            <div className="flex justify-between items-baseline text-emerald-900 font-bold bg-emerald-50/80 p-2 px-3 rounded-xl border border-emerald-200">
-              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
-                <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่ง 20 โต๊ะขึ้นไป):</span>
-              </span>
-              <span className="text-xs sm:text-sm font-black text-emerald-700 font-mono">ฟรี 0 บาท (ประหยัด 1,500.-)</span>
-            </div>
+          {isBkkMetro ? (
+            travelFeeAmount > 0 ? (
+              <div className="flex justify-between items-baseline text-red-700 font-bold bg-red-50/80 p-2 px-3 rounded-xl border border-red-200">
+                <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                  <Truck className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่งไม่ถึง 20 โต๊ะ):</span>
+                </span>
+                <span className="text-sm font-black font-mono">+{formatCurrency(travelFeeAmount)}</span>
+              </div>
+            ) : (
+              <div className="flex justify-between items-baseline text-emerald-900 font-bold bg-emerald-50/80 p-2 px-3 rounded-xl border border-emerald-200">
+                <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                  <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>ค่าเดินทางขนส่ง (กทม./ปริมณฑล สั่ง 20 โต๊ะขึ้นไป):</span>
+                </span>
+                <span className="text-xs sm:text-sm font-black text-emerald-700 font-mono">ฟรี 0 บาท (ประหยัด 1,500.-)</span>
+              </div>
+            )
           ) : (
-            <div className="flex justify-between items-baseline text-amber-900 font-bold bg-amber-50/80 p-2 px-3 rounded-xl border border-amber-200">
-              <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
-                <Truck className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>ค่าเดินทางขนส่ง (ต่างจังหวัด):</span>
-              </span>
-              <span className="text-xs font-black text-amber-800">ตามระยะทาง (ติดต่อคุณแป้ง)</span>
-            </div>
+            travelFeeAmount > 0 ? (
+              <div className="flex justify-between items-baseline text-amber-950 font-bold bg-amber-50/80 p-2 px-3 rounded-xl border border-amber-300">
+                <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                  <Truck className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>ค่าเดินทางขนส่ง (ต่างจังหวัดตามระบุ):</span>
+                </span>
+                <span className="text-sm font-black font-mono text-red-700">+{formatCurrency(travelFeeAmount)}</span>
+              </div>
+            ) : (
+              <div className="flex justify-between items-baseline text-amber-900 font-bold bg-amber-50/80 p-2 px-3 rounded-xl border border-amber-200">
+                <span className="text-xs sm:text-sm flex items-center gap-1.5 font-black">
+                  <Truck className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>ค่าเดินทางขนส่ง (ต่างจังหวัด):</span>
+                </span>
+                <span className="text-xs font-black text-amber-800">ตามระยะทาง (ประสานงานคุณแป้ง)</span>
+              </div>
+            )
           )}
 
           {freeTableCount > 0 && (

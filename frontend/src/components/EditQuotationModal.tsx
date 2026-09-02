@@ -350,13 +350,13 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">เวลาเริ่มเสิร์ฟอาหาร</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">เวลาเสิร์ฟอาหาร (บริการ 4 ชม.)</label>
                 <input
                   type="text"
                   value={eventTime}
                   onChange={(e) => setEventTime(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-medium text-slate-900 outline-none"
-                  placeholder="เช่น 11:00 น. หรือ 18:00 น."
+                  placeholder="เช่น ช่วงเพล (11:00 - 15:00 น. รวม 4 ชม.) หรือ 18:00 - 22:00 น."
                 />
               </div>
 

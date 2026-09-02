@@ -46,6 +46,7 @@ export interface CustomerInfo {
   eventLocation: string;
   eventType: string;
   locationZone?: 'bkk_metro' | 'upcountry';
+  customTravelFee?: number;
   notes?: string;
 }
 
