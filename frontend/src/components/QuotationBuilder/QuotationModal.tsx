@@ -754,11 +754,16 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                     </div>
                   </div>
 
-                  <div className="font-black text-slate-900 text-xs pt-0.5" style={{ lineHeight: '1.6', overflow: 'visible' }}>
-                    ( นางสาวทัศวรรณ จันทร์หอม )
-                  </div>
-                  <div className="text-[10.5px] text-slate-700 font-bold" style={{ lineHeight: '1.6', overflow: 'visible' }}>
-                    วันที่ {formatThaiDate(quotation.createdAt || new Date().toISOString())}
+                  <div className="space-y-0.5 pt-0.5" style={{ overflow: 'visible' }}>
+                    <div className="font-black text-slate-900 text-xs" style={{ lineHeight: '1.5', overflow: 'visible' }}>
+                      ( นางสาวใบชา  สุขอยู่ )
+                    </div>
+                    <div className="text-[10px] text-slate-800 font-bold" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                      ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม
+                    </div>
+                    <div className="text-[10px] text-slate-600 font-medium" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                      วันที่ {formatThaiDate(quotation.createdAt || new Date().toISOString())}
+                    </div>
                   </div>
                 </div>
 
