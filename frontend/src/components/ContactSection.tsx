@@ -353,7 +353,7 @@ export const ContactSection: React.FC = () => {
                   <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
                   <h4 className="text-base font-black text-emerald-950">ส่งข้อความเรียบร้อยแล้ว</h4>
                   <p className="text-xs text-emerald-800">
-                    ทีมงานจะติดต่อกลับไปยังหมายเลข <strong>{formData.phone}</strong> โดยเร็วที่สุดครับ
+                    ทีมงานจะติดต่อกลับไปยังหมายเลข <strong>{formData.phone}</strong> โดยเร็วที่สุดค่ะ
                   </p>
                 </div>
               ) : (

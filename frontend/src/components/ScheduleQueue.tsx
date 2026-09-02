@@ -592,7 +592,7 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
   const handleCheckDate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchDate) {
-      setSearchResult('กรุณาเลือกวันที่ท่านต้องการจัดงานครับ');
+      setSearchResult('กรุณาเลือกวันที่ท่านต้องการจัดงานค่ะ');
       return;
     }
 
@@ -604,16 +604,16 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
         reason: blockedCheck.reason,
         tableCount: blockedCheck.tableCount,
       });
-      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} ${blockedCheck.tableCount ? `(รับจัดเลี้ยงเต็ม ${blockedCheck.tableCount} โต๊ะ)` : 'คิวงานจัดเลี้ยงเต็มแล้วครับ'} (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
+      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} ${blockedCheck.tableCount ? `(รับจัดเลี้ยงเต็ม ${blockedCheck.tableCount} โต๊ะ)` : 'คิวงานจัดเลี้ยงเต็มแล้วค่ะ'} (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       return;
     }
 
     const found = allQueueEvents.find((q) => q.fullDate === searchDate);
     if (found) {
       if (found.status === 'available') {
-        setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิว! พร้อมรับจัดเลี้ยงทันที (รับสิทธิ์ 20 แถม 1)`);
+        setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิวค่ะ! พร้อมรับจัดเลี้ยงทันที (รับสิทธิ์ 20 แถม 1)`);
       } else if (found.status === 'filling_fast') {
-        setSearchResult(`🟡 วันที่ ${found.dateStr} มีการจองแล้ว แต่ยังมีทีมเสริมรองรับได้อีก ${found.availableSlotsRemaining} คิวสุดท้าย! รีบติดต่อจอง`);
+        setSearchResult(`🟡 วันที่ ${found.dateStr} มีการจองแล้ว แต่ยังมีทีมเสริมรองรับได้อีก ${found.availableSlotsRemaining} คิวสุดท้ายค่ะ! รีบติดต่อจอง`);
       } else {
         setBlockedModalInfo({
           date: searchDate,
@@ -621,10 +621,10 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
           reason: 'fully_booked',
           tableCount: found.tableCount,
         });
-        setSearchResult(`🔴 วันที่ ${found.dateStr} คิวงานเต็มแล้วครับ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
+        setSearchResult(`🔴 วันที่ ${found.dateStr} คิวงานเต็มแล้วค่ะ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       }
     } else {
-      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังว่างพร้อมให้บริการเต็มรูปแบบ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันทีครับ`);
+      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังว่างพร้อมให้บริการเต็มรูปแบบค่ะ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันทีนะคะ`);
     }
   };
 
@@ -1291,11 +1291,11 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
                   )}
                 </div>
                 <h3 className="text-lg sm:text-xl font-black text-slate-950 leading-snug">
-                  กราบขออภัยเป็นอย่างยิ่งครับ<br />
-                  <span className="text-red-700">วันที่ {formatThaiDateShort(blockedModalInfo.date)} คิวงานจัดเลี้ยงเต็มแล้วครับ</span>
+                  กราบขออภัยเป็นอย่างยิ่งค่ะ<br />
+                  <span className="text-red-700">วันที่ {formatThaiDateShort(blockedModalInfo.date)} คิวงานจัดเลี้ยงเต็มแล้วค่ะ</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
-                  เพื่อรักษามาตรฐานคุณภาพความสดใหม่ของวัตถุดิบ การปรุงอาหารสุกร้อนสดๆ หน้างาน และการบริการระดับภัตตาคารอย่างดีที่สุด {blockedModalInfo.tableCount ? `(ทีมเชฟและบริกรรองรับเต็มกำลัง ${blockedModalInfo.tableCount} โต๊ะ)` : ''} ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
+                  เพื่อรักษามาตรฐานคุณภาพความสดใหม่ของวัตถุดิบ การปรุงอาหารสุกร้อนสดๆ หน้างาน และการบริการระดับภัตตาคารอย่างดีที่สุด {blockedModalInfo.tableCount ? `(ทีมเชฟและบริกรรองรับเต็มกำลัง ${blockedModalInfo.tableCount} โต๊ะ)` : ''} ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวค่ะ
                 </p>
                 {blockedModalInfo.note && (
                   <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">

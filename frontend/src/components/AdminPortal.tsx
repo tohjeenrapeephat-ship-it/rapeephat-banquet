@@ -4,7 +4,7 @@ import { QuotationApi } from '../services/api.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
-import { QueueService, BlockedDateEntry, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
+import { QueueService, BlockedDateEntry, BookingPolicy, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
 import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
@@ -41,7 +41,8 @@ import {
   FileSpreadsheet,
   Download,
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  Check
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -62,6 +63,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
   // Queue & Blocked Dates Management State
+  const [bookingPolicy, setBookingPolicy] = useState<BookingPolicy>(() => QueueService.getBookingPolicy());
+  const [policyMinTables, setPolicyMinTables] = useState<string>(() => QueueService.getBookingPolicy().minTables?.toString() || '10');
+  const [policyReason, setPolicyReason] = useState<string>(() => QueueService.getBookingPolicy().closedReason || '');
   const [blockedDates, setBlockedDates] = useState<BlockedDateEntry[]>(() => QueueService.getBlockedDates());
   const [newBlockedDate, setNewBlockedDate] = useState('');
   const [newBlockedTableCount, setNewBlockedTableCount] = useState<string>('80');
@@ -383,10 +387,39 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   };
 
   // Queue Management Handlers
+  const handleSaveBookingPolicy = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const minT = parseInt(policyMinTables) || 10;
+    const updated: BookingPolicy = {
+      ...bookingPolicy,
+      minTables: minT,
+      closedReason: policyReason.trim() || 'กราบขออภัยเป็นอย่างยิ่งค่ะ ขณะนี้ทางร้านโต๊ะจีนรพีพัฒน์ของดรับงานจัดเลี้ยงชั่วคราวค่ะ',
+      updatedAt: Date.now(),
+    };
+    QueueService.saveBookingPolicy(updated);
+    setBookingPolicy(updated);
+    setQueueSuccessMsg(`✓ บันทึกนโยบายการรับงานเรียบร้อยแล้วค่ะ (${updated.isAcceptingBookings ? `เปิดรับงานปกติ ขั้นต่ำ ${updated.minTables} โต๊ะ` : 'งดรับงานชั่วคราว'}) 🟢`);
+    setTimeout(() => setQueueSuccessMsg(''), 4000);
+  };
+
+  const handleToggleAccepting = (isOpen: boolean) => {
+    const updated: BookingPolicy = {
+      ...bookingPolicy,
+      isAcceptingBookings: isOpen,
+      minTables: parseInt(policyMinTables) || 10,
+      closedReason: policyReason.trim() || 'กราบขออภัยเป็นอย่างยิ่งค่ะ ขณะนี้ทางร้านโต๊ะจีนรพีพัฒน์ของดรับงานจัดเลี้ยงชั่วคราวค่ะ',
+      updatedAt: Date.now(),
+    };
+    QueueService.saveBookingPolicy(updated);
+    setBookingPolicy(updated);
+    setQueueSuccessMsg(isOpen ? '✓ เปิดรับงานตามปกติเรียบร้อยแล้วค่ะ 🟢' : '✓ ปรับเป็น "งดรับงานชั่วคราว / ไม่รับงานเลย" เรียบร้อยแล้วค่ะ 🔴');
+    setTimeout(() => setQueueSuccessMsg(''), 4000);
+  };
+
   const handleAddBlockedDate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBlockedDate) {
-      alert('กรุณาเลือกวันที่ต้องการระบุว่าคิวเต็มครับ');
+      alert('กรุณาเลือกวันที่ต้องการระบุว่าคิวเต็มค่ะ');
       return;
     }
     const tableNum = newBlockedTableCount ? parseInt(newBlockedTableCount) : undefined;
@@ -400,15 +433,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
     setBlockedDates([...QueueService.getBlockedDates()]);
     setNewBlockedDate('');
     setNewBlockedNote('');
-    setQueueSuccessMsg(`✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} ${entry.tableCount ? `(รับ ${entry.tableCount} โต๊ะ)` : ''} เป็นวันคิวงานเต็มเรียบร้อยแล้ว (แสดงผลหน้าเว็บทันที) 🔴`);
+    setQueueSuccessMsg(`✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} ${entry.tableCount ? `(รับ ${entry.tableCount} โต๊ะ)` : ''} เป็นวันคิวงานเต็มเรียบร้อยแล้วค่ะ (แสดงผลหน้าเว็บทันที) 🔴`);
     setTimeout(() => setQueueSuccessMsg(''), 4000);
   };
 
   const handleRemoveBlockedDate = (id: string, dateStr: string) => {
-    if (!confirm(`ต้องการปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เพื่อเปิดรับจองตามปกติหรือไม่?`)) return;
+    if (!confirm(`ต้องการปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เพื่อเปิดรับจองตามปกติหรือไม่คะ?`)) return;
     QueueService.removeBlockedDate(id);
     setBlockedDates([...QueueService.getBlockedDates()]);
-    setQueueSuccessMsg(`✓ ปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เรียบร้อยแล้ว`);
+    setQueueSuccessMsg(`✓ ปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เรียบร้อยแล้วค่ะ`);
     setTimeout(() => setQueueSuccessMsg(''), 4000);
   };
 
@@ -421,8 +454,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
     window.dispatchEvent(new Event('rapeephat_queue_updated'));
     setQueueSuccessMsg(
       newStatus === 'deposit_paid'
-        ? `✓ ได้รับเงินมัดจำแล้ว! คิวงาน ${quote.quoteNo} ถูกแสดงบนตารางคิวหน้าเว็บเรียบร้อยแล้ว 🟢`
-        : `✓ อัปเดตสถานะ ${quote.quoteNo} เรียบร้อยแล้ว`
+        ? `✓ ได้รับเงินมัดจำแล้วค่ะ! คิวงาน ${quote.quoteNo} ถูกแสดงบนตารางคิวหน้าเว็บเรียบร้อยแล้ว 🟢`
+        : `✓ อัปเดตสถานะ ${quote.quoteNo} เรียบร้อยแล้วค่ะ`
     );
     setTimeout(() => setQueueSuccessMsg(''), 4000);
   };
@@ -1390,6 +1423,134 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 <span>{queueSuccessMsg}</span>
               </div>
             )}
+
+            {/* Section 0: Booking Policy & Minimum Tables Settings (นโยบายการรับงาน & กำหนดขั้นต่ำ) */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-red-950 text-white shadow-xl space-y-6 border border-red-900/40">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                    <Settings className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg sm:text-xl font-black text-amber-400">
+                      ⚙️ นโยบายการรับงานจัดเลี้ยง & กำหนดขั้นต่ำ (Booking Policy)
+                    </h4>
+                    <p className="text-xs text-slate-300 font-medium">
+                      ตั้งค่าสถานะการรับงานของร้าน (เปิดรับปกติ หรือ งดรับงานชั่วคราว) และกำหนดจำนวนโต๊ะขั้นต่ำที่รับ
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Indicator Badge */}
+                <div className="flex items-center gap-2">
+                  <span className={`px-4 py-1.5 rounded-full text-xs font-black shadow-sm flex items-center gap-2 ${
+                    bookingPolicy.isAcceptingBookings
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-red-500/20 text-red-300 border border-red-500/40'
+                  }`}>
+                    <span className={`w-2.5 h-2.5 rounded-full ${bookingPolicy.isAcceptingBookings ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                    {bookingPolicy.isAcceptingBookings ? 'สถานะ: เปิดรับงานตามปกติ 🟢' : 'สถานะ: ไม่รับงานเลย (งดรับชั่วคราว) 🔴'}
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveBookingPolicy} className="grid md:grid-cols-12 gap-6 items-end">
+                {/* 1. Accepting Mode Toggle */}
+                <div className="md:col-span-4 space-y-2">
+                  <label className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                    <span>1. สถานะการเปิดรับงานจัดเลี้ยง:</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAccepting(true)}
+                      className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        bookingPolicy.isAcceptingBookings
+                          ? 'bg-emerald-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Check className="w-4 h-4 text-amber-300" />
+                      <span>เปิดรับงานปกติ</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAccepting(false)}
+                      className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        !bookingPolicy.isAcceptingBookings
+                          ? 'bg-red-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <AlertCircle className="w-4 h-4 text-amber-200" />
+                      <span>ไม่รับงานเลย 🔴</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. Minimum Table Count */}
+                <div className="md:col-span-4 space-y-2">
+                  <label className="text-xs font-black text-amber-300 flex items-center justify-between">
+                    <span>2. รับจัดเลี้ยงขั้นต่ำกี่โต๊ะขึ้นไป:</span>
+                    <span className="text-[11px] text-slate-400 font-normal">ปัจจุบัน: ขั้นต่ำ {bookingPolicy.minTables || 10} โต๊ะ</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={policyMinTables}
+                      onChange={(e) => setPolicyMinTables(e.target.value)}
+                      placeholder="เช่น 5, 10, 20, 30"
+                      className="w-full bg-white/10 border-2 border-white/20 hover:border-amber-400 focus:border-amber-400 rounded-2xl px-4 py-2 text-sm text-white font-black pr-16 focus:outline-none"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-amber-300">
+                      โต๊ะขึ้นไป
+                    </span>
+                  </div>
+                  {/* Presets */}
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {[5, 10, 15, 20, 30, 50].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setPolicyMinTables(t.toString())}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${
+                          policyMinTables === t.toString()
+                            ? 'bg-amber-400 text-slate-950 border-amber-400 font-black'
+                            : 'bg-white/5 hover:bg-white/15 text-slate-300 border-white/10'
+                        }`}
+                      >
+                        {t} โต๊ะ
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Reason & Save Button */}
+                <div className="md:col-span-4 space-y-2">
+                  <label className="text-xs font-black text-amber-300">
+                    3. ข้อความแจ้งเตือนเมื่อปิดรับงาน:
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={policyReason}
+                      onChange={(e) => setPolicyReason(e.target.value)}
+                      placeholder="เช่น กราบขออภัยค่ะ ขณะนี้ทางร้านของดรับงานชั่วคราวค่ะ"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+                    />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0 shadow-md transition-transform hover:scale-102 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>บันทึก</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
 
             {/* Section 1: Add / Manage Blocked Dates (วันที่คิวงานเต็ม) */}
             <div className="grid lg:grid-cols-12 gap-6">

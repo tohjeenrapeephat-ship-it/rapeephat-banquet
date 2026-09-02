@@ -290,7 +290,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
                   คิวงานเต็ม 🔴
                 </span>
                 <span className="text-xs sm:text-sm font-black text-red-900">
-                  วันที่ {formatThaiDateShort(formData.eventDate || '')} คิวงานจัดเลี้ยงเต็มแล้วครับ
+                  วันที่ {formatThaiDateShort(formData.eventDate || '')} คิวงานจัดเลี้ยงเต็มแล้วค่ะ
                 </span>
                 {blockedCheck.tableCount && (
                   <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10.5px] font-black border border-amber-300">
@@ -299,7 +299,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
                 )}
               </div>
               <p className="text-xs text-slate-700 font-medium leading-relaxed">
-                กราบขออภัยเป็นอย่างยิ่งครับ เพื่อรักษามาตรฐานคุณภาพอาหารปรุงสุกสดใหม่และการบริการระดับภัตตาคารอย่างดีที่สุด {blockedCheck.tableCount ? `(ทีมเชฟและบริกรรองรับเต็มกำลัง ${blockedCheck.tableCount} โต๊ะ)` : ''} ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
+                กราบขออภัยเป็นอย่างยิ่งค่ะ เพื่อรักษามาตรฐานคุณภาพอาหารปรุงสุกสดใหม่และการบริการระดับภัตตาคารอย่างดีที่สุด {blockedCheck.tableCount ? `(ทีมเชฟและบริกรรองรับเต็มกำลัง ${blockedCheck.tableCount} โต๊ะ)` : ''} ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวค่ะ
               </p>
               {blockedCheck.note && (
                 <div className="text-xs font-bold text-red-800">

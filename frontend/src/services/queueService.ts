@@ -1,5 +1,12 @@
 import { QuotationDoc } from "../types/quotation.js";
 
+export interface BookingPolicy {
+  isAcceptingBookings: boolean; // true = เปิดรับงานปกติ, false = ไม่รับงานเลย (งดรับงานชั่วคราว)
+  closedReason: string;
+  minTables: number; // e.g. 5, 10, 20 โต๊ะขึ้นไป
+  updatedAt: number;
+}
+
 export interface BlockedDateEntry {
   id: string;
   date: string; // "YYYY-MM-DD"
@@ -32,6 +39,14 @@ export interface DynamicQueueEvent {
 }
 
 const BLOCKED_DATES_KEY = "rapeephat_blocked_dates";
+const BOOKING_POLICY_KEY = "rapeephat_booking_policy";
+
+const DEFAULT_BOOKING_POLICY: BookingPolicy = {
+  isAcceptingBookings: true,
+  closedReason: "กราบขออภัยเป็นอย่างยิ่งค่ะ ขณะนี้ทางร้านโต๊ะจีนรพีพัฒน์ของดรับงานจัดเลี้ยงชั่วคราว เพื่อปรับปรุงและพัฒนาคุณภาพการบริการระดับภัตตาคารค่ะ",
+  minTables: 10,
+  updatedAt: Date.now(),
+};
 
 // Default initial blocked dates (high season auspicious dates)
 const INITIAL_BLOCKED_DATES: BlockedDateEntry[] = [
@@ -122,6 +137,29 @@ export function maskCustomerName(name: string): string {
 }
 
 export const QueueService = {
+  // Booking Policy (เปิดรับงาน / ไม่รับงานเลย / รับขั้นต่ำกี่โต๊ะ)
+  getBookingPolicy(): BookingPolicy {
+    try {
+      const stored = localStorage.getItem(BOOKING_POLICY_KEY);
+      if (stored) {
+        return { ...DEFAULT_BOOKING_POLICY, ...JSON.parse(stored) };
+      }
+    } catch (e) {
+      console.error("Failed to load booking policy:", e);
+    }
+    this.saveBookingPolicy(DEFAULT_BOOKING_POLICY);
+    return DEFAULT_BOOKING_POLICY;
+  },
+
+  saveBookingPolicy(policy: BookingPolicy): void {
+    try {
+      localStorage.setItem(BOOKING_POLICY_KEY, JSON.stringify(policy));
+      window.dispatchEvent(new Event("rapeephat_queue_updated"));
+    } catch (e) {
+      console.error("Failed to save booking policy:", e);
+    }
+  },
+
   // Get list of all blocked dates
   getBlockedDates(): BlockedDateEntry[] {
     try {

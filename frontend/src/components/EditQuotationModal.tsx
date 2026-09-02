@@ -161,7 +161,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
 
   const handleRemoveDish = (index: number) => {
     if (dishes.length <= 1) {
-      alert('ชุดโต๊ะจีนต้องมีรายการอาหารอย่างน้อย 1 รายการครับ');
+      alert('ชุดโต๊ะจีนต้องมีรายการอาหารอย่างน้อย 1 รายการค่ะ');
       return;
     }
     setDishes((prev) => prev.filter((_, i) => i !== index));

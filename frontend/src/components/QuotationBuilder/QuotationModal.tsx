@@ -126,7 +126,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
       .map((d, i) => `   ${i + 1}. ${d.dishName}`)
       .join('\n');
 
-    return `สวัสดีครับ/ค่ะ ขอส่งใบเสนอราคา โต๊ะจีน รพีพัฒน์ พรีเมียม\n` +
+    return `สวัสดีค่ะ ขอส่งใบเสนอราคา โต๊ะจีน รพีพัฒน์ พรีเมียม\n` +
       `📌 เลขที่เอกสาร: ${displayQuoteNo}\n` +
       `👤 ชื่อลูกค้า: ${quotation.customer.name}\n` +
       `📞 โทร: ${quotation.customer.phone}\n` +
@@ -142,7 +142,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
       `   • ธนาคารไทยพาณิชย์: 411-239908-0 (สาขาเซ็นทรัล นครปฐม)\n` +
       `   • พร้อมเพย์: 081-331-1646\n` +
       (driveUrl ? `📄 ลิงก์ PDF บน Google Drive: ${driveUrl}\n` : '') +
-      `ขอบคุณครับ`;
+      `ขอบคุณค่ะ`;
   };
 
   const handleShareLine = () => {
