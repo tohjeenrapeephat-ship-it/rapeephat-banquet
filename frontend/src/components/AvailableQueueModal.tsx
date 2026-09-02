@@ -98,9 +98,18 @@ export const AvailableQueueModal: React.FC<AvailableQueueModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* 🟢 Top Icon Badge (Mint Circle with Green Checkmark) */}
-        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border-4 border-emerald-200 shadow-inner">
-          <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+        {/* 🟢 Top Mascot Sticker: Joyful Chef Celebrating Open/Available Queue */}
+        <div className="flex flex-col items-center justify-center -mt-2">
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 transform hover:scale-105 transition-transform duration-300">
+            <img
+              src="/images/stickers/chef-happy.jpg"
+              alt="เชฟโต๊ะจีนรพีพัฒน์ ยินดีให้บริการค่ะ"
+              className="w-full h-full object-contain drop-shadow-xl animate-pulse"
+            />
+            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white shadow-md">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </div>
         </div>
 
         {/* 🏷️ Top Status Pills Row */}

@@ -300,9 +300,13 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           onClick={() => setShowAvailablePopup(true)}
           className="p-4 sm:p-5 rounded-3xl bg-emerald-50 border-2 border-emerald-400 shadow-md space-y-3 animate-fadeIn text-slate-900 cursor-pointer hover:bg-emerald-100/60 transition-colors"
         >
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <CheckCircle2 className="w-5 h-5" />
+          <div className="flex items-start gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-emerald-300 p-1 flex items-center justify-center shrink-0 shadow-xs">
+              <img
+                src="/images/stickers/chef-happy.jpg"
+                alt="คิวงานไม่เต็มค่ะ"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -340,9 +344,13 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           onClick={() => setShowBlockedPopup(true)}
           className="p-4 sm:p-5 rounded-3xl bg-red-50 border-2 border-red-400 shadow-md space-y-3 animate-fadeIn text-slate-900 cursor-pointer hover:bg-red-100/60 transition-colors"
         >
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <AlertCircle className="w-5 h-5" />
+          <div className="flex items-start gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-red-300 p-1 flex items-center justify-center shrink-0 shadow-xs">
+              <img
+                src="/images/stickers/chef-crying.jpg"
+                alt="คิวงานจัดเลี้ยงเต็มแล้วค่ะ"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -413,9 +421,18 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="relative w-full max-w-lg bg-white rounded-3xl border-2 border-red-500 shadow-2xl p-6 sm:p-7 space-y-5 text-slate-900">
             
-            {/* Icon */}
-            <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto border-4 border-red-200 shadow-inner">
-              <AlertCircle className="w-8 h-8 text-red-600" />
+            {/* 🔴 Top Mascot Sticker: Crying Chef Apologizing for Full Queue */}
+            <div className="flex flex-col items-center justify-center -mt-2">
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 transform hover:scale-105 transition-transform duration-300">
+                <img
+                  src="/images/stickers/chef-crying.jpg"
+                  alt="เชฟโต๊ะจีนรพีพัฒน์ กราบขออภัยคิวงานเต็มค่ะ"
+                  className="w-full h-full object-contain drop-shadow-xl animate-pulse"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-red-600 text-white p-1.5 rounded-full border-2 border-white shadow-md">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+              </div>
             </div>
 
             {/* Title & Designed Apology */}
