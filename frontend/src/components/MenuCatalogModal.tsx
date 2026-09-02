@@ -18,7 +18,13 @@ import {
   Flame,
   UtensilsCrossed,
   ShieldCheck,
-  Award
+  Award,
+  Maximize2,
+  Minimize2,
+  ZoomIn,
+  ZoomOut,
+  Monitor,
+  Smartphone
 } from 'lucide-react';
 
 interface MenuCatalogModalProps {
@@ -36,6 +42,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
 }) => {
   const [selectedPkgId, setSelectedPkgId] = useState<string>(initialPackageId || 'pkg-2500');
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
+  const [isFitScreen, setIsFitScreen] = useState<boolean>(true);
   const [scale, setScale] = useState<number>(1);
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -46,22 +53,51 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
     }
   }, [initialPackageId]);
 
-  // Responsive zoom scale for mobile screens
+  // Compute scale to fit screen perfectly
+  const getFitScale = () => {
+    if (typeof window === 'undefined') return 1;
+    const width = window.innerWidth;
+    if (width < 850) {
+      return Math.max((width - 32) / 794, 0.35);
+    }
+    const height = window.innerHeight;
+    const heightScale = (height - 180) / 1123;
+    const widthScale = (width - 64) / 794;
+    return Math.min(widthScale, Math.max(heightScale, 0.75), 1.15);
+  };
+
+  // Responsive zoom scale calculation
   useEffect(() => {
-    const updateScale = () => {
-      if (typeof window !== 'undefined') {
-        const width = window.innerWidth;
-        if (width < 820) {
-          setScale(Math.max((width - 32) / 794, 0.38));
-        } else {
-          setScale(1);
-        }
+    const handleResize = () => {
+      if (isFitScreen) {
+        setScale(getFitScale());
       }
     };
-    updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, []);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isFitScreen]);
+
+  // Handle Fit to Screen toggle
+  const handleToggleFitScreen = () => {
+    if (isFitScreen) {
+      setIsFitScreen(false);
+      setScale(1);
+    } else {
+      setIsFitScreen(true);
+      setScale(getFitScale());
+    }
+  };
+
+  const handleZoomIn = () => {
+    setIsFitScreen(false);
+    setScale((prev) => Math.min(prev + 0.1, 1.6));
+  };
+
+  const handleZoomOut = () => {
+    setIsFitScreen(false);
+    setScale((prev) => Math.max(prev - 0.1, 0.35));
+  };
 
   // Close on Escape key
   useEffect(() => {
@@ -111,15 +147,15 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
       {/* ========================================================================= */}
       {/* 🧭 TOP CONTROLS & PACKAGE SELECTOR TOOLBAR */}
       {/* ========================================================================= */}
-      <div className="w-full max-w-4xl bg-white rounded-3xl border-2 border-amber-300 shadow-2xl p-3 sm:p-4 mb-4 flex flex-col md:flex-row items-center justify-between gap-3 shrink-0 z-10 sticky top-2">
+      <div className="w-full max-w-5xl bg-white rounded-3xl border-2 border-amber-300 shadow-2xl p-3 sm:p-4 mb-4 flex flex-col lg:flex-row items-center justify-between gap-3 shrink-0 z-10 sticky top-2">
         
-        {/* Package Selector Dropdown & Price Badge */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
+        {/* Package Selector Dropdown */}
+        <div className="flex items-center gap-2.5 w-full lg:w-auto">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs">
             <UtensilsCrossed className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10.5px] font-black text-slate-500 uppercase tracking-wider block">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
               เลือกดูรายการอาหารตามแพ็กเกจราคา:
             </label>
             <select
@@ -137,8 +173,68 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
           </div>
         </div>
 
+        {/* Zoom & Fit Screen Toolbar Controls */}
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-300">
+          
+          {/* Fit to Screen Button (ปุ่มพอดีกับหน้าจอ) */}
+          <button
+            type="button"
+            onClick={handleToggleFitScreen}
+            className={`px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+              isFitScreen
+                ? 'bg-emerald-600 text-white shadow-sm border border-emerald-500'
+                : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
+            }`}
+            title="ปรับขนาดการแสดงผลให้พอดีกับหน้าจออัตโนมัติ"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span>พอดีกับหน้าจอ</span>
+          </button>
+
+          {/* 100% Size Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsFitScreen(false);
+              setScale(1);
+            }}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              !isFitScreen && Math.abs(scale - 1) < 0.05
+                ? 'bg-red-700 text-white shadow-sm'
+                : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'
+            }`}
+            title="แสดงผลขนาดจริง 100% (A4)"
+          >
+            <span>100%</span>
+          </button>
+
+          {/* Zoom In & Out */}
+          <div className="flex items-center gap-0.5 border-l border-slate-300 pl-1">
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              className="p-1.5 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+              title="ย่อขนาด (-)"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-[11px] font-mono font-bold text-slate-700 px-1 min-w-[38px] text-center">
+              {Math.round(scale * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              className="p-1.5 rounded-lg bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+              title="ขยายขนาด (+)"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+        </div>
+
         {/* Action Buttons (Print / Download PDF / Select for Quotation) */}
-        <div className="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto">
+        <div className="flex flex-wrap items-center justify-end gap-2 w-full lg:w-auto">
           
           {/* Direct Print Button */}
           <button
@@ -197,13 +293,14 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
       {/* 📄 A4 PRINTABLE MENU SHEET PREVIEW (ROYAL THAI-CHINESE LUXURY) */}
       {/* ========================================================================= */}
       <div
-        className="w-full flex justify-center py-2 pb-12 overflow-x-auto"
+        className="w-full flex justify-center py-2 pb-16 overflow-x-auto"
         style={{ minHeight: `${1123 * scale}px` }}
       >
         <div
           style={{
             transform: scale !== 1 ? `scale(${scale})` : undefined,
             transformOrigin: 'top center',
+            transition: 'transform 0.2s ease-out',
           }}
         >
           <div
