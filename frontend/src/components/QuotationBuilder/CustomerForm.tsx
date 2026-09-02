@@ -301,9 +301,9 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           className="p-4 sm:p-5 rounded-3xl bg-emerald-50 border-2 border-emerald-400 shadow-md space-y-3 animate-fadeIn text-slate-900 cursor-pointer hover:bg-emerald-100/60 transition-colors"
         >
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-emerald-300 p-1 flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-emerald-300 p-0.5 flex items-center justify-center shrink-0 shadow-xs">
               <img
-                src="/images/stickers/chef-happy.jpg"
+                src="/images/stickers/chef-happy.png"
                 alt="คิวงานไม่เต็มค่ะ"
                 className="w-full h-full object-contain"
               />
@@ -345,9 +345,9 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
           className="p-4 sm:p-5 rounded-3xl bg-red-50 border-2 border-red-400 shadow-md space-y-3 animate-fadeIn text-slate-900 cursor-pointer hover:bg-red-100/60 transition-colors"
         >
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-red-300 p-1 flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-red-300 p-0.5 flex items-center justify-center shrink-0 shadow-xs">
               <img
-                src="/images/stickers/chef-crying.jpg"
+                src="/images/stickers/chef-crying.png"
                 alt="คิวงานจัดเลี้ยงเต็มแล้วค่ะ"
                 className="w-full h-full object-contain"
               />
@@ -421,15 +421,15 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="relative w-full max-w-lg bg-white rounded-3xl border-2 border-red-500 shadow-2xl p-6 sm:p-7 space-y-5 text-slate-900">
             
-            {/* 🔴 Top Mascot Sticker: Crying Chef Apologizing for Full Queue */}
+            {/* 🔴 Top Mascot: Crying Chef Apologizing for Full Queue (Clean Transparent PNG) */}
             <div className="flex flex-col items-center justify-center -mt-2">
-              <div className="relative w-28 h-28 sm:w-32 sm:h-32 transform hover:scale-105 transition-transform duration-300">
+              <div className="relative w-32 h-32 sm:w-36 sm:h-36 transform hover:scale-105 transition-transform duration-300">
                 <img
-                  src="/images/stickers/chef-crying.jpg"
+                  src="/images/stickers/chef-crying.png"
                   alt="เชฟโต๊ะจีนรพีพัฒน์ กราบขออภัยคิวงานเต็มค่ะ"
-                  className="w-full h-full object-contain drop-shadow-xl animate-pulse"
+                  className="w-full h-full object-contain filter drop-shadow-md animate-pulse"
                 />
-                <div className="absolute -bottom-1 -right-1 bg-red-600 text-white p-1.5 rounded-full border-2 border-white shadow-md">
+                <div className="absolute bottom-1 right-2 bg-red-600 text-white p-1.5 rounded-full border-2 border-white shadow-md">
                   <AlertCircle className="w-5 h-5" />
                 </div>
               </div>

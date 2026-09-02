@@ -98,15 +98,15 @@ export const AvailableQueueModal: React.FC<AvailableQueueModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {/* 🟢 Top Mascot Sticker: Joyful Chef Celebrating Open/Available Queue */}
+        {/* 🟢 Top Mascot: Joyful Chef Celebrating Open/Available Queue (Clean Transparent PNG) */}
         <div className="flex flex-col items-center justify-center -mt-2">
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 transform hover:scale-105 transition-transform duration-300">
+          <div className="relative w-32 h-32 sm:w-36 sm:h-36 transform hover:scale-105 transition-transform duration-300">
             <img
-              src="/images/stickers/chef-happy.jpg"
+              src="/images/stickers/chef-happy.png"
               alt="เชฟโต๊ะจีนรพีพัฒน์ ยินดีให้บริการค่ะ"
-              className="w-full h-full object-contain drop-shadow-xl animate-pulse"
+              className="w-full h-full object-contain filter drop-shadow-md animate-pulse"
             />
-            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white shadow-md">
+            <div className="absolute bottom-1 right-2 bg-emerald-500 text-white p-1.5 rounded-full border-2 border-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
