@@ -84,27 +84,40 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
 
         </div>
 
-        {/* Enterprise Security & PDPA Compliance Assurance Bar */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-amber-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-3 text-slate-800">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
+        {/* Official Trustmark & Quality Assurance Bar */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-amber-300/80 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-3.5 text-slate-800">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-800 text-white flex flex-col items-center justify-center shrink-0 shadow-md border border-cyan-300/50 p-1">
+              <div className="text-[8px] font-black leading-none text-cyan-200">กรมพัฒนา</div>
+              <div className="text-[12px] font-black leading-none text-white my-0.5">DBD</div>
+              <div className="text-[6.5px] font-bold tracking-widest leading-none text-cyan-300 uppercase">Registered</div>
             </div>
             <div>
-              <div className="font-black text-slate-900 flex items-center gap-1.5">
-                <span>มาตรฐานความปลอดภัยระดับองค์กร & นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>
-                <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-mono font-bold rounded">SSL 256-BIT</span>
+              <div className="font-black text-slate-950 flex flex-wrap items-center gap-2">
+                <span className="text-sm">DBD Registered ทะเบียนพาณิชย์อิเล็กทรอนิกส์ กรมพัฒนาธุรกิจการค้า</span>
+                <span className="px-2 py-0.2 bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-black rounded-full">
+                  ✓ ตรวจสอบได้ 100%
+                </span>
               </div>
-              <div className="text-[11px] text-slate-600 font-medium">
-                รองรับการจัดซื้อจัดจ้าง ออกใบเสนอราคา สัญญาจ้าง และเอกสารหักภาษี ณ ที่จ่าย (WHT 3%) ถูกต้องตามกฎหมาย 100%
+              <div className="text-xs text-slate-600 font-medium mt-0.5">
+                วัตถุดิบคัดเกรดพรีเมียม สดใหม่ต่อวัน ปรุงสุกร้อนหน้างาน 100% • สืบทอดตำนานความอร่อยต้นตำรับนครปฐม 35+ ปี
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 text-[11px] font-bold text-slate-600">
-            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">🔒 HTTPS Secured</span>
-            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">📋 นิติบุคคลตรวจสอบได้</span>
-            <span className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">🛡️ PDPA Compliant</span>
+          <div className="flex flex-wrap items-center justify-center gap-2 shrink-0 text-[11px] font-bold text-slate-700">
+            <span className="px-3 py-1.5 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-950 font-black">
+              🏛️ DBD Registered
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 font-black">
+              🌿 สดใหม่ ปรุงสุกหน้างาน 100%
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 font-black">
+              👑 ต้นตำรับนครปฐม 35+ ปี
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 font-black">
+              📜 สัญญา & ใบเสร็จครบถ้วน
+            </span>
           </div>
         </div>
 

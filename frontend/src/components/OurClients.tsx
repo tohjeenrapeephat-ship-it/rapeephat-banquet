@@ -12,7 +12,13 @@ import {
   Grid,
   Play,
   Pause,
-  ChevronRight
+  ChevronRight,
+  Utensils,
+  Flame,
+  Crown,
+  FileCheck2,
+  BadgeCheck,
+  Shield
 } from 'lucide-react';
 
 interface ClientLogo {
@@ -342,43 +348,114 @@ export const OurClients: React.FC = () => {
           </div>
         </div>
 
-        {/* Enterprise Security & Compliance Trust Bar */}
-        <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white border border-slate-700/80 shadow-lg">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4 text-center sm:text-left">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shrink-0 shadow-inner">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-sm sm:text-base font-black text-white flex items-center gap-2 justify-center sm:justify-start">
-                  <span>มาตรฐานความปลอดภัยระดับองค์กร & นโยบายคุ้มครองข้อมูล (PDPA)</span>
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-500/30 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-400/40">
-                    GRADE A+
-                  </span>
+        {/* Official Trustmark & Culinary Quality Guarantee Badges */}
+        <div className="mt-10 space-y-4">
+          <div className="text-center space-y-1">
+            <span className="text-[11px] font-black tracking-widest text-amber-500 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 inline-block">
+              👑 การันตีความมั่นใจ มาตรฐานโต๊ะจีนระดับภัตตาคาร
+            </span>
+            <h4 className="text-lg sm:text-xl font-black text-white">
+              เครื่องหมายรับรองมาตรฐาน & ความน่าเชื่อถือสูงสุด
+            </h4>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            {/* 1. DBD Registered Badge */}
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-2 border-cyan-500/40 shadow-xl relative overflow-hidden group hover:border-cyan-400 transition-all hover:scale-101">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all" />
+              <div className="flex items-start gap-3.5 relative z-10">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-800 text-white flex flex-col items-center justify-center shrink-0 shadow-lg border border-cyan-300/50 p-1">
+                  <div className="text-[9px] font-black tracking-wider leading-none text-cyan-200">กรมพัฒนา</div>
+                  <div className="text-[13px] font-black tracking-tighter leading-none text-white my-0.5">DBD</div>
+                  <div className="text-[7.5px] font-bold tracking-widest leading-none text-cyan-300 uppercase">Registered</div>
                 </div>
-                <p className="text-xs text-slate-300 font-medium mt-0.5">
-                  ระบบเว็บและเซิร์ฟเวอร์ได้รับการเข้ารหัส 256-bit SSL/TLS มาตรฐานสากล ข้อมูลติดต่อและงบประมาณขององค์กรถูกจัดเก็บเป็นความลับสูงสุด
-                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-cyan-300 tracking-wide">DBD Registered</span>
+                    <span className="px-2 py-0.2 rounded-full bg-cyan-500/20 text-cyan-200 text-[10px] font-bold border border-cyan-400/40">
+                      ✓ ตรวจสอบได้ 100%
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-white">
+                    ทะเบียนพาณิชย์อิเล็กทรอนิกส์ กรมพัฒนาธุรกิจการค้า
+                  </div>
+                  <p className="text-[11.5px] text-slate-300 font-medium leading-relaxed pt-0.5">
+                    จดทะเบียนพาณิชย์ถูกต้องตามกฎหมาย มีสถานที่ตั้งและตัวตนชัดเจน มั่นใจในความซื่อสัตย์ ปลอดภัยทุกการสั่งจอง
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto text-[11px] font-bold shrink-0">
-              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
-                <span className="text-emerald-400 font-mono font-black text-xs">256-BIT SSL</span>
-                <span className="text-slate-400 text-[10px]">เข้ารหัสความปลอดภัย</span>
+            {/* 2. 100% Fresh & Cleanliness Guarantee Badge */}
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-2 border-emerald-500/40 shadow-xl relative overflow-hidden group hover:border-emerald-400 transition-all hover:scale-101">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
+              <div className="flex items-start gap-3.5 relative z-10">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-800 text-white flex flex-col items-center justify-center shrink-0 shadow-lg border border-emerald-300/50 p-1">
+                  <Flame className="w-5 h-5 text-amber-300" />
+                  <div className="text-[8px] font-black tracking-wider leading-none text-emerald-100 uppercase mt-0.5">100% Fresh</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-emerald-400 tracking-wide">ความสะอาด & สดใหม่ 100%</span>
+                    <span className="px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-200 text-[10px] font-bold border border-emerald-400/40">
+                      GRADE A+
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-white">
+                    วัตถุดิบคัดเกรดพรีเมียม สดใหม่ต่อวัน ปรุงสุกร้อนหน้างาน 100%
+                  </div>
+                  <p className="text-[11.5px] text-slate-300 font-medium leading-relaxed pt-0.5">
+                    คัดสรรเนื้อสัตว์ ผักสด และซีฟู้ดสดใหม่วันต่อวัน ปรุงสุกสดใหม่ร้อนๆ ณ สถานที่จัดงาน ไร้สารกันบูด ถูกสุขอนามัย
+                  </p>
+                </div>
               </div>
-              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
-                <span className="text-amber-400 font-black text-xs">PDPA 100%</span>
-                <span className="text-slate-400 text-[10px]">คุ้มครองข้อมูลส่วนบุคคล</span>
+            </div>
+
+            {/* 3. 35+ Years Culinary Heritage Guarantee Badge */}
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-2 border-amber-500/40 shadow-xl relative overflow-hidden group hover:border-amber-400 transition-all hover:scale-101 md:col-span-2 lg:col-span-1">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
+              <div className="flex items-start gap-3.5 relative z-10">
+                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-800 text-white flex flex-col items-center justify-center shrink-0 shadow-lg border border-amber-300/50 p-1">
+                  <Crown className="w-5 h-5 text-amber-200" />
+                  <div className="text-[8.5px] font-black tracking-wider leading-none text-amber-100 uppercase mt-0.5">35+ Years</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-amber-300 tracking-wide">การันตีประสบการณ์ 35+ ปี</span>
+                    <span className="px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-200 text-[10px] font-bold border border-amber-400/40">
+                      ต้นตำรับแท้
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-white">
+                    สืบทอดตำนานความอร่อย ต้นตำรับนครปฐม ยาวนานกว่า 35 ปี
+                  </div>
+                  <p className="text-[11.5px] text-slate-300 font-medium leading-relaxed pt-0.5">
+                    สืบสานสูตรลับโต๊ะจีนนครปฐมแท้ชั้นครูภัตตาคาร การันตีความประทับใจและความสมเกียรติเจ้าภาพกว่า 10,000+ งาน
+                  </p>
+                </div>
               </div>
-              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
-                <span className="text-blue-400 font-black text-xs">WHT 3%</span>
-                <span className="text-slate-400 text-[10px]">เอกสารหักภาษี ณ ที่จ่าย</span>
+            </div>
+
+          </div>
+
+          {/* Bottom Contract & Official Receipts Assurance Strip */}
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                <FileCheck2 className="w-4 h-4" />
               </div>
-              <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center">
-                <span className="text-purple-400 font-black text-xs">B2B READY</span>
-                <span className="text-slate-400 text-[10px]">ระบบจัดซื้อจัดจ้าง</span>
-              </div>
+              <span className="font-bold text-white text-center sm:text-left">
+                📜 มีสัญญาจ้างจัดเลี้ยง ออกใบเสร็จรับเงินมัดจำ 30% และใบเสร็จรับเงินคงเหลือ 70% ชัดเจน มีผลบังคับใช้ตามกฎหมาย 100%
+              </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-black">
+                ✓ บุคคลธรรมดา
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-black">
+                ✓ องค์กร & นิติบุคคล
+              </span>
             </div>
           </div>
         </div>
