@@ -14,8 +14,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
-  Images
+  Images,
+  Printer,
+  FileText
 } from 'lucide-react';
+import { MenuCatalogModal } from './MenuCatalogModal.js';
 
 interface MenuItem {
   category: string;
@@ -30,6 +33,7 @@ export const MenuShowcase: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [galleryPhotoIndex, setGalleryPhotoIndex] = useState<number>(0);
+  const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
 
   const categories = [
     { id: 'all', name: '✨ เมนูทั้งหมด', icon: '🍽️' },
@@ -277,6 +281,16 @@ export const MenuShowcase: React.FC = () => {
               <Check className="w-3.5 h-3.5 text-emerald-600" />
               <span>อาหารสดสะอาด เสิร์ฟตรงเวลา</span>
             </div>
+
+            {/* Direct Print Menu Catalog Button */}
+            <button
+              type="button"
+              onClick={() => setCatalogModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 hover:bg-black text-amber-300 hover:text-white text-xs font-black shadow-sm transition-all transform hover:scale-102 cursor-pointer border border-amber-400"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              <span>🖨️ ดู & พิมพ์ใบรายการอาหาร PDF A4</span>
+            </button>
           </div>
 
         </div>
@@ -544,6 +558,13 @@ export const MenuShowcase: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Menu Catalog & Printable A4 PDF Modal */}
+      <MenuCatalogModal
+        isOpen={catalogModalOpen}
+        onClose={() => setCatalogModalOpen(false)}
+        initialPackageId="pkg-2500"
+      />
 
     </section>
   );

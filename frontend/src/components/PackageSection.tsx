@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { PackageTier } from '../types/quotation.js';
-import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight } from 'lucide-react';
+import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText, Download } from 'lucide-react';
 import { formatCurrency } from '../utils/currency.js';
+import { MenuCatalogModal } from './MenuCatalogModal.js';
 
 interface PackageSectionProps {
   onSelectPackage: (pkg: PackageTier) => void;
@@ -10,9 +11,16 @@ interface PackageSectionProps {
 
 export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage }) => {
   const [expandedPkgId, setExpandedPkgId] = useState<string | null>('pkg-1700');
+  const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
+  const [catalogPkgId, setCatalogPkgId] = useState<string>('pkg-2500');
 
   const toggleExpand = (id: string) => {
     setExpandedPkgId(expandedPkgId === id ? null : id);
+  };
+
+  const handleOpenCatalog = (pkgId?: string) => {
+    if (pkgId) setCatalogPkgId(pkgId);
+    setCatalogModalOpen(true);
   };
 
   return (
@@ -20,7 +28,7 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs font-black uppercase tracking-wider shadow-2xs">
             <Crown className="w-3.5 h-3.5 text-amber-600" />
             <span>แพ็กเกจโต๊ะจีนมาตรฐานภัตตาคาร</span>
@@ -34,6 +42,19 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
           <p className="text-slate-700 text-sm sm:text-base font-medium">
             ทุกแพ็กเกจ <strong className="text-red-700 font-black">ฟรี!</strong> อุปกรณ์โต๊ะ เก้าอี้ ผ้าคลุมผูกโบว์ ชุดจานชาม และบริกรครบเซ็ต • <span className="text-amber-800 font-bold">สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะทันที</span>
           </p>
+
+          {/* Prominent Global Print Menu Catalogue CTA */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => handleOpenCatalog('pkg-2500')}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white hover:bg-amber-50 border-2 border-amber-300 text-slate-900 hover:text-red-700 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer"
+            >
+              <Printer className="w-4 h-4 text-red-600" />
+              <span>🖨️ ดู & พิมพ์ใบรายการอาหารทุกราคา (PDF Brochure)</span>
+              <FileText className="w-4 h-4 text-amber-600" />
+            </button>
+          </div>
         </div>
 
         {/* Packages Grid */}
@@ -115,8 +136,10 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                     </div>
                   </div>
 
-                  {/* Action CTA Button */}
-                  <div className="pt-4 border-t border-amber-100">
+                  {/* Action CTA Buttons (Select for Quotation & Print PDF) */}
+                  <div className="pt-4 border-t border-amber-100 space-y-2">
+                    
+                    {/* Primary Builder Button */}
                     <button
                       type="button"
                       onClick={() => onSelectPackage(pkg)}
@@ -130,6 +153,17 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                       <span>เลือกแพ็กเกจนี้ & ออกใบเสนอราคา</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
+
+                    {/* Print / Download PDF Button for This Specific Package */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCatalog(pkg.id)}
+                      className="w-full py-2 px-3 rounded-xl bg-amber-50/80 hover:bg-amber-100 text-slate-800 hover:text-red-700 font-bold text-xs flex items-center justify-center gap-1.5 border border-amber-300 transition-colors cursor-pointer"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-amber-600" />
+                      <span>พิมพ์รายการอาหารนี้ (PDF A4)</span>
+                    </button>
+
                   </div>
                 </div>
 
@@ -139,6 +173,15 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
         </div>
 
       </div>
+
+      {/* Menu Catalog & Printable A4 PDF Modal */}
+      <MenuCatalogModal
+        isOpen={catalogModalOpen}
+        onClose={() => setCatalogModalOpen(false)}
+        initialPackageId={catalogPkgId}
+        onSelectForQuotation={(pkg) => onSelectPackage(pkg)}
+      />
+
     </section>
   );
 };

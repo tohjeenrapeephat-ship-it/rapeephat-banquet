@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PackageTier, SelectedDishMap } from '../../types/quotation.js';
-import { Utensils, CheckCircle2, Circle, Sparkles, Crown, Check, ChefHat } from 'lucide-react';
+import { Utensils, CheckCircle2, Circle, Sparkles, Crown, Check, ChefHat, Printer, FileText } from 'lucide-react';
+import { MenuCatalogModal } from '../MenuCatalogModal.js';
 
 interface CourseSelectorProps {
   selectedPackage: PackageTier;
@@ -13,16 +14,28 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
   selectedDishes,
   onDishSelect,
 }) => {
+  const [showCatalogModal, setShowCatalogModal] = useState<boolean>(false);
+
   return (
     <div className="space-y-6">
       
       {/* ========================================================================= */}
       {/* 👑 PACKAGE TITLE & HEADER (ตามแบบฟอร์มโต๊ะจีนราคา X บาท) */}
       {/* ========================================================================= */}
-      <div className="text-center py-2 space-y-2 border-b-2 border-amber-200 pb-5">
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-black uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          <span>{selectedPackage.tag || 'แพ็กเกจโต๊ะจีนยอดนิยม'}</span>
+      <div className="text-center py-2 space-y-2.5 border-b-2 border-amber-200 pb-5">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-black uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>{selectedPackage.tag || 'แพ็กเกจโต๊ะจีนยอดนิยม'}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowCatalogModal(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white hover:bg-amber-50 border-2 border-amber-300 text-slate-800 hover:text-red-700 text-xs font-black shadow-2xs transition-all cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5 text-red-600" />
+            <span>พิมพ์รายการอาหารนี้ (PDF A4)</span>
+          </button>
         </div>
 
         <h2 className="text-3xl sm:text-4xl font-black text-emerald-900 tracking-tight">
@@ -126,6 +139,13 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
           );
         })}
       </div>
+
+      {/* Menu Catalog & Printable A4 PDF Modal */}
+      <MenuCatalogModal
+        isOpen={showCatalogModal}
+        onClose={() => setShowCatalogModal(false)}
+        initialPackageId={selectedPackage.id}
+      />
 
     </div>
   );
