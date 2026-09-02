@@ -18,9 +18,12 @@ import {
   ArrowRight,
   Mail,
   Building2,
-  ChefHat
+  ChefHat,
+  Star,
+  QrCode
 } from 'lucide-react';
 import { WatermarkOverlay } from './WatermarkOverlay';
+import { GoogleReviewCard } from './GoogleReviewCard.js';
 
 export const ContactSection: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -526,6 +529,9 @@ export const ContactSection: React.FC = () => {
             </div>
 
           </div>
+
+          {/* ⭐ GOOGLE MAPS & BUSINESS REVIEW QR CODE CARD */}
+          <GoogleReviewCard />
 
           {/* 💫 Highlight Quote Banner */}
           <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-red-900 via-slate-900 to-red-950 text-white border-2 border-amber-400 shadow-xl text-center relative overflow-hidden">

@@ -16,8 +16,10 @@ import {
   Flame,
   Check,
   BadgeCheck,
-  ChevronRight
+  ChevronRight,
+  QrCode
 } from 'lucide-react';
+import { GoogleReviewCard } from './GoogleReviewCard.js';
 
 interface CeremonyReview {
   id: string;
@@ -389,6 +391,11 @@ export const Testimonials: React.FC = () => {
             );
           })}
         </div>
+
+        {/* ========================================================================= */}
+        {/* ⭐ GOOGLE MAPS & GOOGLE MY BUSINESS REVIEW QR CODE CARD */}
+        {/* ========================================================================= */}
+        <GoogleReviewCard />
 
         {/* ========================================================================= */}
         {/* 🎁 FREE TABLE PROMOTION CTA BANNER */}
