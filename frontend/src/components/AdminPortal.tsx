@@ -4,6 +4,7 @@ import { QuotationApi } from '../services/api.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
+import { QueueService, BlockedDateEntry, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
 import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
@@ -39,7 +40,8 @@ import {
   Printer,
   FileSpreadsheet,
   Download,
-  CreditCard
+  CreditCard,
+  AlertCircle
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -57,9 +59,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
   const [receiptType, setReceiptType] = useState<ReceiptType>('deposit_30');
   const [editingQuote, setEditingQuote] = useState<QuotationDoc | null>(null);
-  const [activeTab, setActiveTab] = useState<'quotations' | 'chat_leads' | 'packages' | 'settings'>('quotations');
+  const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'settings'>('quotations');
   
-  // Real-time Chat Operator States
+  // Queue & Blocked Dates Management State
+  const [blockedDates, setBlockedDates] = useState<BlockedDateEntry[]>(() => QueueService.getBlockedDates());
+  const [newBlockedDate, setNewBlockedDate] = useState('');
+  const [newBlockedNote, setNewBlockedNote] = useState('');
+  const [newBlockedReason, setNewBlockedReason] = useState<BlockedDateEntry['reason']>('fully_booked');
+  const [queueSuccessMsg, setQueueSuccessMsg] = useState('');
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
     const all = chatSync.getAllSessions();
     if (all.length === 0) {
@@ -374,6 +381,48 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
     setTimeout(() => setGasSaved(false), 3000);
   };
 
+  // Queue Management Handlers
+  const handleAddBlockedDate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBlockedDate) {
+      alert('กรุณาเลือกวันที่ต้องการระบุว่าคิวเต็มครับ');
+      return;
+    }
+    const entry = QueueService.addBlockedDate(
+      newBlockedDate,
+      newBlockedNote.trim() || 'คิวงานเต็มทุกช่วงเวลา (งดรับจอง)',
+      newBlockedReason
+    );
+    setBlockedDates([...QueueService.getBlockedDates()]);
+    setNewBlockedDate('');
+    setNewBlockedNote('');
+    setQueueSuccessMsg(`✓ บันทึกวันที่ ${formatThaiDateShort(entry.date)} เป็นวันคิวงานเต็มเรียบร้อยแล้ว (แสดงผลหน้าเว็บทันที)`);
+    setTimeout(() => setQueueSuccessMsg(''), 4000);
+  };
+
+  const handleRemoveBlockedDate = (id: string, dateStr: string) => {
+    if (!confirm(`ต้องการปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เพื่อเปิดรับจองตามปกติหรือไม่?`)) return;
+    QueueService.removeBlockedDate(id);
+    setBlockedDates([...QueueService.getBlockedDates()]);
+    setQueueSuccessMsg(`✓ ปลดล็อกคิววันที่ ${formatThaiDateShort(dateStr)} เรียบร้อยแล้ว`);
+    setTimeout(() => setQueueSuccessMsg(''), 4000);
+  };
+
+  const handleQuickStatusChange = async (quote: QuotationDoc, newStatus: string) => {
+    const updated: QuotationDoc = { ...quote, status: newStatus as any, updatedAt: Date.now() };
+    try {
+      await QuotationApi.update(updated);
+    } catch {}
+    setQuotations((prev) => prev.map((q) => (q.quoteNo === quote.quoteNo ? updated : q)));
+    window.dispatchEvent(new Event('rapeephat_queue_updated'));
+    setQueueSuccessMsg(
+      newStatus === 'deposit_paid'
+        ? `✓ ได้รับเงินมัดจำแล้ว! คิวงาน ${quote.quoteNo} ถูกแสดงบนตารางคิวหน้าเว็บเรียบร้อยแล้ว 🟢`
+        : `✓ อัปเดตสถานะ ${quote.quoteNo} เรียบร้อยแล้ว`
+    );
+    setTimeout(() => setQueueSuccessMsg(''), 4000);
+  };
+
   // Calculate Metrics
   const totalQuotations = quotations.length;
   const totalRevenue = quotations.reduce((acc, q) => acc + (q.grandTotal || 0), 0);
@@ -431,6 +480,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
               >
                 <FileText className="w-3.5 h-3.5" />
                 <span>ใบเสนอราคา</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('queue_manager')}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 relative ${
+                  activeTab === 'queue_manager'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>จัดการคิวงาน & วันคิวเต็ม</span>
+                {blockedDates.length > 0 && (
+                  <span className="bg-red-700 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full leading-none border border-white/40">
+                    {blockedDates.length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -1272,6 +1338,356 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 )}
               </div>
             )}
+
+          </div>
+        )}
+
+        {/* TAB: Queue & Blocked Dates Management */}
+        {activeTab === 'queue_manager' && (
+          <div className="space-y-6">
+            
+            {/* Header & Explanation */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-black uppercase">
+                    LIVE QUEUE CONTROL
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    เชื่อมต่อหน้าเว็บสด
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
+                  📅 ระบบจัดการคิวงาน & วันที่คิวเต็ม (Queue Manager)
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium">
+                  ใส่วันที่คิวงานเต็มเพื่อให้ระบบแจ้งเตือนลูกค้าบนหน้าเว็บทันที และติดตามรายการที่ได้รับมัดจำแล้วเพื่อแสดงผลบนตารางคิวงานสด
+                </p>
+              </div>
+
+              {/* Stat Counters */}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="p-3 px-4 rounded-2xl bg-red-50 border border-red-200 text-center">
+                  <div className="text-xs font-bold text-red-700">วันที่คิวเต็ม (บล็อก)</div>
+                  <div className="text-xl font-black text-red-900">{blockedDates.length} วัน</div>
+                </div>
+                <div className="p-3 px-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+                  <div className="text-xs font-bold text-emerald-700">มัดจำล็อกคิวแล้ว</div>
+                  <div className="text-xl font-black text-emerald-900">{depositPaidCount + confirmedCount} งาน</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Notification Message */}
+            {queueSuccessMsg && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 font-bold text-sm flex items-center gap-2 shadow-sm animate-fadeIn">
+                <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span>{queueSuccessMsg}</span>
+              </div>
+            )}
+
+            {/* Section 1: Add / Manage Blocked Dates (วันที่คิวงานเต็ม) */}
+            <div className="grid lg:grid-cols-12 gap-6">
+              
+              {/* Add Blocked Date Form Card */}
+              <div className="lg:col-span-5 p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <div className="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                    <AlertCircle className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-black text-slate-900">ใส่วันที่คิวงานเต็ม / งดรับจอง</h4>
+                    <p className="text-[11px] text-slate-500 font-medium">ลูกค้าที่เลือกวันนี้จะได้รับข้อความแจ้งเตือนอย่างสุภาพทันที</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleAddBlockedDate} className="space-y-3.5">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-red-600" />
+                      <span>เลือกวันที่คิวเต็ม <span className="text-red-600">*</span></span>
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={newBlockedDate}
+                      onChange={(e) => setNewBlockedDate(e.target.value)}
+                      className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-bold focus:outline-none focus:border-red-600 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800">
+                      เหตุผล / ประเภทการล็อกคิว:
+                    </label>
+                    <select
+                      value={newBlockedReason}
+                      onChange={(e) => setNewBlockedReason(e.target.value as any)}
+                      className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-bold focus:outline-none focus:border-red-600 cursor-pointer"
+                    >
+                      <option value="fully_booked">🔴 คิวงานเต็มทุกช่วงเวลา (งานแต่ง/งานใหญ่)</option>
+                      <option value="maintenance">🛠️ ซ่อมบำรุงอุปกรณ์ / ปรับปรุงโรงครัว</option>
+                      <option value="holiday">🏖️ วันหยุดเทศกาล / ประจำปี</option>
+                      <option value="custom">🔒 ล็อกคิวเฉพาะกิจ</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-800">
+                      หมายเหตุเพิ่มเติม (แสดงเป็นข้อมูลอ้างอิง):
+                    </label>
+                    <input
+                      type="text"
+                      value={newBlockedNote}
+                      onChange={(e) => setNewBlockedNote(e.target.value)}
+                      placeholder="เช่น คิวเต็ม 100 โต๊ะ / งานมงคลสมรสหอประชุมใหญ่"
+                      className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-red-600 font-medium"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>+ บันทึกวันคิวงานเต็ม (อัปเดตหน้าเว็บทันที)</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* Blocked Dates List Card */}
+              <div className="lg:col-span-7 p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
+                      <FileCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900">รายการวันที่คิวเต็มทั้งหมด ({blockedDates.length} วัน)</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">วันที่เหล่านี้จะถูกปิดรับจองและแสดงสถานะคิวเต็มบนหน้าเว็บ</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="max-h-[380px] overflow-y-auto space-y-2.5 pr-1">
+                  {blockedDates.length === 0 ? (
+                    <div className="text-center py-10 text-slate-400 text-xs">
+                      ยังไม่มีการระบุวันคิวเต็ม สามารถเพิ่มวันที่ได้จากฟอร์มด้านซ้าย
+                    </div>
+                  ) : (
+                    blockedDates.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-red-300 transition-colors flex items-center justify-between gap-3"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-red-100 text-red-800 font-mono font-black text-xs border border-red-200">
+                              {item.date}
+                            </span>
+                            <span className="text-xs font-black text-slate-900">
+                              {getDayOfWeekThai(item.date)}ที่ {formatThaiDateShort(item.date)}
+                            </span>
+                            <span className="px-2 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-bold">
+                              คิวเต็ม 🔴
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-600 font-medium">
+                            • {item.note || 'คิวงานเต็มทุกช่วงเวลา'}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveBlockedDate(item.id, item.date)}
+                          className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-red-100 hover:text-red-700 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                          title="ปลดล็อกคิวเพื่อเปิดรับจอง"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>ปลดล็อก</span>
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Section 2: Deposit Paid Bookings Live on Website */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black">
+                    <Crown className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-black text-slate-900">
+                      รายการคิวงานที่ได้รับเงินมัดจำแล้ว & แสดงผลบนหน้าเว็บ (Live Queue)
+                    </h4>
+                    <p className="text-xs text-slate-500 font-medium">
+                      คิวงานด้านล่างจะถูกนำไปแสดงผลบน "ตารางคิวงานจัดเลี้ยงมงคล" หน้าเว็บเพื่อเพิ่มความน่าเชื่อถือ (ระบบจะซ่อนชื่อจริงโดยอัตโนมัติ)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600">แสดงทั้งหมด:</span>
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 font-black text-xs border border-emerald-300">
+                    {quotations.filter((q) => q.status === 'deposit_paid' || q.status === 'confirmed').length} รายการ
+                  </span>
+                </div>
+              </div>
+
+              {/* Table of Paid Bookings */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 font-black">
+                      <th className="p-3.5">เลขที่ / วันที่จัดงาน</th>
+                      <th className="p-3.5">ชื่อเจ้าภาพ & เบอร์โทร</th>
+                      <th className="p-3.5">ประเภทงาน & สถานที่</th>
+                      <th className="p-3.5 text-center">จำนวนโต๊ะ</th>
+                      <th className="p-3.5 text-right">ยอดมัดจำ 30%</th>
+                      <th className="p-3.5 text-center">สถานะหน้าเว็บ</th>
+                      <th className="p-3.5 text-center">ปรับสถานะด่วน</th>
+                      <th className="p-3.5 text-center">เอกสาร</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {quotations.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="p-8 text-center text-slate-400 font-medium">
+                          ยังไม่มีข้อมูลใบเสนอราคาในระบบ
+                        </td>
+                      </tr>
+                    ) : (
+                      quotations.map((quote) => {
+                        const isLiveOnWeb = quote.status === 'deposit_paid' || quote.status === 'confirmed' || quote.status === 'completed';
+                        const totalT = quote.tableCount + (quote.freeTableCount || 0);
+                        return (
+                          <tr key={quote.quoteNo} className={`hover:bg-slate-50/80 transition-colors ${isLiveOnWeb ? 'bg-emerald-50/30' : ''}`}>
+                            <td className="p-3.5">
+                              <div className="font-mono font-black text-red-700 text-xs">{quote.quoteNo}</div>
+                              <div className="text-slate-900 font-bold text-[11px] mt-0.5">
+                                📅 {formatThaiDateShort(quote.customer?.eventDate || '')}
+                              </div>
+                              <div className="text-slate-500 text-[10px]">
+                                ⏰ {quote.customer?.eventTime || 'ไม่ระบุ'}
+                              </div>
+                            </td>
+
+                            <td className="p-3.5">
+                              <div className="font-bold text-slate-900">{quote.customer?.name}</div>
+                              <a href={`tel:${quote.customer?.phone}`} className="text-red-700 font-mono font-semibold text-[11px] hover:underline">
+                                {quote.customer?.phone}
+                              </a>
+                            </td>
+
+                            <td className="p-3.5">
+                              <div className="font-bold text-slate-800">{quote.customer?.eventType || 'งานจัดเลี้ยง'}</div>
+                              <div className="text-slate-500 text-[11px] truncate max-w-[160px]" title={quote.customer?.eventLocation}>
+                                📍 {quote.customer?.eventLocation || '-'}
+                              </div>
+                            </td>
+
+                            <td className="p-3.5 text-center">
+                              <span className="font-black text-slate-900 text-sm">{totalT}</span>
+                              <span className="text-slate-500 text-[10px] block">โต๊ะ</span>
+                            </td>
+
+                            <td className="p-3.5 text-right font-mono font-black text-emerald-800">
+                              {formatCurrency(quote.depositAmount)}
+                            </td>
+
+                            <td className="p-3.5 text-center">
+                              {isLiveOnWeb ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black border border-emerald-300">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  แสดงผลสด 🟢
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold">
+                                  รอมัดจำ ⏳
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="p-3.5 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {quote.status !== 'deposit_paid' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(quote, 'deposit_paid')}
+                                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] shadow-xs cursor-pointer"
+                                    title="บันทึกว่าได้รับมัดจำแล้ว และนำขึ้นแสดงผลหน้าเว็บ"
+                                  >
+                                    ✓ ได้รับมัดจำ
+                                  </button>
+                                )}
+                                {quote.status !== 'confirmed' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(quote, 'confirmed')}
+                                    className="px-2 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] shadow-xs cursor-pointer"
+                                    title="ยืนยันคิวเต็ม 100%"
+                                  >
+                                    👑 คิวเต็ม
+                                  </button>
+                                )}
+                                {quote.status && quote.status !== 'pending' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(quote, 'pending')}
+                                    className="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-[10px] cursor-pointer"
+                                    title="เปลี่ยนกลับเป็นรอยืนยัน"
+                                  >
+                                    รอยืนยัน
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="p-3.5 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveQuote(quote)}
+                                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 transition-colors"
+                                  title="ดูใบเสนอราคา"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setContractQuote(quote)}
+                                  className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 transition-colors"
+                                  title="ดูสัญญาจ้างจัดเลี้ยง"
+                                >
+                                  <FileCheck className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReceiptQuote(quote);
+                                    setReceiptType('deposit_30');
+                                  }}
+                                  className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-colors"
+                                  title="ออกใบเสร็จรับเงินมัดจำ 30%"
+                                >
+                                  <Receipt className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
           </div>
         )}

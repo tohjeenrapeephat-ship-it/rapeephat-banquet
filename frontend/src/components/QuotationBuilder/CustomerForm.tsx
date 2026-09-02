@@ -1,6 +1,7 @@
 import React from 'react';
 import { CustomerInfo } from '../../types/quotation.js';
-import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText, Truck, Building2, Navigation, CheckCircle2 } from 'lucide-react';
+import { QueueService, formatThaiDateShort } from '../../services/queueService.js';
+import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText, Truck, Building2, Navigation, CheckCircle2, AlertCircle, MessageCircle } from 'lucide-react';
 
 interface CustomerFormProps {
   formData: CustomerInfo;
@@ -9,6 +10,7 @@ interface CustomerFormProps {
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }) => {
   const currentZone = formData.locationZone || 'bkk_metro';
+  const blockedCheck = QueueService.isDateBlocked(formData.eventDate || '');
 
   return (
     <div className="space-y-6">
@@ -88,7 +90,9 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
             required
             value={formData.eventDate}
             onChange={(e) => onChange({ eventDate: e.target.value })}
-            className="w-full h-13 bg-white border-2 border-slate-300 hover:border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100 rounded-2xl px-4 text-base sm:text-lg text-slate-900 font-bold shadow-2xs transition-all cursor-pointer"
+            className={`w-full h-13 bg-white border-2 ${
+              blockedCheck.isBlocked ? 'border-red-600 ring-2 ring-red-200' : 'border-slate-300 hover:border-amber-400 focus:border-red-600 focus:ring-2 focus:ring-red-100'
+            } rounded-2xl px-4 text-base sm:text-lg text-slate-900 font-bold shadow-2xs transition-all cursor-pointer`}
           />
         </div>
 
@@ -272,6 +276,57 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         </div>
 
       </div>
+
+      {/* Blocked Date Alert Notice */}
+      {blockedCheck.isBlocked && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-red-50 border-2 border-red-400 shadow-md space-y-3 animate-fadeIn text-slate-900">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase">
+                  คิวงานเต็ม 🔴
+                </span>
+                <span className="text-xs sm:text-sm font-black text-red-900">
+                  วันที่ {formatThaiDateShort(formData.eventDate || '')} คิวงานจัดเลี้ยงเต็มแล้วครับ
+                </span>
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                กราบขออภัยเป็นอย่างยิ่งครับ เพื่อรักษามาตรฐานคุณภาพอาหารปรุงสุกสดใหม่และการบริการระดับภัตตาคารอย่างดีที่สุด ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
+              </p>
+              {blockedCheck.note && (
+                <div className="text-xs font-bold text-red-800">
+                  • {blockedCheck.note}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-2.5 pt-1 border-t border-red-200">
+            <span className="text-xs text-slate-600 font-semibold mr-auto">
+              💡 ปรึกษาช่วงเวลาพิเศษหรือคิวเสริม:
+            </span>
+            <a
+              href="tel:0813311646"
+              className="px-3.5 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-transform hover:scale-102 cursor-pointer"
+            >
+              <Phone className="w-3.5 h-3.5 text-amber-300" />
+              <span>โทร 081-331-1646</span>
+            </a>
+            <a
+              href="https://line.me/ti/p/~pang_baichaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-transform hover:scale-102 cursor-pointer"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>แชทไลน์ คุณแป้ง</span>
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

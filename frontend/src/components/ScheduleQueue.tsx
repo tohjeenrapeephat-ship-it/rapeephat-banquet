@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { QuotationApi } from '../services/api.js';
+import { QueueService, DynamicQueueEvent, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -39,7 +41,7 @@ interface QueueEvent {
   dayOfWeek: string; // e.g. "วันอาทิตย์"
   monthKey: 'mar' | 'apr' | 'may' | 'jun_dec';
   monthLabel: string;
-  ceremonyType: 'wedding' | 'ordination' | 'housewarming' | 'birthday' | 'graduation' | 'reunion' | 'available';
+  ceremonyType: 'wedding' | 'ordination' | 'housewarming' | 'birthday' | 'graduation' | 'reunion' | 'corporate' | 'available';
   ceremonyName: string;
   icon: React.ElementType;
   hostName: string;
@@ -518,8 +520,69 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
   const [searchDate, setSearchDate] = useState<string>('');
   const [searchProvince, setSearchProvince] = useState<string>('all');
   const [searchResult, setSearchResult] = useState<string | null>(null);
+  const [blockedModalInfo, setBlockedModalInfo] = useState<{ date: string; note?: string; reason?: string } | null>(null);
+  const [allQueueEvents, setAllQueueEvents] = useState<QueueEvent[]>(QUEUE_DATA);
 
-  const filteredQueue = QUEUE_DATA.filter((item) => {
+  // Load dynamic bookings from quotations and blocked dates
+  const loadDynamicEvents = async () => {
+    try {
+      const quotes = await QuotationApi.getAll();
+      const dynamicEvents = QueueService.buildLiveQueueEvents(quotes);
+      
+      const mapped: QueueEvent[] = dynamicEvents.map((de) => {
+        let icon = Sparkles;
+        if (de.ceremonyType === 'wedding') icon = Crown;
+        else if (de.ceremonyType === 'ordination') icon = HeartHandshake;
+        else if (de.ceremonyType === 'housewarming') icon = Home;
+        else if (de.ceremonyType === 'birthday') icon = Cake;
+        else if (de.ceremonyType === 'graduation') icon = GraduationCap;
+        else if (de.ceremonyType === 'reunion' || de.ceremonyType === 'corporate') icon = PartyPopper;
+
+        return {
+          id: de.id,
+          dateStr: de.dateStr,
+          fullDate: de.fullDate,
+          dayOfWeek: de.dayOfWeek,
+          monthKey: (de.monthKey === 'all' ? 'mar' : de.monthKey) as any,
+          monthLabel: de.monthLabel,
+          ceremonyType: de.ceremonyType,
+          ceremonyName: de.ceremonyName,
+          icon,
+          hostName: de.hostName,
+          tableCount: de.tableCount,
+          location: de.location,
+          province: de.province,
+          status: de.status,
+          statusText: de.statusText,
+          statusBadgeClass: de.statusBadgeClass,
+          availableSlotsRemaining: de.availableSlotsRemaining,
+        };
+      });
+
+      // Merge with base events
+      const combined = [...mapped];
+      QUEUE_DATA.forEach((base) => {
+        if (!combined.some((c) => c.fullDate === base.fullDate)) {
+          combined.push(base);
+        }
+      });
+
+      combined.sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
+      setAllQueueEvents(combined);
+    } catch (e) {
+      console.error('Failed to load dynamic queue events:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadDynamicEvents();
+    window.addEventListener('rapeephat_queue_updated', loadDynamicEvents);
+    return () => {
+      window.removeEventListener('rapeephat_queue_updated', loadDynamicEvents);
+    };
+  }, []);
+
+  const filteredQueue = allQueueEvents.filter((item) => {
     const matchMonth = selectedMonth === 'all' || item.monthKey === selectedMonth;
     const matchStatus = selectedStatus === 'all' || item.status === selectedStatus;
     const matchProvince = searchProvince === 'all' || item.province.includes(searchProvince) || item.province === 'ทั่วประเทศ';
@@ -529,21 +592,37 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
   const handleCheckDate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchDate) {
-      setSearchResult('กรุณาเลือกวันที่ท่านต้องการจัดงาน');
+      setSearchResult('กรุณาเลือกวันที่ท่านต้องการจัดงานครับ');
       return;
     }
 
-    const found = QUEUE_DATA.find((q) => q.fullDate === searchDate);
+    const blockedCheck = QueueService.isDateBlocked(searchDate);
+    if (blockedCheck.isBlocked) {
+      setBlockedModalInfo({
+        date: searchDate,
+        note: blockedCheck.note,
+        reason: blockedCheck.reason,
+      });
+      setSearchResult(`🔴 วันที่ ${formatThaiDateShort(searchDate)} คิวงานจัดเลี้ยงเต็มแล้วครับ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
+      return;
+    }
+
+    const found = allQueueEvents.find((q) => q.fullDate === searchDate);
     if (found) {
       if (found.status === 'available') {
-        setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิว! พร้อมรับจัดเลี้ยงทันที`);
+        setSearchResult(`🟢 วันที่ ${found.dateStr} ยังมีคิวว่าง ${found.availableSlotsRemaining} คิว! พร้อมรับจัดเลี้ยงทันที (รับสิทธิ์ 20 แถม 1)`);
       } else if (found.status === 'filling_fast') {
         setSearchResult(`🟡 วันที่ ${found.dateStr} มีการจองแล้ว แต่ยังมีทีมเสริมรองรับได้อีก ${found.availableSlotsRemaining} คิวสุดท้าย! รีบติดต่อจอง`);
       } else {
-        setSearchResult(`🔴 วันที่ ${found.dateStr} ทีมหลักเต็มแล้ว แต่สามารถเปิดทีมเชฟสำรองพิเศษได้ (กรุณาโทรสอบถามด่วน)`);
+        setBlockedModalInfo({
+          date: searchDate,
+          note: found.location || 'คิวงานเต็มทุกช่วงเวลา',
+          reason: 'fully_booked',
+        });
+        setSearchResult(`🔴 วันที่ ${found.dateStr} คิวงานเต็มแล้วครับ (คลิกเพื่อดูรายละเอียดและคำแนะนำ)`);
       }
     } else {
-      setSearchResult(`🟢 วันที่เลือก ยังมีคิวว่างพร้อมให้บริการเต็มรูปแบบ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันที`);
+      setSearchResult(`🟢 วันที่ ${formatThaiDateShort(searchDate)} คิวงานยังว่างพร้อมให้บริการเต็มรูปแบบ! สามารถจองล็อกวันและออกใบเสนอราคาได้ทันทีครับ`);
     }
   };
 
@@ -736,10 +815,10 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
 
             <div className="flex flex-wrap gap-2">
               {[
-                { id: 'all', name: '✨ ดูคิวทั้งหมด', count: QUEUE_DATA.length },
-                { id: 'mar', name: '🌸 มีนาคม 2569', count: QUEUE_DATA.filter((q) => q.monthKey === 'mar').length },
-                { id: 'apr', name: '☀️ เมษายน 2569 (สงกรานต์)', count: QUEUE_DATA.filter((q) => q.monthKey === 'apr').length },
-                { id: 'may', name: '🌿 พฤษภาคม 2569', count: QUEUE_DATA.filter((q) => q.monthKey === 'may').length },
+                { id: 'all', name: '✨ ดูคิวทั้งหมด', count: allQueueEvents.length },
+                { id: 'mar', name: '🌸 มีนาคม 2569', count: allQueueEvents.filter((q) => q.monthKey === 'mar').length },
+                { id: 'apr', name: '☀️ เมษายน 2569 (สงกรานต์)', count: allQueueEvents.filter((q) => q.monthKey === 'apr').length },
+                { id: 'may', name: '🌿 พฤษภาคม 2569', count: allQueueEvents.filter((q) => q.monthKey === 'may').length },
               ].map((m) => {
                 const isActive = selectedMonth === m.id;
                 return (
@@ -1186,6 +1265,78 @@ export const ScheduleQueue: React.FC<ScheduleQueueProps> = ({ onOpenBuilder }) =
             </a>
           </div>
         </div>
+
+        {/* Modal: Auspicious & Polite Notice when Date is Fully Booked */}
+        {blockedModalInfo && (
+          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+            <div className="relative w-full max-w-lg bg-white rounded-3xl border-2 border-red-500 shadow-2xl p-6 sm:p-7 space-y-5 text-slate-900">
+              
+              {/* Icon */}
+              <div className="w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto border-4 border-red-200 shadow-inner">
+                <AlertCircle className="w-8 h-8 text-red-600" />
+              </div>
+
+              {/* Title & Designed Apology */}
+              <div className="text-center space-y-2">
+                <span className="text-xs font-black text-red-700 uppercase tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-200 inline-block">
+                  👑 แจ้งสถานะคิวงานจัดเลี้ยง
+                </span>
+                <h3 className="text-lg sm:text-xl font-black text-slate-950 leading-snug">
+                  กราบขออภัยเป็นอย่างยิ่งครับ<br />
+                  <span className="text-red-700">วันที่ {formatThaiDateShort(blockedModalInfo.date)} คิวงานจัดเลี้ยงเต็มแล้วครับ</span>
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
+                  เพื่อรักษามาตรฐานคุณภาพความสดใหม่ของวัตถุดิบ การปรุงอาหารสุกร้อนสดๆ หน้างาน และการบริการระดับภัตตาคารอย่างดีที่สุด ทางโต๊ะจีนรพีพัฒน์จึงขอสงวนสิทธิ์ปิดรับจองในวันดังกล่าวครับ
+                </p>
+                {blockedModalInfo.note && (
+                  <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">
+                    • {blockedModalInfo.note}
+                  </div>
+                )}
+              </div>
+
+              {/* Recommendations Box */}
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-700 font-medium space-y-1.5">
+                <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
+                  <Sparkles className="w-4 h-4 text-amber-600" />
+                  <span>คำแนะนำสำหรับเจ้าภาพ / ผู้ว่าจ้าง:</span>
+                </div>
+                <p>• แนะนำเลือกวันจัดงานใกล้เคียง หรือเลือกวันธรรมดาที่คิวว่าง</p>
+                <p>• สามารถโทรปรึกษาคุณแป้งโดยตรง เพื่อตรวจสอบคิวพิเศษหรือช่วงเวลาแทรกได้ตลอด 24 ชม.</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <a
+                  href="tel:0813311646"
+                  className="py-3 px-4 rounded-2xl bg-red-700 hover:bg-red-800 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                >
+                  <Phone className="w-4 h-4 text-amber-300" />
+                  <span>โทร 081-331-1646</span>
+                </a>
+                <a
+                  href="https://line.me/ti/p/~pang_baichaa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-3 px-4 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>ทัก LINE: คุณแป้ง</span>
+                </a>
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setBlockedModalInfo(null)}
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+              >
+                ปิดหน้าต่าง & เลือกวันใหม่
+              </button>
+
+            </div>
+          </div>
+        )}
 
       </div>
     </section>
