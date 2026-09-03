@@ -75,6 +75,16 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               </a>
 
               <a
+                href="https://www.youtube.com/channel/UCY1eIpowWx1wcYtMZ09VCZA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-950 font-black text-xs border border-red-200 transition-colors shadow-2xs"
+                title="ติดตามช่อง YouTube โต๊ะจีน รพีพัฒน์"
+              >
+                <span>▶️ YouTube ช่องทางการ</span>
+              </a>
+
+              <a
                 href="https://line.me/ti/p/~pang_baichaa"
                 target="_blank"
                 rel="noopener noreferrer"

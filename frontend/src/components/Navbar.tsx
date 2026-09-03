@@ -123,6 +123,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
             <span>🎵 TikTok</span>
           </a>
 
+          {/* Direct YouTube Channel Link */}
+          <a
+            href="https://www.youtube.com/channel/UCY1eIpowWx1wcYtMZ09VCZA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 rounded-2xl bg-red-50 hover:bg-red-100 text-red-950 border-2 border-red-300 font-black text-xs xl:text-sm flex items-center gap-1.5 shadow-2xs transition-all whitespace-nowrap"
+            title="ติดตาม YouTube โต๊ะจีน รพีพัฒน์"
+          >
+            <span>▶️ YouTube</span>
+          </a>
+
           {/* Direct Phone Call Button */}
           <a
             href="tel:0813311646"
@@ -197,22 +208,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
               <span>คำนวณราคา & ออกใบเสนอราคา A4</span>
             </button>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <a
                 href="https://web.facebook.com/profile.php?id=61593868896647"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2.5 rounded-xl bg-blue-50 text-blue-900 border border-blue-200 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                className="py-2.5 rounded-xl bg-blue-50 text-blue-900 border border-blue-200 font-bold text-xs flex items-center justify-center gap-1 shadow-xs"
               >
-                <span>📘 Facebook เพจ</span>
+                <span>📘 Facebook</span>
               </a>
               <a
                 href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2.5 rounded-xl bg-pink-50 text-pink-950 border border-pink-200 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                className="py-2.5 rounded-xl bg-pink-50 text-pink-950 border border-pink-200 font-bold text-xs flex items-center justify-center gap-1 shadow-xs"
               >
-                <span>🎵 TikTok ช่อง</span>
+                <span>🎵 TikTok</span>
+              </a>
+              <a
+                href="https://www.youtube.com/channel/UCY1eIpowWx1wcYtMZ09VCZA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 rounded-xl bg-red-50 text-red-950 border border-red-200 font-bold text-xs flex items-center justify-center gap-1 shadow-xs"
+              >
+                <span>▶️ YouTube</span>
               </a>
             </div>
 

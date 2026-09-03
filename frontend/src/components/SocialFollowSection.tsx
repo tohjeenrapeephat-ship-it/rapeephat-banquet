@@ -45,11 +45,24 @@ export const SocialFollowSection: React.FC = () => {
       followers: 'คลิปทำอาหารสดหน้างาน',
       color: 'from-slate-900 via-pink-600 to-slate-950',
       bgColor: 'bg-pink-50/50 border-pink-200',
-      badge: '🔥 ช่องทางการ Official',
+      badge: '🔥 TikTok Official',
       icon: '🎵',
       desc: 'คลิปทำอาหารสดไฟลุกควันฉุย เคล็ดลับสูตรโต๊ะจีนโบราณ 35 ปี นครปฐม',
       ctaText: 'กดติดตามบน TikTok',
       url: 'https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ',
+    },
+    {
+      id: 'youtube',
+      name: 'YouTube Channel',
+      handle: 'โต๊ะจีนรพีพัฒน์ นครปฐม',
+      followers: 'คลิปไฮไลต์ & เบื้องหลัง 35 ปี',
+      color: 'from-red-600 via-red-700 to-slate-950',
+      bgColor: 'bg-red-50/60 border-red-200',
+      badge: '▶️ YouTube Official',
+      icon: '🔴',
+      desc: 'รับชมวิดีโอทำอาหารสดระดับภัตตาคาร บรรยากาศงานเลี้ยงจริง และรีวิวจากเจ้าภาพ',
+      ctaText: 'กดติดตามบน YouTube',
+      url: 'https://www.youtube.com/channel/UCY1eIpowWx1wcYtMZ09VCZA',
     },
     {
       id: 'line',
@@ -167,33 +180,43 @@ export const SocialFollowSection: React.FC = () => {
                   <span>สิทธิพิเศษเฉพาะผู้ติดตามเพจ (Follower Bonus)</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-white">
-                  กดติดตามเพจ Facebook & LINE วันนี้ รับสิทธิ์อัปเกรดเมนูพิเศษฟรี!
+                  กดติดตาม Facebook, TikTok & YouTube วันนี้ รับสิทธิ์อัปเกรดเมนูพิเศษฟรี!
                 </h3>
                 <p className="text-xs sm:text-sm text-red-100 font-medium">
-                  เพียงแจ้งแคปหน้าจอที่กดติดตามเพจกับทีมงาน รับสิทธิ์เลือกจานพิเศษเพิ่ม หรือรับส่วนลดจัดเลี้ยงทันทีค่ะ
+                  เพียงแจ้งแคปหน้าจอที่กดติดตามช่องทางใดก็ได้กับทีมงาน รับสิทธิ์เลือกจานพิเศษเพิ่ม หรือรับส่วนลดจัดเลี้ยงทันทีค่ะ
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
               <a
-                href="https://www.facebook.com/profile.php?id=61593868896647"
+                href="https://web.facebook.com/profile.php?id=61593868896647"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-all transform hover:scale-105 border border-blue-300"
+                className="px-4.5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs shadow-xl flex items-center gap-1.5 transition-all transform hover:scale-105 border border-blue-300"
               >
-                <ThumbsUp className="w-4 h-4 fill-white" />
-                <span>กดติดตาม Facebook</span>
+                <ThumbsUp className="w-3.5 h-3.5 fill-white" />
+                <span>ติดตาม Facebook</span>
+              </a>
+
+              <a
+                href="https://www.youtube.com/channel/UCY1eIpowWx1wcYtMZ09VCZA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4.5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-xl flex items-center gap-1.5 transition-all transform hover:scale-105 border border-red-300"
+              >
+                <Play className="w-3.5 h-3.5 fill-white" />
+                <span>ติดตาม YouTube</span>
               </a>
 
               <a
                 href="https://line.me/ti/p/~pang_baichaa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-2xl bg-[#06C755] hover:bg-green-600 text-white font-black text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-all transform hover:scale-105 border border-green-300"
+                className="px-4.5 py-2.5 rounded-2xl bg-[#06C755] hover:bg-green-600 text-white font-black text-xs shadow-xl flex items-center gap-1.5 transition-all transform hover:scale-105 border border-green-300"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>เพิ่มเพื่อน LINE รับสิทธิ์</span>
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>แอดไลน์ รับสิทธิ์</span>
               </a>
             </div>
 
@@ -201,9 +224,9 @@ export const SocialFollowSection: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 🌐 3. SOCIAL CHANNELS GRID (FACEBOOK, TIKTOK, LINE, GOOGLE) */}
+        {/* 🌐 3. SOCIAL CHANNELS GRID (FACEBOOK, TIKTOK, YOUTUBE, LINE, GOOGLE) */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {socialChannels.map((chan) => (
             <div
               key={chan.id}
