@@ -19,11 +19,9 @@ import {
   Video
 } from 'lucide-react';
 import { GoogleReviewModal, DEFAULT_GOOGLE_REVIEW_URL } from './GoogleReviewModal.js';
-import { HeritageVideoModal } from './HeritageVideoModal.js';
 
 export const SocialFollowSection: React.FC = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState<boolean>(false);
-  const [heritageVideoOpen, setHeritageVideoOpen] = useState<boolean>(false);
   const [activeVideoModal, setActiveVideoModal] = useState<string | null>(null);
 
   const socialChannels = [
@@ -282,26 +280,15 @@ export const SocialFollowSection: React.FC = () => {
               </h3>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setHeritageVideoOpen(true)}
-                className="px-5 py-2 rounded-2xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-xs flex items-center gap-2 shadow-md transition-all transform hover:scale-105 border border-amber-300 cursor-pointer"
-              >
-                <Play className="w-3.5 h-3.5 fill-white text-white" />
-                <span>🎬 ชมคลิปประวัติ 35 ปี & โหลดลงเพจ</span>
-              </button>
-
-              <a
-                href="https://www.tiktok.com/@rapeephat_catering"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 hover:text-white font-black text-xs flex items-center gap-2 shadow-sm transition-colors border border-amber-400"
-              >
-                <span>ดูคลิปบน TikTok</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
+            <a
+              href="https://www.tiktok.com/@rapeephat_catering"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 hover:text-white font-black text-xs flex items-center gap-2 shadow-sm transition-colors border border-amber-400"
+            >
+              <span>ดูคลิปทั้งหมดบน TikTok</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
           </div>
 
           {/* Video Cards Grid */}
@@ -372,12 +359,6 @@ export const SocialFollowSection: React.FC = () => {
       <GoogleReviewModal
         isOpen={reviewModalOpen}
         onClose={() => setReviewModalOpen(false)}
-      />
-
-      {/* Official Heritage Video Studio Modal */}
-      <HeritageVideoModal
-        isOpen={heritageVideoOpen}
-        onClose={() => setHeritageVideoOpen(false)}
       />
 
     </section>
