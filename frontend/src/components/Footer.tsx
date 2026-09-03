@@ -65,13 +65,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               </a>
 
               <a
-                href="https://www.tiktok.com/@rapeephat_catering"
+                href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-950 font-black text-xs border border-pink-200 transition-colors shadow-2xs"
-                title="ติดตาม TikTok โต๊ะจีน รพีพัฒน์"
+                title="ติดตามช่อง TikTok โต๊ะจีน รพีพัฒน์"
               >
-                <span>🎵 TikTok (85K+)</span>
+                <span>🎵 TikTok ช่องทางการ</span>
               </a>
 
               <a

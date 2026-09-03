@@ -103,13 +103,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
 
           {/* Direct Facebook Page Link */}
           <a
-            href="https://www.facebook.com/profile.php?id=61593868896647"
+            href="https://web.facebook.com/profile.php?id=61593868896647"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-2.5 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-900 border-2 border-blue-300 font-black text-xs xl:text-sm flex items-center gap-1.5 shadow-2xs transition-all whitespace-nowrap"
+            className="px-3 py-2 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-900 border-2 border-blue-300 font-black text-xs xl:text-sm flex items-center gap-1.5 shadow-2xs transition-all whitespace-nowrap"
             title="ติดตามเพจ Facebook โต๊ะจีน รพีพัฒน์"
           >
-            <span>📘 เพจ Facebook</span>
+            <span>📘 Facebook</span>
+          </a>
+
+          {/* Direct TikTok Channel Link */}
+          <a
+            href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 rounded-2xl bg-pink-50 hover:bg-pink-100 text-pink-950 border-2 border-pink-300 font-black text-xs xl:text-sm flex items-center gap-1.5 shadow-2xs transition-all whitespace-nowrap"
+            title="ติดตาม TikTok โต๊ะจีน รพีพัฒน์"
+          >
+            <span>🎵 TikTok</span>
           </a>
 
           {/* Direct Phone Call Button */}
@@ -185,6 +196,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>คำนวณราคา & ออกใบเสนอราคา A4</span>
             </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href="https://web.facebook.com/profile.php?id=61593868896647"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 rounded-xl bg-blue-50 text-blue-900 border border-blue-200 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              >
+                <span>📘 Facebook เพจ</span>
+              </a>
+              <a
+                href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 rounded-xl bg-pink-50 text-pink-950 border border-pink-200 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              >
+                <span>🎵 TikTok ช่อง</span>
+              </a>
+            </div>
 
             <div className="grid grid-cols-2 gap-2">
               <a

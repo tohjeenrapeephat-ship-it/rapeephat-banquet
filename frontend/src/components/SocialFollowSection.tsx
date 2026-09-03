@@ -41,15 +41,15 @@ export const SocialFollowSection: React.FC = () => {
     {
       id: 'tiktok',
       name: 'TikTok Channel',
-      handle: '@rapeephat_catering',
-      followers: '85,400+ ผู้ติดตาม (ยอดวิว 10M+)',
+      handle: '@user6577563937099',
+      followers: 'คลิปทำอาหารสดหน้างาน',
       color: 'from-slate-900 via-pink-600 to-slate-950',
       bgColor: 'bg-pink-50/50 border-pink-200',
-      badge: '🔥 คลิปไวรัลล้านวิว',
+      badge: '🔥 ช่องทางการ Official',
       icon: '🎵',
-      desc: 'คลิปทำอาหารสดไฟลุกควันฉุย เคล็ดลับสูตรโต๊ะจีนโบราณ 35 ปี',
+      desc: 'คลิปทำอาหารสดไฟลุกควันฉุย เคล็ดลับสูตรโต๊ะจีนโบราณ 35 ปี นครปฐม',
       ctaText: 'กดติดตามบน TikTok',
-      url: 'https://www.tiktok.com/@rapeephat_catering',
+      url: 'https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ',
     },
     {
       id: 'line',
@@ -281,7 +281,7 @@ export const SocialFollowSection: React.FC = () => {
             </div>
 
             <a
-              href="https://www.tiktok.com/@rapeephat_catering"
+              href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2 rounded-2xl bg-slate-900 hover:bg-black text-amber-300 hover:text-white font-black text-xs flex items-center gap-2 shadow-sm transition-colors border border-amber-400"
@@ -337,7 +337,7 @@ export const SocialFollowSection: React.FC = () => {
                   </h4>
 
                   <a
-                    href="https://www.tiktok.com/@rapeephat_catering"
+                    href="https://www.tiktok.com/@user6577563937099?_r=1&_t=ZS-99PYzBzUIbJ"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-slate-900 hover:text-red-700 text-xs font-bold flex items-center justify-center gap-1 border border-amber-300 transition-colors"
