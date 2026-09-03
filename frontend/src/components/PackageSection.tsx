@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { PackageTier } from '../types/quotation.js';
-import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText, Download, Images } from 'lucide-react';
+import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText } from 'lucide-react';
 import { formatCurrency } from '../utils/currency.js';
 import { MenuCatalogModal } from './MenuCatalogModal.js';
-import { getDishImage, getPackageHeroImage } from '../utils/dishImageHelper.js';
-import { WatermarkOverlay } from './WatermarkOverlay.js';
 
 interface PackageSectionProps {
   onSelectPackage: (pkg: PackageTier) => void;
@@ -82,28 +80,8 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                   </div>
                 )}
 
-                {/* Package Hero Image Banner with Zoom & Dish Preview */}
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950 group">
-                  <img
-                    src={getPackageHeroImage(pkg.id)}
-                    alt={pkg.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <WatermarkOverlay size="sm" opacity={0.35} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-                  
-                  {/* Bottom Dish Highlight Chip */}
-                  <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-bold z-10">
-                    <span className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/20 truncate text-amber-300 font-black flex items-center gap-1 shadow-md">
-                      <Sparkles className="w-3 h-3 text-amber-400" />
-                      <span>{pkg.highlight || `${pkg.courses.length} จานเด็ดภัตตาคาร`}</span>
-                    </span>
-                  </div>
-                </div>
-
                 {/* Package Header */}
-                <div className={`p-6 sm:p-7 border-b ${isPopular ? 'border-red-100 bg-gradient-to-b from-red-50/60 to-white' : 'border-amber-100 bg-gradient-to-b from-amber-50/40 to-white'}`}>
+                <div className={`p-6 sm:p-7 border-b ${isPopular ? 'border-red-100 bg-gradient-to-b from-red-50/60 to-white pt-8' : 'border-amber-100 bg-gradient-to-b from-amber-50/40 to-white'}`}>
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-xl font-black text-slate-900 leading-tight">
                       {pkg.name}
@@ -133,26 +111,16 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                       <span>รายการอาหารในเซ็ต ({pkg.courses.length} จาน):</span>
                     </div>
 
-                    <div className="space-y-2 text-xs text-slate-800">
+                    <div className="space-y-1.5 text-xs text-slate-800">
                       {(isExpanded ? pkg.courses : pkg.courses.slice(0, 4)).map((course, idx) => {
                         const dishName = course.options[0]?.name || course.title;
-                        const dishImg = getDishImage(dishName, course.title);
                         return (
-                          <div key={idx} className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-amber-50/80 transition-colors">
-                            <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-300 shrink-0 bg-slate-100 shadow-2xs">
-                              <img
-                                src={dishImg}
-                                alt={dishName}
-                                className="w-full h-full object-cover"
-                                loading="lazy"
-                              />
-                            </div>
-                            <div className="min-w-0 flex-1 flex items-center justify-between gap-1">
-                              <span className="font-bold text-slate-800 text-xs leading-tight truncate">
-                                <span className="text-amber-800 font-black mr-1">{idx + 1}.</span>
-                                {dishName}
-                              </span>
-                            </div>
+                          <div key={idx} className="flex items-start gap-2 leading-relaxed">
+                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span className="font-bold text-slate-800 text-xs">
+                              <span className="text-amber-800 font-black mr-1">{idx + 1}.</span>
+                              {dishName}
+                            </span>
                           </div>
                         );
                       })}
@@ -199,16 +167,39 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                     </button>
 
                   </div>
-                </div>
 
+                </div>
               </div>
             );
           })}
         </div>
 
+        {/* Bottom Guarantee Banner */}
+        <div className="mt-12 p-6 rounded-3xl bg-gradient-to-r from-slate-950 via-red-950 to-slate-950 text-white border-2 border-amber-400 text-center space-y-3 shadow-xl">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm font-bold text-amber-200">
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>ปรับเปลี่ยนเมนูอาหารได้ตามใจ</span>
+            </span>
+            <span className="hidden sm:inline text-amber-400">•</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>ไม่คิดค่าแม่ครัว & บริกรเพิ่ม</span>
+            </span>
+            <span className="hidden sm:inline text-amber-400">•</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>มัดจำ 30% ชำระหลังจบงาน 70%</span>
+            </span>
+          </div>
+          <p className="text-xs text-slate-300 max-w-2xl mx-auto">
+            หากต้องการเซ็ตเมนูพิเศษสำหรับงานมงคลสมรส งานพิธีการ หรืองานองค์กรขนาดใหญ่ สามารถติดต่อทีมงานเพื่อจัดเซ็ตเมนูตามงบประมาณได้ทันที
+          </p>
+        </div>
+
       </div>
 
-      {/* Menu Catalog & Printable A4 PDF Modal */}
+      {/* Menu Catalog Modal */}
       <MenuCatalogModal
         isOpen={catalogModalOpen}
         onClose={() => setCatalogModalOpen(false)}
