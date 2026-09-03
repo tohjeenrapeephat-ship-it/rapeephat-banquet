@@ -33,19 +33,20 @@ export const MenuShowcase: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [galleryPhotoIndex, setGalleryPhotoIndex] = useState<number>(0);
+  const [cardPhotoIndexes, setCardPhotoIndexes] = useState<Record<string, number>>({});
   const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
 
   const categories = [
-    { id: 'all', name: '✨ เมนูทั้งหมด', icon: '🍽️' },
-    { id: 'appetizer', name: '🥟 ข้าวเกรียบ & ออเดิร์ฟ', icon: '🥟' },
-    { id: 'salad', name: '🥗 ยำสามกรอบ & ยำซีฟู้ดรสเด็ด', icon: '🥗' },
-    { id: 'poultry', name: '🦆 เป็ดปักกิ่ง & หมูหัน', icon: '🦆' },
-    { id: 'soup', name: '🍲 หูฉลาม & กระเพาะปลา', icon: '🍲' },
-    { id: 'pork', name: '🍖 ขาหมูน้ำแดง & ขาหมูเยอรมัน', icon: '🍖' },
-    { id: 'fish', name: '🐟 ปลากะพง & ปลาทับทิม 9 ขีด', icon: '🐟' },
-    { id: 'hotpot', name: '🔥 ต้มยำ & โป๊ะแตกหม้อไฟ', icon: '🔥' },
-    { id: 'rice', name: '🍚 ข้าวผัดปู & ผัดหมี่มงคล', icon: '🍚' },
-    { id: 'dessert', name: '🍨 ของหวานมงคล', icon: '🍨' },
+    { id: 'all', name: 'เมนูทั้งหมด', icon: '🍽️' },
+    { id: 'appetizer', name: 'ข้าวเกรียบ & ออเดิร์ฟ', icon: '🥟' },
+    { id: 'salad', name: 'ยำสามกรอบ & ยำซีฟู้ด', icon: '🥗' },
+    { id: 'poultry', name: 'เป็ดปักกิ่ง & เป็ดอบ', icon: '🦆' },
+    { id: 'soup', name: 'หูฉลาม & กระเพาะปลา', icon: '🍲' },
+    { id: 'pork', name: 'ขาหมูน้ำแดง & ขาหมูเยอรมัน', icon: '🍖' },
+    { id: 'fish', name: 'ปลากะพง & ปลาทับทิม 9 ขีด', icon: '🐟' },
+    { id: 'hotpot', name: 'ต้มยำ & โป๊ะแตกหม้อไฟ', icon: '🔥' },
+    { id: 'rice', name: 'ข้าวผัดปู & ข้าวผัดทรงเครื่อง', icon: '🍚' },
+    { id: 'dessert', name: 'ของหวานมงคล', icon: '🍨' },
   ];
 
   // Authentic Banquet Menu Items (100% Plated Dish Photos - No Table Photos)
@@ -160,6 +161,47 @@ export const MenuShowcase: React.FC = () => {
       ],
     },
     
+    {
+      category: 'hotpot',
+      name: 'ต้มยำกุ้งแม่น้ำน้ำข้น & ต้มยำซีฟู้ดรวมมิตรน้ำข้น (เสิร์ฟหม้อไฟร้อนๆ ควันฉุย)',
+      description: 'สุดยอดต้มยำน้ำข้นสูตรเด็ดภัตตาคาร 35 ปี คัดกุ้งแม่น้ำตัวใหญ่เนื้อแน่น หอยแมลงภู่นิวซีแลนด์ตัวโต และปลาหมึกสดบั้งลายสวย ต้มกับเครื่องสมุนไพรสด ข่า ตะไคร้ ใบมะกรูด น้ำพริกเผาสูตรลับ และนมสดแท้ รสชาติเข้มข้น จัดจ้าน เปรี้ยว เผ็ด กลมกล่อม หอมกรุ่น เสิร์ฟในหม้อไฟสแตนเลสร้อนฉ่าตลอดงาน',
+      tag: '🔥 ต้มยำน้ำข้นกุ้งแม่น้ำ (รวม 5 ภาพจริง)',
+      image: '/images/dishes/hotpots/hotpot-tomyum-creamy-prawn-blackwood.jpg',
+      gallery: [
+        '/images/dishes/hotpots/hotpot-tomyum-creamy-prawn-blackwood.jpg',
+        '/images/dishes/hotpots/hotpot-tomyum-prawn-macro-lime.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-squid-mussel-steaming.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-mussel-squid-macro.jpg',
+        '/images/dishes/hotpots/hotpot-tomyum-creamy-banquet.jpg',
+      ],
+    },
+    {
+      category: 'hotpot',
+      name: 'ทะเลโป๊ะแตกหม้อไฟซีฟู้ด & โป๊ะแตกสมุนไพรพริกขี้หนูสวน (หม้อไฟร้อนๆ ควันฉุย)',
+      description: 'ทะเลโป๊ะแตกสูตรเด็ดรสแซ่บจัดจ้าน น้ำซุปใสสมุนไพรไทยแท้ ปรุงรสด้วยมะนาวแท้ 100% พริกขี้หนูสวนบุบ และใบกะเพราหอมกรุ่น ยกขบวนซีฟู้ดสดใหม่เต็มหม้อ: กุ้งสด หอยแมลงภู่นิวซีแลนด์ ปลาหมึกสดกรอบ และเนื้อปลากะพงสด ซดร้อนๆ คล่องคอ อร่อยจัดจ้านถึงใจ แขกทุกท่านประทับใจ',
+      tag: '🍲 ทะเลโป๊ะแตกหม้อไฟ (รวม 6 ภาพจริง)',
+      image: '/images/dishes/hotpots/hotpot-seafood-potaek-smoking-wood.jpg',
+      gallery: [
+        '/images/dishes/hotpots/hotpot-seafood-potaek-smoking-wood.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-potaek-ladle-mussel.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-potaek-table-steaming.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-potaek-herb-chili-macro.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-potaek-clear-herb.jpg',
+        '/images/dishes/hotpots/hotpot-seafood-potaek-topview-slate.jpg',
+      ],
+    },
+    {
+      category: 'hotpot',
+      name: 'ต้มยำเนื้อปลากะพง & ต้มยำหัวปลาหม้อไฟ (หม้อไฟปล่องสูงไฟลุก)',
+      description: 'ปลากะพงสดใหม่ส่งตรงจากแพ คัดเฉพาะเนื้อปลาชิ้นหนาไร้ก้าง ต้มกับน้ำซุปต้มยำสมุนไพรสูตรน้ำใสและน้ำข้น รสชาติเปรี้ยวแซ่บนำ กลมกล่อมลงตัว เสิร์ฟในหม้อไฟปล่องสูงแบบภัตตาคารจีนโบราณ ร้อนเดือดไฟลุกตลอดมื้ออาหาร',
+      tag: '🐟 ต้มยำปลากะพงหม้อไฟ (รวม 3 ภาพจริง)',
+      image: '/images/dishes/hotpots/hotpot-seabass-grouper-flaming-chimney.jpg',
+      gallery: [
+        '/images/dishes/hotpots/hotpot-seabass-grouper-flaming-chimney.jpg',
+        '/images/dishes/hotpots/hotpot-tomyum-clear-banquet.jpg',
+        '/images/dishes/hotpots/hotpot-tomyum-clear-prawn-brownwood.jpg',
+      ],
+    },
     {
       category: 'rice',
       name: 'ข้าวผัดทรงเครื่องกุนเชียงจักรพรรดิ & ข้าวผัดปูก้อน (จานเปลสีแดงขนาดใหญ่)',
@@ -281,16 +323,6 @@ export const MenuShowcase: React.FC = () => {
               <Check className="w-3.5 h-3.5 text-emerald-600" />
               <span>อาหารสดสะอาด เสิร์ฟตรงเวลา</span>
             </div>
-
-            {/* Direct Print Menu Catalog Button */}
-            <button
-              type="button"
-              onClick={() => setCatalogModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 hover:bg-black text-amber-300 hover:text-white text-xs font-black shadow-sm transition-all transform hover:scale-102 cursor-pointer border border-amber-400"
-            >
-              <Printer className="w-3.5 h-3.5 text-amber-400" />
-              <span>🖨️ ดู & พิมพ์ใบรายการอาหาร PDF A4</span>
-            </button>
           </div>
 
         </div>
@@ -324,76 +356,111 @@ export const MenuShowcase: React.FC = () => {
         {/* 🍲 DISHES GRID WITH INTERACTIVE LIGHTBOX PREVIEW */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => handleOpenPreview(idx)}
-              className="bg-white rounded-3xl overflow-hidden border-2 border-amber-200/90 hover:border-amber-400 hover:shadow-2xl transition-all duration-500 group flex flex-col justify-between shadow-md cursor-pointer"
-            >
-              {/* Image Container with Zoom & Album Badges */}
-              <div className="relative aspect-[4/3] overflow-hidden bg-slate-950">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 select-none pointer-events-none"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
-                <WatermarkOverlay size="md" opacity={0.43} />
+          {filteredItems.map((item, idx) => {
+            const activeCardImgIdx = cardPhotoIndexes[item.name] || 0;
+            const currentCardImg = item.gallery ? (item.gallery[activeCardImgIdx] || item.image) : item.image;
 
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-black/20 to-transparent pointer-events-none" />
-                
-                {/* Top Left Tag Badge */}
-                <div className="absolute top-3.5 left-3.5 z-20">
-                  <span className="px-3 py-1 rounded-xl bg-slate-950/85 backdrop-blur-md text-amber-300 text-[11px] font-black border border-amber-300/40 shadow-md">
-                    {item.tag}
-                  </span>
-                </div>
+            return (
+              <div
+                key={idx}
+                onClick={() => handleOpenPreview(idx)}
+                className="bg-white rounded-3xl overflow-hidden border-2 border-amber-200/90 hover:border-amber-400 hover:shadow-2xl transition-all duration-500 group flex flex-col justify-between shadow-md cursor-pointer"
+              >
+                {/* Image Container with Zoom & Album Badges */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-950">
+                  <img
+                    src={currentCardImg}
+                    alt={item.name}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 select-none pointer-events-none"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <WatermarkOverlay size="md" opacity={0.43} />
 
-                {/* Top Right Zoom & Album Counter Badges */}
-                <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5">
-                  {item.gallery && (
-                    <span className="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-md text-slate-950 text-[10px] font-black shadow-md flex items-center gap-1 border border-amber-300">
-                      <Images className="w-3 h-3" />
-                      <span>{item.gallery.length} ภาพ</span>
-                    </span>
-                  )}
-                  <span className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center border border-white/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors shadow-md">
-                    <ZoomIn className="w-4 h-4" />
-                  </span>
-                </div>
-
-                {/* Dish Title on Bottom of Image */}
-                <div className="absolute bottom-3.5 left-3.5 right-3.5 z-20">
-                  <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md leading-tight group-hover:text-amber-300 transition-colors">
-                    {item.name}
-                  </h3>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-5 space-y-4 flex-1 flex flex-col justify-between bg-white">
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  {item.description}
-                </p>
-
-                <div className="pt-3 border-t border-amber-100 flex items-center justify-between text-xs font-bold">
-                  <span className="flex items-center gap-1 text-emerald-700">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>มีในแพ็กเกจทุกระดับ</span>
-                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-black/20 to-transparent pointer-events-none" />
                   
-                  <a
-                    href="#quotation"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-black group/link"
-                  >
-                    <span>เลือกในใบเสนอราคา</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
-                  </a>
+                  {/* Top Left Tag Badge */}
+                  <div className="absolute top-3.5 left-3.5 z-20">
+                    <span className="px-3 py-1 rounded-xl bg-slate-950/85 backdrop-blur-md text-amber-300 text-[11px] font-black border border-amber-300/40 shadow-md">
+                      {item.tag}
+                    </span>
+                  </div>
+
+                  {/* Top Right Zoom & Album Counter Badges */}
+                  <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5">
+                    {item.gallery && (
+                      <span className="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-md text-slate-950 text-[10px] font-black shadow-md flex items-center gap-1 border border-amber-300">
+                        <Images className="w-3 h-3" />
+                        <span>{item.gallery.length} ภาพ</span>
+                      </span>
+                    )}
+                    <span className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center border border-white/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors shadow-md">
+                      <ZoomIn className="w-4 h-4" />
+                    </span>
+                  </div>
+
+                  {/* Dish Title on Bottom of Image */}
+                  <div className="absolute bottom-3.5 left-3.5 right-3.5 z-20">
+                    <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md leading-tight group-hover:text-amber-300 transition-colors">
+                      {item.name}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* 🖼️ Quick Inline Album Thumbnail Selector Bar */}
+                {item.gallery && item.gallery.length > 1 && (
+                  <div className="px-3 py-2 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-400/40 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    {item.gallery.map((gImg, gIdx) => (
+                      <button
+                        key={gIdx}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCardPhotoIndexes((prev) => ({ ...prev, [item.name]: gIdx }));
+                        }}
+                        onMouseEnter={() => {
+                          setCardPhotoIndexes((prev) => ({ ...prev, [item.name]: gIdx }));
+                        }}
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                          activeCardImgIdx === gIdx
+                            ? 'border-amber-400 scale-110 shadow-md ring-2 ring-amber-300/60'
+                            : 'border-slate-700 opacity-60 hover:opacity-100 hover:border-amber-300'
+                        }`}
+                        title={`ดูรูปที่ ${gIdx + 1}`}
+                      >
+                        <img src={gImg} alt="รูปในเซ็ต" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                    <span className="text-[10px] font-bold text-amber-300 whitespace-nowrap pl-1">
+                      {activeCardImgIdx + 1}/{item.gallery.length} ภาพ
+                    </span>
+                  </div>
+                )}
+
+                {/* Card Body */}
+                <div className="p-5 space-y-4 flex-1 flex flex-col justify-between bg-white">
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    {item.description}
+                  </p>
+
+                  <div className="pt-3 border-t border-amber-100 flex items-center justify-between text-xs font-bold">
+                    <span className="flex items-center gap-1 text-emerald-700">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>มีในแพ็กเกจทุกระดับ</span>
+                    </span>
+                    
+                    <a
+                      href="#quotation"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-black group/link"
+                    >
+                      <span>เลือกในใบเสนอราคา</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>

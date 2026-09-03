@@ -45,7 +45,7 @@ const CLIENT_LOGOS: ClientLogo[] = [
   { id: 'fn', name: 'F&N', category: 'corp', categoryLabel: 'สินค้าอุปโภคบริโภค', image: '/images/clients/logos/fn.jpg' },
 
   // Banks & Financial Institutions
-  { id: 'scb', name: 'ธนาคารไทยพาณิชย์ (SCB)', category: 'bank', categoryLabel: 'สถาบันการเงิน', image: '/images/clients/logos/scb.jpg' },
+  { id: 'scb', name: 'ธนาคารไทยพาณิชย์ (SCB)', category: 'bank', categoryLabel: 'สถาบันการเงิน', image: '/images/clients/logos/scb.svg' },
   { id: 'krungthai', name: 'ธนาคารกรุงไทย', category: 'bank', categoryLabel: 'สถาบันการเงิน', image: '/images/clients/logos/krungthai.jpg' },
   { id: 'krungsri', name: 'ธนาคารกรุงศรีอยุธยา', category: 'bank', categoryLabel: 'สถาบันการเงิน', image: '/images/clients/logos/krungsri.jpg' },
   { id: 'ttb', name: 'ทีเอ็มบีธนชาต (ttb)', category: 'bank', categoryLabel: 'สถาบันการเงิน', image: '/images/clients/logos/ttb.jpg' },

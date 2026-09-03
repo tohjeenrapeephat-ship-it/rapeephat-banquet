@@ -13,7 +13,9 @@ import {
   ArrowRight,
   MapPin,
   Clock,
-  ChefHat
+  ChefHat,
+  Truck,
+  Gift
 } from 'lucide-react';
 import { WatermarkOverlay } from './WatermarkOverlay';
 
@@ -230,17 +232,45 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
             })}
           </div>
 
-          {/* CTA Ribbon */}
-          <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <div className="text-sm font-black text-white">
-                พร้อมสัมผัสรสชาติต้นตำรับโต๊ะจีนระดับตำนาน แห่งเมืองนครปฐมในงานของคุณ?
+          {/* ========================================================================= */}
+          {/* 🌟 LUXURY CTA BANNER: เริ่มต้นเพียง 1,400 บาท/โต๊ะ • 20 โต๊ะขึ้นไป ฟรีค่าเดินทาง */}
+          {/* ========================================================================= */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-r from-red-950 via-slate-900 to-slate-950 border-2 border-amber-400 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6">
+            
+            {/* Background Glow Accent */}
+            <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="space-y-3 text-center lg:text-left relative z-10">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                  <Crown className="w-3.5 h-3.5" />
+                  <span>โปรโมชั่นพิเศษ 35 ปี</span>
+                </span>
+                <span className="px-3 py-1 rounded-full bg-emerald-950/90 text-emerald-300 border border-emerald-400 text-xs font-black flex items-center gap-1">
+                  <Truck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>20 โต๊ะขึ้นไป ฟรีค่าเดินทาง</span>
+                </span>
               </div>
-              <div className="text-xs text-amber-300 font-medium">
-                เริ่มต้นเพียง 1,500 บาท/โต๊ะ • ฟรีค่าเดินทางในระยะที่กำหนด
+
+              <h4 className="text-base sm:text-lg lg:text-xl font-black text-white leading-snug">
+                พร้อมสัมผัสรสชาติต้นตำรับโต๊ะจีนระดับตำนาน แห่งเมืองนครปฐมในงานของคุณ?
+              </h4>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-0.5">
+                <div className="inline-flex items-baseline gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-2xl border border-amber-300/40">
+                  <span className="text-xs text-amber-200 font-bold">เริ่มต้นเพียง</span>
+                  <span className="text-xl sm:text-2xl font-black text-amber-300 font-mono">1,400</span>
+                  <span className="text-xs text-amber-200 font-bold">บาท / โต๊ะ</span>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 px-3.5 py-1.5 rounded-2xl border border-emerald-400/40 text-emerald-300 text-xs font-black">
+                  <Truck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>20 โต๊ะขึ้นไป ฟรีค่าเดินทาง (พร้อมสิทธิ์ 20 แถม 1)</span>
+                </div>
               </div>
             </div>
 
+            {/* Action CTA Button */}
             <a
               href="#quotation"
               onClick={(e) => {
@@ -249,11 +279,13 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
                   onOpenBuilder();
                 }
               }}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-sm shadow-xl flex items-center gap-2 border border-amber-300 transition-transform hover:scale-105 cursor-pointer shrink-0"
+              className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:from-red-700 active:to-amber-600 text-white font-black text-sm sm:text-base shadow-xl hover:shadow-2xl flex items-center gap-2 border-2 border-amber-300 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shrink-0 text-center justify-center relative z-10"
             >
+              <Crown className="w-4 h-4 text-amber-300" />
               <span>คำนวณราคา & จองคิวงาน</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-amber-200" />
             </a>
+
           </div>
         </div>
 

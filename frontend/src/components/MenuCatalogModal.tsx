@@ -3,6 +3,7 @@ import { BANQUET_PACKAGES } from '../data/packages.js';
 import { PackageTier } from '../types/quotation.js';
 import { generateA4Pdf } from '../services/pdfService.js';
 import { formatCurrency } from '../utils/currency.js';
+import { getDishImage } from '../utils/dishImageHelper.js';
 import {
   Printer,
   Download,
@@ -427,54 +428,70 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {currentPkg.courses.map((course, idx) => (
-                    <div
-                      key={course.id || idx}
-                      className="p-3 rounded-xl bg-amber-50/40 border border-amber-200/90 space-y-1.5 shadow-2xs break-inside-avoid"
-                    >
-                      {/* Course Number & Title */}
-                      <div className="flex items-center justify-between gap-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-red-700 text-white text-xs font-black flex items-center justify-center shrink-0 shadow-2xs">
-                            {idx + 1}
-                          </span>
-                          <h4 className="text-xs font-black text-slate-950">
-                            {course.title.replace(/^จานที่\s*\d+:?\s*/i, '')}
-                          </h4>
-                        </div>
-                        {course.options.length > 1 && (
-                          <span className="text-[9.5px] font-bold text-red-700 bg-red-50 px-1.5 py-0.2 rounded border border-red-200 shrink-0">
-                            เลือก 1 อย่าง
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Dish Options List */}
-                      <div className="space-y-1 pl-7 text-xs">
-                        {course.options.map((opt, optIdx) => (
-                          <div
-                            key={opt.id || optIdx}
-                            className={`flex items-start gap-1.5 ${
-                              optIdx === 0 ? 'font-black text-slate-900' : 'font-medium text-slate-700'
-                            }`}
-                          >
-                            <span className="text-slate-400 font-mono text-[11px] mt-0.5 shrink-0">
-                              [ ]
-                            </span>
-                            <span className="leading-snug">
-                              {opt.name}
-                              {opt.tag && (
-                                <span className="ml-1.5 text-[9.5px] font-bold text-amber-800 bg-amber-100/70 px-1 py-0.2 rounded">
-                                  {opt.tag}
+                  {currentPkg.courses.map((course, idx) => {
+                    const primaryDishName = course.options[0]?.name || course.title;
+                    const dishImg = getDishImage(primaryDishName, course.title);
+                    return (
+                      <div
+                        key={course.id || idx}
+                        className="p-2.5 rounded-xl bg-amber-50/40 border border-amber-200/90 space-y-1.5 shadow-2xs break-inside-avoid"
+                      >
+                        {/* Course Number & Title & Mini Thumbnail */}
+                        <div className="flex items-center justify-between gap-1.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-300 shrink-0 bg-white shadow-2xs">
+                              <img
+                                src={dishImg}
+                                alt={primaryDishName}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-4 h-4 rounded-full bg-red-700 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                                  {idx + 1}
                                 </span>
-                              )}
-                            </span>
+                                <h4 className="text-xs font-black text-slate-950 truncate">
+                                  {course.title.replace(/^จานที่\s*\d+:?\s*/i, '')}
+                                </h4>
+                              </div>
+                            </div>
                           </div>
-                        ))}
-                      </div>
+                          {course.options.length > 1 && (
+                            <span className="text-[9.5px] font-bold text-red-700 bg-red-50 px-1.5 py-0.2 rounded border border-red-200 shrink-0">
+                              เลือก 1 อย่าง
+                            </span>
+                          )}
+                        </div>
 
-                    </div>
-                  ))}
+                        {/* Dish Options List */}
+                        <div className="space-y-1 pl-1 text-xs">
+                          {course.options.map((opt, optIdx) => (
+                            <div
+                              key={opt.id || optIdx}
+                              className={`flex items-start gap-1.5 ${
+                                optIdx === 0 ? 'font-black text-slate-900' : 'font-medium text-slate-700'
+                              }`}
+                            >
+                              <span className="text-slate-400 font-mono text-[11px] mt-0.5 shrink-0">
+                                [ ]
+                              </span>
+                              <span className="leading-snug">
+                                {opt.name}
+                                {opt.tag && (
+                                  <span className="ml-1.5 text-[9.5px] font-bold text-amber-800 bg-amber-100/70 px-1 py-0.2 rounded">
+                                    {opt.tag}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                      </div>
+                    );
+                  })}
                 </div>
 
               </div>

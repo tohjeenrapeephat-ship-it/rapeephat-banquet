@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <!-- Transparent / Clean Canvas -->
+  <rect width="500" height="500" fill="#FFFFFF" rx="30" />
+  
+  <!-- SCB Official Purple Rounded Container with Ample Margin -->
+  <rect x="35" y="35" width="430" height="430" rx="95" fill="#4E2A84" />
+  
+  <!-- SCB Official Golden Bodhi Tree Emblem -->
+  <g fill="#F5A623" transform="matrix(1.25 0 0 1.25 -125 -45)">
+    <!-- Outer Bodhi Leaf -->
+    <path d="M 300 105
+             C 320 145, 375 195, 375 250
+             C 375 295, 345 320, 310 320
+             C 285 320, 268 300, 268 280
+             C 268 260, 282 245, 296 245
+             C 306 245, 314 252, 314 262
+             C 314 268, 310 272, 304 274
+             C 316 284, 334 286, 346 265
+             C 352 250, 350 230, 328 198
+             C 314 175, 300 155, 300 155
+             C 300 155, 286 175, 272 198
+             C 250 230, 248 250, 254 265
+             C 266 286, 284 284, 296 274
+             C 290 272, 286 268, 286 262
+             C 286 252, 294 245, 304 245
+             C 318 245, 332 260, 332 280
+             C 332 300, 315 320, 290 320
+             C 255 320, 225 295, 225 250
+             C 225 195, 280 145, 300 105 Z" />
+  </g>
+  
+  <!-- SCB Crisp White Lettering -->
+  <text x="250" y="415" 
+        font-family="'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" 
+        font-size="62" 
+        font-weight="900" 
+        letter-spacing="6" 
+        fill="#FFFFFF" 
+        text-anchor="middle">
+    SCB
+  </text>
+</svg>
