@@ -13,9 +13,13 @@ import {
   ArrowRight,
   MapPin,
   Clock,
-  ChefHat
+  ChefHat,
+  Film,
+  Play,
+  Video
 } from 'lucide-react';
 import { WatermarkOverlay } from './WatermarkOverlay';
+import { HeritageVideoModal } from './HeritageVideoModal.js';
 
 interface HeritageCard {
   id: string;
@@ -30,6 +34,7 @@ interface HeritageCard {
 
 export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void }> = ({ onOpenBuilder }) => {
   const [selectedImage, setSelectedImage] = useState<{ src: string; title: string; desc: string } | null>(null);
+  const [videoModalOpen, setVideoModalOpen] = useState<boolean>(false);
 
   const heritageCards: HeritageCard[] = [
     {
@@ -125,6 +130,20 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
           <p className="text-xs sm:text-sm md:text-base text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed">
             สืบทอดศาสตร์และศิลป์แห่งการจัดเลี้ยงโต๊ะจีนสูตรจักรพรรดิกว่า 35 ปี จากนครปฐม เมืองหลวงโต๊ะจีนแห่งประเทศไทย ผสานวัตถุดิบคัดสดพรีเมียมและการปรุงสดด้วยไฟแรงควันกระทะ เสิร์ฟความอร่อยระดับภัตตาคารส่งตรงถึงงานของคุณทั่วประเทศ
           </p>
+
+          {/* 🎬 Interactive Heritage Video Showcase Button */}
+          <div className="pt-2 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setVideoModalOpen(true)}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-600 via-amber-500 to-red-600 hover:from-red-500 hover:to-amber-400 text-white font-black text-xs sm:text-sm shadow-xl flex items-center gap-2.5 transition-all transform hover:scale-105 border-2 border-amber-300 cursor-pointer animate-pulse"
+            >
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                <Play className="w-3.5 h-3.5 fill-white ml-0.5 text-white" />
+              </div>
+              <span>🎬 ชมคลิปวีดีโอประวัติ 35 ปี & ดาวน์โหลดสำหรับโพสต์ลงเพจ</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -324,6 +343,14 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* 🎬 OFFICIAL HERITAGE VIDEO MODAL & EXPORT SUITE */}
+      {/* ========================================================================= */}
+      <HeritageVideoModal
+        isOpen={videoModalOpen}
+        onClose={() => setVideoModalOpen(false)}
+      />
 
     </section>
   );
