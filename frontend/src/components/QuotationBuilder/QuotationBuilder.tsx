@@ -8,6 +8,7 @@ import { TableCalculator } from './TableCalculator.js';
 import { SummaryCard } from './SummaryCard.js';
 import { QuotationModal } from './QuotationModal.js';
 import { QuotationApi } from '../../services/api.js';
+import { sendOrderToLine } from '../../utils/lineOrderHelper.js';
 import { Calculator, Sparkles, Utensils, CheckCircle, ChevronRight, Flame, Crown, Check } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency.js';
 
@@ -89,13 +90,8 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     tableCount >= 10
   );
 
-  // Generate Quotation Action
-  const handleGenerateQuotation = async () => {
-    if (!isValid) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน: ชื่อผู้ติดต่อ, เบอร์โทร, วันที่จัดงาน และสถานที่จัดงาน');
-      return;
-    }
-
+  // Helper to build Quote Document
+  const buildQuoteDoc = (): QuotationDoc => {
     const selectedDishesArray = selectedPackage.courses.map((course) => {
       const activeDishId = selectedDishes[course.id] || course.defaultDishId;
       const dish = course.options.find((o) => o.id === activeDishId) || course.options[0];
@@ -127,7 +123,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
 
     const subtotal = packageTotal + beverageTotal + floorServiceTotal;
     const discount = 0;
-    const grandTotal = subtotal + travelFeeAmount; // Free tables are complimentary (0 THB), not subtracted from ordered tables
+    const grandTotal = subtotal + travelFeeAmount;
 
     const depositAmount = Math.round(grandTotal * 0.30);
     const finalAmount = grandTotal - depositAmount;
@@ -138,7 +134,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     const random = Math.floor(1000 + Math.random() * 9000);
     const quoteNo = `QT${year}${month}-${random}`;
 
-    const quoteDoc: QuotationDoc = {
+    return {
       quoteNo,
       createdAt: new Date().toISOString(),
       customer: customerData,
@@ -174,6 +170,16 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
       finalAmount,
       status: 'pending',
     };
+  };
+
+  // Generate Quotation Document Action (View Modal)
+  const handleGenerateQuotation = async () => {
+    if (!isValid) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วน: ชื่อผู้ติดต่อ, เบอร์โทร, วันที่จัดงาน และสถานที่จัดงานนะคะ');
+      return;
+    }
+
+    const quoteDoc = buildQuoteDoc();
 
     // Save to Database (or localStorage fallback)
     try {
@@ -181,6 +187,27 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
       setGeneratedQuotation(saved);
       if (onQuotationGenerated) onQuotationGenerated(saved);
     } catch (e) {
+      setGeneratedQuotation(quoteDoc);
+      if (onQuotationGenerated) onQuotationGenerated(quoteDoc);
+    }
+  };
+
+  // Send Order Directly to LINE Action (Primary CTA)
+  const handleSendLineOrder = async () => {
+    if (!isValid) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วน: ชื่อผู้ติดต่อ, เบอร์โทร, วันที่จัดงาน และสถานที่จัดงาน เพื่อส่งเข้า LINE นะคะ');
+      return;
+    }
+
+    const quoteDoc = buildQuoteDoc();
+
+    try {
+      const saved = await QuotationApi.create(quoteDoc);
+      sendOrderToLine(saved);
+      setGeneratedQuotation(saved);
+      if (onQuotationGenerated) onQuotationGenerated(saved);
+    } catch (e) {
+      sendOrderToLine(quoteDoc);
       setGeneratedQuotation(quoteDoc);
       if (onQuotationGenerated) onQuotationGenerated(quoteDoc);
     }
@@ -341,6 +368,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
               locationZone={customerData.locationZone || 'bkk_metro'}
               customTravelFee={customerData.customTravelFee}
               onGenerateQuotation={handleGenerateQuotation}
+              onSendLineOrder={handleSendLineOrder}
               isValid={isValid}
             />
 

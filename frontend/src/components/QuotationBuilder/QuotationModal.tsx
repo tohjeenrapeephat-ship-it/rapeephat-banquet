@@ -5,6 +5,7 @@ import { formatThaiDate } from '../../utils/thaiDate.js';
 import { generateA4Pdf } from '../../services/pdfService.js';
 import { uploadPdfToGoogleDrive } from '../../services/gasDriveService.js';
 import { QuotationApi } from '../../services/api.js';
+import { sendOrderToLine, formatLineOrderMessage } from '../../utils/lineOrderHelper.js';
 import confetti from 'canvas-confetti';
 import {
   X,
@@ -122,31 +123,21 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
 
   // Handle LINE Direct Message Summary
   const getLineMessage = () => {
-    const dishesList = quotation.selectedDishes
-      .map((d, i) => `   ${i + 1}. ${d.dishName}`)
-      .join('\n');
-
-    return `สวัสดีค่ะ ขอส่งใบเสนอราคา โต๊ะจีน รพีพัฒน์ พรีเมียม\n` +
-      `📌 เลขที่เอกสาร: ${displayQuoteNo}\n` +
-      `👤 ชื่อลูกค้า: ${quotation.customer.name}\n` +
-      `📞 โทร: ${quotation.customer.phone}\n` +
-      `📅 วันที่จัดงาน: ${formatThaiDate(quotation.customer.eventDate)} (${quotation.customer.eventTime})\n` +
-      `📍 สถานที่: ${quotation.customer.eventLocation}\n` +
-      `🍱 แพ็กเกจ: ${quotation.package.name} (${formatCurrency(quotation.package.price)}/โต๊ะ)\n` +
-      `🍽️ จำนวน: ${quotation.tableCount} โต๊ะ ${quotation.freeTableCount > 0 ? `(แถมฟรี ${quotation.freeTableCount} โต๊ะ)` : ''}\n` +
-      `📋 เมนูอาหารที่เลือก (${quotation.selectedDishes.length} จาน):\n${dishesList}\n` +
-      `💰 ยอดสุทธิ: ${formatCurrency(quotation.grandTotal)} บาท\n` +
-      `🔒 มัดจำ 30%: ${formatCurrency(quotation.depositAmount)} บาท\n` +
-      `🏦 ข้อมูลการโอนเงิน:\n` +
-      `   • ชื่อบัญชี: นางสาวทัศวรรณ จันทร์หอม\n` +
-      `   • ธนาคารไทยพาณิชย์: 411-239908-0 (สาขาเซ็นทรัล นครปฐม)\n` +
-      `   • พร้อมเพย์: 081-331-1646\n` +
-      (driveUrl ? `📄 ลิงก์ PDF บน Google Drive: ${driveUrl}\n` : '') +
-      `ขอบคุณค่ะ`;
+    return formatLineOrderMessage({
+      ...quotation,
+      quoteNo: displayQuoteNo,
+      pdfDriveUrl: driveUrl || quotation.pdfDriveUrl,
+    });
   };
 
   const handleShareLine = () => {
-    window.open(`https://line.me/ti/p/~pang_baichaa`, '_blank');
+    sendOrderToLine({
+      ...quotation,
+      quoteNo: displayQuoteNo,
+      pdfDriveUrl: driveUrl || quotation.pdfDriveUrl,
+    });
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 3000);
   };
 
   const handleCopySummary = () => {
@@ -220,6 +211,17 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
             >
               <Printer className="w-4 h-4 text-amber-400" />
               <span>พิมพ์เอกสาร</span>
+            </button>
+
+            {/* Direct LINE Send Button */}
+            <button
+              type="button"
+              onClick={handleShareLine}
+              className="px-3.5 py-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-black flex items-center gap-1.5 shadow-md transition-all border border-green-400 cursor-pointer"
+              title="ส่งออร์เดอร์นี้เข้า LINE คุณแป้งทันที"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>ส่งเข้า LINE</span>
             </button>
 
             {/* Download PDF */}
@@ -800,23 +802,23 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
             <span className="text-xs font-medium">ติดต่อสอบถามข้อมูลเพิ่มเติม โทร <strong className="text-white font-bold">081-331-1646</strong> (คุณแป้ง)</span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleCopySummary}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-none px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {copySuccess ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-              <span>{copySuccess ? 'คัดลอกเรียบร้อยแล้ว' : 'คัดลอกข้อความสรุป'}</span>
+              <span>{copySuccess ? 'คัดลอกเรียบร้อยแล้วค่ะ' : 'คัดลอกข้อความสรุป'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleShareLine}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+              className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-gradient-to-r from-[#06C755] to-emerald-600 hover:from-[#05b34c] hover:to-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all border border-green-300 cursor-pointer transform hover:scale-102"
             >
-              <MessageCircle className="w-4 h-4" />
-              <span>ส่งต่อทาง LINE</span>
+              <MessageCircle className="w-5 h-5 fill-white" />
+              <span>📲 ส่งออร์เดอร์นี้เข้า LINE คุณแป้ง</span>
             </button>
           </div>
         </div>

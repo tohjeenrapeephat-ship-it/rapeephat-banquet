@@ -4,6 +4,7 @@ import { QuotationApi } from '../services/api.js';
 import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
 import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
+import { sendOrderToLine } from '../utils/lineOrderHelper.js';
 import {
   FileText,
   Calendar,
@@ -11,7 +12,8 @@ import {
   Trash2,
   CloudUpload,
   X,
-  Search
+  Search,
+  MessageCircle
 } from 'lucide-react';
 
 interface QuotationHistoryProps {
@@ -137,6 +139,14 @@ export const QuotationHistory: React.FC<QuotationHistoryProps> = ({ isOpen, onCl
                   </div>
 
                   <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => sendOrderToLine(quote)}
+                      className="p-2 rounded-xl bg-emerald-50 hover:bg-[#06C755] text-emerald-700 hover:text-white font-bold transition-all border border-emerald-300"
+                      title="ส่งข้อมูลออร์เดอร์นี้เข้า LINE คุณแป้ง"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </button>
+
                     <button
                       onClick={() => setActiveQuote(quote)}
                       className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white font-bold transition-all border border-red-200"

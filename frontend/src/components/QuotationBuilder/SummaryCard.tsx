@@ -14,7 +14,8 @@ import {
   CupSoda,
   Award,
   Utensils,
-  Truck
+  Truck,
+  MessageCircle
 } from 'lucide-react';
 
 interface SummaryCardProps {
@@ -26,6 +27,7 @@ interface SummaryCardProps {
   locationZone?: 'bkk_metro' | 'upcountry';
   customTravelFee?: number;
   onGenerateQuotation: () => void;
+  onSendLineOrder?: () => void;
   isValid: boolean;
 }
 
@@ -38,6 +40,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   locationZone = 'bkk_metro',
   customTravelFee,
   onGenerateQuotation,
+  onSendLineOrder,
   isValid,
 }) => {
   // Calculations
@@ -277,16 +280,27 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 6. ปุ่มจองโต๊ะ / ออกใบเสนอราคา A4 */}
+        {/* 6. ปุ่มส่งออร์เดอร์เข้า LINE & ออกใบเสนอราคา A4 */}
         {/* ========================================================================= */}
-        <button
-          type="button"
-          onClick={onGenerateQuotation}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-base sm:text-lg shadow-red-glow flex items-center justify-center gap-2.5 transition-all transform hover:scale-[1.02] active:scale-98 cursor-pointer border-2 border-amber-300"
-        >
-          <PhoneCall className="w-5 h-5 text-amber-300" />
-          <span>จองโต๊ะราคา {selectedPackage.price.toLocaleString()} บาท / ออกใบเสนอราคา</span>
-        </button>
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            onClick={onSendLineOrder || onGenerateQuotation}
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-500 hover:to-green-600 text-white font-black text-base sm:text-lg shadow-xl flex items-center justify-center gap-2.5 transition-all transform hover:scale-[1.02] active:scale-98 cursor-pointer border-2 border-green-300"
+          >
+            <MessageCircle className="w-6 h-6 text-white" />
+            <span>📲 ส่งออร์เดอร์นี้เข้า LINE คุณแป้ง (ล็อกคิวงาน)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onGenerateQuotation}
+            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm sm:text-base shadow-md flex items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-98 cursor-pointer border border-amber-300"
+          >
+            <FileText className="w-4 h-4 text-amber-300" />
+            <span>📄 ดู & พิมพ์ใบเสนอราคามาตรฐาน A4 ฉบับจริง</span>
+          </button>
+        </div>
 
       </div>
 
