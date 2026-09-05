@@ -52,6 +52,8 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
   }, [workingPackages, selectedPkgId]);
 
   // Notification state
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isSavedSuccess, setIsSavedSuccess] = useState<boolean>(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string>('');
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
@@ -207,21 +209,32 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
   // =========================================================================
 
   const handleSaveAllChanges = () => {
-    savePackages(workingPackages);
-    setSaveSuccessMsg('✓ บันทึกการเปลี่ยนแปลงเมนูอาหารและแพ็กเกจขึ้นหน้าเว็บเรียบร้อยแล้ว');
+    setIsSaving(true);
+    setIsSavedSuccess(false);
+
     setTimeout(() => {
+      savePackages(workingPackages);
+      setIsSaving(false);
+      setIsSavedSuccess(true);
+      setSaveSuccessMsg('✓ บันทึกการเปลี่ยนแปลงสำเร็จเรียบร้อยแล้ว! ข้อมูลเมนูและรูปภาพทั้งหมดอัปเดตขึ้นสู่หน้าเว็บไซต์จริงแบบ Real-Time เรียบร้อยแล้วค่ะ');
+    }, 280);
+
+    setTimeout(() => {
+      setIsSavedSuccess(false);
       setSaveSuccessMsg('');
-    }, 4000);
+    }, 4500);
   };
 
   const handleConfirmReset = () => {
     resetToDefault();
     setWorkingPackages(packageService.getPackages());
     setShowResetConfirm(false);
+    setIsSavedSuccess(true);
     setSaveSuccessMsg('✓ คืนค่าเมนูเริ่มต้นมาตรฐานโรงครัวเรียบร้อยแล้ว');
     setTimeout(() => {
+      setIsSavedSuccess(false);
       setSaveSuccessMsg('');
-    }, 4000);
+    }, 4500);
   };
 
   const handleExportJson = () => {
@@ -313,19 +326,50 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
           <button
             type="button"
             onClick={handleSaveAllChanges}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white text-xs sm:text-sm font-black flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer scale-100 hover:scale-[1.02]"
+            disabled={isSaving}
+            className={`px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer transform duration-300 ${
+              isSavedSuccess
+                ? 'bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 text-white shadow-xl ring-4 ring-emerald-300/60 scale-105'
+                : isSaving
+                ? 'bg-slate-700 text-white opacity-90 cursor-wait'
+                : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white shadow-md hover:shadow-lg scale-100 hover:scale-[1.02]'
+            }`}
           >
-            <Save className="w-4 h-4" />
-            <span>บันทึกการเปลี่ยนแปลงทั้งหมด</span>
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>กำลังบันทึกข้อมูล...</span>
+              </>
+            ) : isSavedSuccess ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-amber-300 animate-bounce" />
+                <span>✓ บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>บันทึกการเปลี่ยนแปลงทั้งหมด</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
       {/* Save Success Alert Banner */}
       {saveSuccessMsg && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-400 text-emerald-950 text-xs sm:text-sm font-black flex items-center gap-2.5 shadow-sm animate-fadeIn">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>{saveSuccessMsg}</span>
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-50 via-green-50 to-amber-50 border-2 border-emerald-400 text-emerald-950 text-xs sm:text-sm font-black flex items-center justify-between gap-3 shadow-md animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-black text-emerald-950 text-sm">{saveSuccessMsg}</div>
+              <div className="text-emerald-800 text-xs font-medium">ข้อมูลถูกบันทึกและแสดงผลขึ้นหน้าเว็บไซต์จริงแบบ Real-Time เรียบร้อยแล้วค่ะ</div>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-emerald-200/80 text-emerald-950 text-xs font-black shrink-0 hidden sm:inline">
+            ⚡ อัปเดตขึ้นเว็บแล้ว
+          </span>
         </div>
       )}
 
@@ -681,10 +725,31 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
           <button
             type="button"
             onClick={handleSaveAllChanges}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer hover:scale-[1.02]"
+            disabled={isSaving}
+            className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer transform duration-300 ${
+              isSavedSuccess
+                ? 'bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 text-white shadow-xl ring-4 ring-emerald-300/60 scale-105'
+                : isSaving
+                ? 'bg-slate-700 text-white opacity-90 cursor-wait'
+                : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-amber-700 text-white shadow-md hover:shadow-xl scale-100 hover:scale-[1.02]'
+            }`}
           >
-            <Save className="w-4 h-4" />
-            <span>บันทึกการเปลี่ยนแปลงทั้งหมด</span>
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>กำลังบันทึกข้อมูล...</span>
+              </>
+            ) : isSavedSuccess ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-amber-300 animate-bounce" />
+                <span>✓ บันทึกการเปลี่ยนแปลงสำเร็จแล้ว!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>บันทึกการเปลี่ยนแปลงทั้งหมด</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -883,6 +948,66 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 🌟 DELUXE FLOATING ISLAND SUCCESS NOTIFICATION MODAL */}
+      {/* ========================================================================= */}
+      {isSavedSuccess && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-lg w-[92vw] sm:w-full animate-toast-in pointer-events-auto">
+          <div className="relative rounded-3xl bg-slate-950/95 backdrop-blur-2xl border-2 border-emerald-400 text-white shadow-2xl p-4 sm:p-5 flex items-start gap-3.5 overflow-hidden ring-4 ring-emerald-500/25">
+            
+            {/* Ambient Lighting Gradients */}
+            <div className="absolute -top-10 -right-10 w-36 h-36 bg-emerald-500/25 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Glowing Emerald Checkmark Badge */}
+            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/40 ring-2 ring-emerald-300 relative">
+              <CheckCircle2 className="w-7 h-7 stroke-[2.5]" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 absolute -top-1 -right-1 animate-pulse" />
+            </div>
+
+            {/* Content Body */}
+            <div className="flex-1 min-w-0 space-y-1">
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-sm sm:text-base font-black text-white leading-tight">
+                  บันทึกการเปลี่ยนแปลงสำเร็จเรียบร้อยแล้ว!
+                </h4>
+              </div>
+
+              <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                ข้อมูลรายการอาหาร รูปภาพ และแพ็กเกจทั้งหมด ถูกอัปเดตและแสดงผลขึ้นหน้าเว็บไซต์จริงแบบ Real-Time เรียบร้อยแล้วค่ะ
+              </p>
+
+              {/* Status Tags */}
+              <div className="flex flex-wrap items-center gap-2 pt-1.5">
+                <span className="px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-400/60 text-emerald-300 text-[10.5px] font-black flex items-center gap-1 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  <span>อัปเดตหน้าเว็บสด 100%</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded-lg bg-amber-950/90 border border-amber-400/60 text-amber-300 text-[10.5px] font-black flex items-center gap-1 shadow-2xs">
+                  <span>✨ ซิงค์ทุกแท็บ & อุปกรณ์</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setIsSavedSuccess(false)}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 border border-white/10"
+              title="ปิดการแจ้งเตือน"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Animated Countdown Progress Bar at Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-800/80">
+              <div className="h-full bg-gradient-to-r from-emerald-400 via-green-400 to-amber-400 animate-countdown-bar" />
+            </div>
+
           </div>
         </div>
       )}
