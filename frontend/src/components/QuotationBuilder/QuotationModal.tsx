@@ -34,9 +34,10 @@ interface QuotationModalProps {
   quotation: QuotationDoc;
   onClose: () => void;
   onSaved?: (savedQuote: QuotationDoc) => void;
+  onEdit?: (quotation: QuotationDoc) => void;
 }
 
-export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClose }) => {
+export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClose, onEdit }) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isUploadingDrive, setIsUploadingDrive] = useState(false);
@@ -181,6 +182,18 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
           {/* Right Action Buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             
+            {/* Edit Menu & Price Button */}
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(quotation)}
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-md border border-amber-300 transition-all cursor-pointer"
+                title="แก้ไขรายการอาหารและราคาในใบเสนอราคานี้"
+              >
+                <span>✏️ แก้ไขเมนู & ราคา</span>
+              </button>
+            )}
+
             {/* View Mode Toggle (Desktop / Mobile Fit) */}
             <button
               type="button"

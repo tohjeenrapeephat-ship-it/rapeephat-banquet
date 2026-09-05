@@ -9,6 +9,7 @@ import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
 import { EditQuotationModal } from './EditQuotationModal.js';
 import { PackageMenuEditor } from './Admin/PackageMenuEditor.js';
+import { BANQUET_PACKAGES } from '../data/packages.js';
 import {
   LayoutDashboard,
   FileText,
@@ -42,7 +43,8 @@ import {
   Download,
   CreditCard,
   AlertCircle,
-  Check
+  Check,
+  Plus
 } from 'lucide-react';
 import { chatSync, ChatSession, LiveMessage } from '../services/chatService.js';
 
@@ -276,6 +278,77 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
     } catch {}
   };
 
+  // Create New Quotation directly from Admin
+  const handleCreateNewQuotation = () => {
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    const yy = String(today.getFullYear()).slice(-2);
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const quoteNo = `QT-${yy}${mm}${dd}-${randomSuffix}`;
+
+    const defaultPkg = BANQUET_PACKAGES.find((p) => p.price === 2000) || BANQUET_PACKAGES[0];
+    const selectedDishes = defaultPkg.courses.map((c) => ({
+      courseId: c.id,
+      courseTitle: c.title,
+      dishName: c.options[0]?.name || '',
+    }));
+
+    const foodTotal = defaultPkg.price * 10;
+
+    const newQuote: QuotationDoc = {
+      quoteNo,
+      createdAt: new Date().toISOString(),
+      customer: {
+        name: 'ลูกค้าใหม่ (ออกโดยแอดมิน)',
+        phone: '',
+        email: '',
+        eventDate: dateStr,
+        eventTime: '18:00 น.',
+        eventLocation: '',
+        eventType: 'งานเลี้ยงสังสรรค์ / งานทั่วไป',
+        locationZone: 'bkk_metro',
+        customTravelFee: 0,
+        notes: '',
+      },
+      package: {
+        id: defaultPkg.id,
+        name: defaultPkg.name,
+        price: defaultPkg.price,
+      },
+      selectedDishes,
+      tableCount: 10,
+      freeTableCount: 0,
+      beverage: {
+        id: 'none',
+        name: 'ไม่รับเครื่องดื่ม (เจ้าภาพจัดเตรียมเอง)',
+        pricePerTable: 0,
+        total: 0,
+      },
+      floorService: {
+        enabled: false,
+        pricePerTable: 0,
+        total: 0,
+      },
+      travelFee: {
+        amount: 0,
+        description: 'กรุงเทพฯ และปริมณฑล (ฟรีค่าเดินทาง)',
+        zone: 'bkk_metro',
+        isFree: true,
+      },
+      subtotal: foodTotal,
+      discount: 0,
+      grandTotal: foodTotal,
+      depositAmount: Math.round(foodTotal * 0.3),
+      finalAmount: Math.round(foodTotal * 0.7),
+      notes: '',
+      status: 'pending',
+    };
+
+    setEditingQuote(newQuote);
+  };
+
   // Save Edited Quotation Handler (Full Update + Re-Generate PDF workflow)
   const handleSaveEditedQuote = async (updatedQuote: QuotationDoc, openPreview?: boolean) => {
     try {
@@ -284,9 +357,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
       console.warn('API update error:', e);
     }
 
-    const updatedList = quotations.map((q) =>
-      q.quoteNo === updatedQuote.quoteNo || (updatedQuote.id && q.id === updatedQuote.id) ? updatedQuote : q
+    const exists = quotations.some(
+      (q) => q.quoteNo === updatedQuote.quoteNo || (updatedQuote.id && q.id === updatedQuote.id)
     );
+    const updatedList = exists
+      ? quotations.map((q) =>
+          q.quoteNo === updatedQuote.quoteNo || (updatedQuote.id && q.id === updatedQuote.id) ? updatedQuote : q
+        )
+      : [updatedQuote, ...quotations];
+
     setQuotations(updatedList);
     try {
       localStorage.setItem('rapeephat_quotations_db', JSON.stringify(updatedList));
@@ -776,13 +855,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 </div>
               </div>
 
-              {/* Action Buttons: Excel Export & Refresh */}
+              {/* Action Buttons: Create, Excel Export & Refresh */}
               <div className="flex items-center gap-2">
+                {/* Create New Quotation Button */}
+                <button
+                  type="button"
+                  onClick={handleCreateNewQuotation}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-red-700 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white flex items-center justify-center gap-2 text-xs font-black shadow-md transition-all border border-red-500 transform hover:scale-102 cursor-pointer"
+                  title="สร้างใบเสนอราคาใหม่โดยตรงจากระบบหลังร้าน กำหนดเมนูและราคาได้อิสระ"
+                >
+                  <Plus className="w-4 h-4 text-white" />
+                  <span>➕ ออกใบเสนอราคาใหม่</span>
+                </button>
+
                 {/* 1-Click Excel Export Button */}
                 <button
                   type="button"
                   onClick={() => exportQuotationsToExcel(filteredQuotes)}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white flex items-center justify-center gap-2 text-xs font-black shadow-md transition-all border border-emerald-500 transform hover:scale-102"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white flex items-center justify-center gap-2 text-xs font-black shadow-md transition-all border border-emerald-500 transform hover:scale-102 cursor-pointer"
                   title="ส่งออกรายงานใบเสนอราคาทั้งหมดเป็นไฟล์ Excel (.csv รองรับภาษาไทย 100%)"
                 >
                   <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
@@ -793,7 +883,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 <button
                   type="button"
                   onClick={fetchQuotations}
-                  className="p-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors"
+                  className="p-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors cursor-pointer"
                   title="รีเฟรชรายการ"
                 >
                   <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-red-600' : ''}`} />
@@ -969,14 +1059,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                                 <span className="hidden xl:inline">ใบเสร็จ 70%</span>
                               </button>
 
-                              {/* Edit Quotation & Re-generate PDF Button */}
+                              {/* Edit Dishes & Price Button */}
                               <button
                                 onClick={() => setEditingQuote(quote)}
-                                className="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-800 hover:text-white font-bold text-xs flex items-center gap-1 transition-all border border-blue-200 shadow-2xs"
-                                title="แก้ไขข้อมูลใบเสนอราคา / แก้ไขรายละเอียดเพื่อออก PDF ใหม่"
+                                className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs flex items-center gap-1.5 transition-all shadow-sm transform hover:scale-102 cursor-pointer"
+                                title="แก้ไขรายการอาหาร, เปลี่ยนราคาต่อโต๊ะ, ส่วนลด และรายละเอียดใบเสนอราคา"
                               >
-                                <Edit3 className="w-3.5 h-3.5 text-blue-600 group-hover:text-white" />
-                                <span>แก้ไข</span>
+                                <Edit3 className="w-3.5 h-3.5 text-white" />
+                                <span>แก้ไขเมนู & ราคา</span>
                               </button>
 
                               {/* Open A4 Full Quotation */}
@@ -2155,6 +2245,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
         <QuotationModal
           quotation={activeQuote}
           onClose={() => setActiveQuote(null)}
+          onEdit={(quote) => {
+            setActiveQuote(null);
+            setEditingQuote(quote);
+          }}
         />
       )}
 
