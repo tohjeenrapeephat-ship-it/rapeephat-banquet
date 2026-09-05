@@ -92,13 +92,14 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
               {isSingleOption ? (
                 /* Single Included Dish with Real Photo Thumbnail */
                 (() => {
-                  const dishName = course.options[0].name;
-                  const dishImg = getDishImage(dishName, course.title);
+                  const firstOpt = course.options[0];
+                  const dishName = firstOpt.name;
+                  const dishImg = firstOpt.imageUrl || getDishImage(dishName, course.title);
                   return (
                     <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50 border-2 border-slate-200/90 flex items-center justify-between gap-3 shadow-2xs">
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          onClick={() => setPreviewDish({ name: dishName, image: dishImg, tag: course.options[0].tag })}
+                          onClick={() => setPreviewDish({ name: dishName, image: dishImg, tag: firstOpt.tag })}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-emerald-300 shrink-0 bg-white shadow-2xs relative group/img cursor-pointer"
                         >
                           <img
@@ -115,9 +116,9 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                           <div className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
                             {dishName}
                           </div>
-                          {course.options[0].tag && (
+                          {firstOpt.tag && (
                             <div className="text-[10px] font-bold text-emerald-700 mt-0.5">
-                              {course.options[0].tag}
+                              {firstOpt.tag}
                             </div>
                           )}
                         </div>
@@ -131,7 +132,7 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                 <div className="space-y-2 pt-0.5">
                   {course.options.map((option) => {
                     const isSelected = currentDishId === option.id;
-                    const dishImg = getDishImage(option.name, course.title);
+                    const dishImg = option.imageUrl || getDishImage(option.name, course.title);
 
                     return (
                       <div
