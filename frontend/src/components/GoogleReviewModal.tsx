@@ -1,21 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { generateQrSvgString, generateQrMatrix } from '../utils/qrCodeGenerator.js';
+import QRCode from 'qrcode';
 import {
   Star,
-  MapPin,
-  QrCode,
   Printer,
   Download,
   Copy,
   Check,
   ExternalLink,
   X,
-  Sparkles,
   Crown,
-  Heart,
-  ChefHat,
-  Smartphone,
-  Share2
+  Smartphone
 } from 'lucide-react';
 
 interface GoogleReviewModalProps {
@@ -25,7 +19,7 @@ interface GoogleReviewModalProps {
 }
 
 export const DEFAULT_GOOGLE_REVIEW_URL =
-  'https://www.google.com/maps/search/?api=1&query=%E0%B9%82%E0%B8%95%E0%B9%8A%E0%B8%B0%E0%B8%88%E0%B8%B5%E0%B8%99+%E0%B8%A3%E0%B8%9E%E0%B8%B5%E0%B8%9E%E0%B8%B1%E0%B8%92%E0%B8%99%E0%B9%8C+%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%9B%E0%B8%90%E0%B8%A1';
+  'https://maps.google.com/?q=ครัวรพีพัฒน์+(โต๊ะจีน+รพีพัฒน์)+72+หมู่+1+ตำบลนครปฐม+อำเภอเมืองนครปฐม+นครปฐม+73000';
 
 export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   isOpen,
@@ -33,49 +27,34 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   customReviewUrl,
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
-  const [printMode, setPrintMode] = useState<'card' | 'tent'>('card');
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const cardRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const reviewUrl = customReviewUrl || DEFAULT_GOOGLE_REVIEW_URL;
 
-  // Render QR matrix onto canvas for instant crisp download & preview
+  // Generate ultra-high resolution QR Code via standard qrcode engine
   useEffect(() => {
     if (!isOpen) return;
-    try {
-      const matrix = generateQrMatrix(reviewUrl, 1);
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const moduleCount = matrix.length;
-          const margin = 3;
-          const size = 320;
-          const cellSize = size / (moduleCount + margin * 2);
+    let isMounted = true;
+    QRCode.toDataURL(reviewUrl, {
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      width: 700,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff',
+      },
+    })
+      .then((url) => {
+        if (isMounted) setQrDataUrl(url);
+      })
+      .catch((err) => {
+        console.error('QR Code render error:', err);
+      });
 
-          canvas.width = size;
-          canvas.height = size;
-
-          // White background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, size, size);
-
-          // Black Modules with soft rounding
-          ctx.fillStyle = '#0F172A';
-          for (let r = 0; r < moduleCount; r++) {
-            for (let c = 0; c < moduleCount; c++) {
-              if (matrix[r][c]) {
-                const x = (c + margin) * cellSize;
-                const y = (r + margin) * cellSize;
-                ctx.fillRect(x, y, cellSize + 0.4, cellSize + 0.4);
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.error('QR Code render error:', e);
-    }
+    return () => {
+      isMounted = false;
+    };
   }, [isOpen, reviewUrl]);
 
   // Handle Copy Review Link
@@ -87,10 +66,10 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
 
   // Handle Direct Download of PNG QR Code
   const handleDownloadQrPng = () => {
-    if (!canvasRef.current) return;
+    if (!qrDataUrl) return;
     const link = document.createElement('a');
     link.download = 'QR_Code_รีวิว_Google_Maps_โต๊ะจีนรพีพัฒน์.png';
-    link.href = canvasRef.current.toDataURL('image/png');
+    link.href = qrDataUrl;
     link.click();
   };
 
@@ -182,17 +161,20 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
               </p>
             </div>
 
-            {/* QR Code Canvas Frame with Gold Corner Accents */}
+            {/* QR Code Frame with Gold Corner Accents (100% Unobstructed Crisp PNG) */}
             <div className="flex justify-center py-2">
-              <div className="p-3.5 rounded-3xl bg-white border-3 border-amber-400 shadow-lg relative group">
-                <canvas
-                  ref={canvasRef}
-                  className="w-52 h-52 sm:w-60 sm:h-60 rounded-xl"
-                />
-
-                {/* Center Google Map Badge */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white shadow-md border-2 border-red-500 flex items-center justify-center pointer-events-none">
-                  <MapPin className="w-6 h-6 text-red-600 fill-red-100" />
+              <div className="p-3 rounded-3xl bg-white border-3 border-amber-400 shadow-lg relative group">
+                <div className="w-52 h-52 sm:w-60 sm:h-60 rounded-xl bg-white flex items-center justify-center overflow-hidden">
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt="QR Code รีวิว Google Maps"
+                      className="w-full h-full object-contain block bg-white"
+                      style={{ imageRendering: 'crisp-edges' }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-100 animate-pulse rounded" />
+                  )}
                 </div>
               </div>
             </div>
@@ -204,7 +186,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
                 <span>เปิดกล้องมือถือแล้วส่องที่ QR Code เพื่อรีวิวได้ทันที</span>
               </div>
               <div className="text-[11px] text-slate-500 font-medium">
-                โต๊ะจีน รพีพัฒน์ • บริการจัดเลี้ยงทั่วประเทศไทย • โทร: 081-331-1646
+                ครัวรพีพัฒน์ (โต๊ะจีน รพีพัฒน์) • บริการจัดเลี้ยงทั่วประเทศไทย • โทร: 081-331-1646
               </div>
             </div>
 

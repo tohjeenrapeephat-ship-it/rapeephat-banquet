@@ -1,19 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { generateQrMatrix } from '../utils/qrCodeGenerator.js';
+import React, { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import { DEFAULT_GOOGLE_REVIEW_URL, GoogleReviewModal } from './GoogleReviewModal.js';
 import {
   Star,
-  MapPin,
   QrCode,
   ExternalLink,
-  Sparkles,
   Crown,
-  ChefHat,
   Smartphone,
   Copy,
-  Check,
-  Download,
-  Printer
+  Check
 } from 'lucide-react';
 
 interface GoogleReviewCardProps {
@@ -27,46 +22,32 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   const reviewUrl = customReviewUrl || DEFAULT_GOOGLE_REVIEW_URL;
 
-  // Render QR Code on canvas
+  // Generate ultra-high resolution, 100% scannable QR Code
   useEffect(() => {
-    try {
-      const matrix = generateQrMatrix(reviewUrl, 1);
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const moduleCount = matrix.length;
-          const margin = 2;
-          const size = 200;
-          const cellSize = size / (moduleCount + margin * 2);
+    let isMounted = true;
+    QRCode.toDataURL(reviewUrl, {
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      width: 600,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff',
+      },
+    })
+      .then((url) => {
+        if (isMounted) setQrDataUrl(url);
+      })
+      .catch((err) => {
+        console.error('QR error:', err);
+      });
 
-          canvas.width = size;
-          canvas.height = size;
-
-          // White background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, size, size);
-
-          // Dark slate modules
-          ctx.fillStyle = '#0F172A';
-          for (let r = 0; r < moduleCount; r++) {
-            for (let c = 0; c < moduleCount; c++) {
-              if (matrix[r][c]) {
-                const x = (c + margin) * cellSize;
-                const y = (r + margin) * cellSize;
-                ctx.fillRect(x, y, cellSize + 0.3, cellSize + 0.3);
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.error('QR Canvas error:', e);
-    }
+    return () => {
+      isMounted = false;
+    };
   }, [reviewUrl]);
 
   const handleCopyLink = (e: React.MouseEvent) => {
@@ -118,7 +99,7 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-xs flex items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer border border-amber-300"
             >
               <QrCode className="w-4 h-4 text-amber-200" />
               <span>ดูป้าย QR Code ขนาดใหญ่</span>
@@ -158,24 +139,26 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
 
         </div>
 
-        {/* Right Column: Crisp Scan QR Box */}
+        {/* Right Column: High-Resolution Scan QR Box (100% Unobstructed & Ultra Sharp) */}
         <div
           onClick={() => setModalOpen(true)}
-          className="shrink-0 p-3 rounded-2xl bg-white border-2 border-amber-300 shadow-md flex flex-col items-center gap-1.5 cursor-pointer hover:border-red-500 hover:shadow-lg transition-all group"
+          className="shrink-0 p-3 rounded-2xl bg-white border-2 border-amber-300 shadow-md flex flex-col items-center gap-2 cursor-pointer hover:border-red-500 hover:shadow-lg transition-all group"
           title="คลิกเพื่อเปิดดูป้าย QR Code ขยายใหญ่และสั่งพิมพ์"
         >
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              className="w-32 h-32 sm:w-36 sm:h-36 rounded-lg"
-            />
-            {/* Center Pin Icon */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow border border-red-500 flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-red-600 fill-red-100" />
-            </div>
+          <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-xl bg-white p-1.5 border border-slate-200 shadow-inner flex items-center justify-center overflow-hidden">
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt="QR Code รีวิว Google Maps"
+                className="w-full h-full object-contain block bg-white"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+            ) : (
+              <div className="w-full h-full bg-slate-100 animate-pulse rounded" />
+            )}
           </div>
-          <span className="text-[10px] font-black text-slate-600 group-hover:text-red-700 transition-colors flex items-center gap-1">
-            <Smartphone className="w-3 h-3 text-emerald-600" />
+          <span className="text-[11px] font-black text-slate-700 group-hover:text-red-700 transition-colors flex items-center gap-1">
+            <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
             <span>สแกนด้วยกล้องมือถือ</span>
           </span>
         </div>
