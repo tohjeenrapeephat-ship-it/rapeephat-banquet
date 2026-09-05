@@ -81,8 +81,7 @@ export const App: React.FC = () => {
         search.includes('review')
       ) {
         window.location.replace(
-          'https://www.google.com/maps/search/?api=1&query=' +
-            encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ นครปฐม')
+          'https://www.google.com/search?q=%E0%B9%82%E0%B8%95%E0%B9%8A%E0%B8%B0%E0%B8%88%E0%B8%B5%E0%B8%99+%E0%B8%A3%E0%B8%9E%E0%B8%B5%E0%B8%9E%E0%B8%B1%E0%B8%92%E0%B8%99%E0%B9%8C'
         );
         return;
       }

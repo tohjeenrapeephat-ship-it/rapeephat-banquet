@@ -20,7 +20,7 @@ interface GoogleReviewModalProps {
 
 export const DEFAULT_GOOGLE_REVIEW_URL = 'https://rapeephatcatering.com/review';
 export const GOOGLE_MAPS_DIRECT_URL =
-  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 นครปฐม');
+  'https://www.google.com/search?q=%E0%B9%82%E0%B8%95%E0%B9%8A%E0%B8%B0%E0%B8%88%E0%B8%B5%E0%B8%99+%E0%B8%A3%E0%B8%9E%E0%B8%B5%E0%B8%9E%E0%B8%B1%E0%B8%92%E0%B8%99%E0%B9%8C';
 
 export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   isOpen,
@@ -200,7 +200,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
             
             {/* Primary Button: Open Google Maps Direct */}
             <a
-              href={reviewUrl}
+              href={GOOGLE_MAPS_DIRECT_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer border border-amber-300"
