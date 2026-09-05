@@ -8,10 +8,16 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   const d = (dishName || '').toLowerCase().trim();
   const c = (courseTitle || '').toLowerCase().trim();
 
+  // --- 0. PRIORITY DISH MAPPING (แกงป่ารวมมิตร / แกงป่า / โฮกฮือ) ---
+  if (d.includes('แกงป่า') || d.includes('โฮกฮือ')) {
+    return '/images/dishes/hotpots/hotpot-gaengpa-ruammit-2026.jpg?v=20260905_v3';
+  }
+
   // --- 1. Snack Starters & Crackers (ข้าวเกรียบ & ถั่วอบ & ของทานเล่น) ---
   if (
     ['ข้าวเกรียบ', 'ถั่วทอด', 'ถั่วอบ', 'ถั่วโก๋แก่', 'เฟรนช์ฟรายส์', 'ของทานเล่น', 'เม็ดมะม่วงหิมพานต์อบเกลือ', 'เม็ดมะม่วงอบ'].some((k) => d.includes(k)) ||
-    c.includes('จานที่ 1') ||
+    c.startsWith('จานที่ 1 ') ||
+    c === 'จานที่ 1' ||
     d === 'เม็ดมะม่วง'
   ) {
     return '/images/dishes/dish-prawn-crackers.jpg';
