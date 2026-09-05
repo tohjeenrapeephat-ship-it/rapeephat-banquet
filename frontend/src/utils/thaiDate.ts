@@ -18,3 +18,23 @@ export function formatThaiDate(dateString: string): string {
     return dateString;
   }
 }
+
+/**
+ * Format customer name with honorific 'คุณ' prefix
+ */
+export function formatCustomerNameWithPrefix(name?: string): string {
+  if (!name || !name.trim()) return 'คุณลูกค้าผู้มีเกียรติ';
+  const trimmed = name.trim();
+  
+  const prefixes = [
+    'คุณ', 'นาย', 'นาง', 'นางสาว', 'น.ส.', 'ดร.', 'ศ.', 'ผศ.', 'รศ.', 
+    'พล.', 'พ.ต.', 'พ.อ.', 'พ.ท.', 'ร.ต.', 'ร.อ.', 'ร.ท.', 
+    'บจก.', 'หจก.', 'บริษัท', 'ห้างหุ้นส่วน'
+  ];
+  
+  const hasPrefix = prefixes.some(p => trimmed.startsWith(p));
+  if (hasPrefix) return trimmed;
+  
+  return `คุณ${trimmed}`;
+}
+

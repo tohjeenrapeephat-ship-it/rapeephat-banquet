@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { QuotationDoc } from '../types/quotation.js';
 import { formatCurrency, thaiBahtText } from '../utils/currency.js';
-import { formatThaiDate } from '../utils/thaiDate.js';
+import { formatThaiDate, formatCustomerNameWithPrefix } from '../utils/thaiDate.js';
 import { generateA4Pdf } from '../services/pdfService.js';
 import { EventLocationQrBadge } from './QuotationBuilder/EventLocationQrBadge.js';
 import {
@@ -287,7 +287,7 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
                   สัญญาฉบับนี้ทำขึ้นระหว่าง <strong>โต๊ะจีน รพีพัฒน์ พรีเมียม</strong> (โดย นางสาวใบชา สุขอยู่) ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้รับจ้าง"</strong> ฝ่ายหนึ่ง กับ
                 </p>
                 <p>
-                  <strong>{quotation.customer?.name || 'ลูกค้าผู้ว่าจ้าง'}</strong> โทรศัพท์: <strong className="font-mono text-red-700 text-xs font-black">{quotation.customer?.phone || '-'}</strong> ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้ว่าจ้าง"</strong> อีกฝ่ายหนึ่ง
+                  <strong>{formatCustomerNameWithPrefix(quotation.customer?.name)}</strong> โทรศัพท์: <strong className="font-mono text-red-700 text-xs font-black">{quotation.customer?.phone || '-'}</strong> ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>"ผู้ว่าจ้าง"</strong> อีกฝ่ายหนึ่ง
                 </p>
                 <p className="text-slate-600 text-[10px]">
                   ทั้งสองฝ่ายตกลงทำสัญญาว่าจ้างบริการจัดเลี้ยงโต๊ะจีน โดยมีข้อตกลงและเงื่อนไขการให้บริการดังต่อไปนี้:
@@ -394,42 +394,43 @@ export const CateringContractModal: React.FC<CateringContractModalProps> = ({
               </div>
 
               {/* 7. Signatures Section with Royal Seal Stamp */}
-              <div className="grid grid-cols-2 gap-6 pt-2 border-t-2 border-slate-200">
-                <div className="text-center space-y-4">
-                  <div className="text-xs font-bold text-slate-700">ลงชื่อ ผู้ว่าจ้าง (เจ้าภาพ)</div>
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 pt-3 border-t-2 border-slate-200">
+                <div className="text-center space-y-3 flex flex-col justify-between">
+                  <div className="text-[11px] sm:text-xs font-bold text-slate-700">ลงชื่อ ผู้ว่าจ้าง (เจ้าภาพ)</div>
                   <div className="space-y-1">
-                    <div className="w-44 mx-auto border-b border-dashed border-slate-400" />
-                    <div className="text-xs font-black text-slate-900">({quotation.customer?.name || '...........................................'})</div>
+                    <div className="w-32 sm:w-44 mx-auto border-b border-dotted border-slate-400 pb-1" />
+                    <div className="text-xs font-black text-slate-900">({formatCustomerNameWithPrefix(quotation.customer?.name)})</div>
                     <div className="text-[9.5px] text-slate-500 font-medium">วันที่: ......./......./...........</div>
                   </div>
                 </div>
 
-                <div className="text-center space-y-2 relative">
-                  <div className="flex items-end justify-center text-xs font-bold text-slate-700 gap-1 pb-1">
-                    <span>ลงชื่อ</span>
-                    <div className="relative inline-flex items-end justify-center min-w-[170px] border-b border-dotted border-slate-500 pb-0.5 px-2">
+                <div className="text-center space-y-2 relative flex flex-col justify-between">
+                  <div className="flex flex-wrap items-center justify-center text-[10.5px] sm:text-xs font-bold text-slate-700 gap-1 pb-1">
+                    <span className="shrink-0">ลงชื่อ</span>
+                    <div className="relative inline-flex items-center justify-center w-32 sm:w-40 border-b border-dotted border-slate-400 pb-1 mx-1">
+                      {/* Signature floating elegantly above the dotted line with 3-4px clearance */}
                       <img
                         src="/images/brand/signature-rapeephat-p.png"
                         alt="ลายเซ็น Rapeephat P."
-                        className="absolute -top-3.5 left-1/2 -translate-x-1/2 h-10 w-auto object-contain mix-blend-multiply filter contrast-200 brightness-75 drop-shadow-xs select-none pointer-events-none z-10"
+                        className="absolute -top-5 left-1/2 -translate-x-1/2 h-9 sm:h-10 w-auto object-contain mix-blend-multiply filter contrast-200 brightness-75 drop-shadow-xs select-none pointer-events-none z-10"
                       />
-                      <span className="invisible text-[10px]">...........................................</span>
+                      <span className="invisible text-[9px] select-none">...........................................</span>
                     </div>
-                    <span>ผู้รับจ้าง (โต๊ะจีนรพีพัฒน์)</span>
+                    <span className="shrink-0 text-[10px] sm:text-xs">ผู้รับจ้าง (โต๊ะจีนรพีพัฒน์)</span>
                   </div>
                   
-                  {/* Subtle Modern Official Shop Logo Watermark */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-14 h-14 opacity-25 pointer-events-none select-none flex items-center justify-center">
+                  {/* Subtle Modern Official Shop Logo Watermark - Safely Contained */}
+                  <div className="absolute right-0 sm:right-1 top-0 w-11 h-11 sm:w-13 sm:h-13 opacity-20 pointer-events-none select-none flex items-center justify-center overflow-hidden">
                     <img
                       src="/images/brand/logo.png"
                       alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
-                      className="w-full h-full object-contain filter contrast-125"
+                      className="w-full h-full object-contain"
                     />
                   </div>
 
-                  <div className="space-y-0.5">
-                    <div className="text-xs font-black text-slate-900">( นางสาวใบชา สุขอยู่ )</div>
-                    <div className="text-[10px] text-slate-700 font-bold">ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม</div>
+                  <div className="space-y-0.5 relative z-10">
+                    <div className="text-xs sm:text-[12.5px] font-black text-slate-900">( นางสาวใบชา สุขอยู่ )</div>
+                    <div className="text-[9.5px] sm:text-[10px] text-slate-700 font-bold">ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม</div>
                   </div>
                 </div>
               </div>

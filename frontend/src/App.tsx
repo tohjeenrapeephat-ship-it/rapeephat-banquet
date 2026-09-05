@@ -13,6 +13,8 @@ import { CateringFeatures } from './components/CateringFeatures.js';
 import { FleetLogistics } from './components/FleetLogistics.js';
 import { ScheduleQueue } from './components/ScheduleQueue.js';
 import { QuotationPage } from './components/QuotationPage.js';
+import { QuotationBuilder } from './components/QuotationBuilder/QuotationBuilder.js';
+import { MenuCatalogModal } from './components/MenuCatalogModal.js';
 import { QuotationHistory } from './components/QuotationHistory.js';
 import { Testimonials } from './components/Testimonials.js';
 import { SocialFollowSection } from './components/SocialFollowSection.js';
@@ -58,6 +60,8 @@ export const App: React.FC = () => {
   const [historyOpen, setHistoryOpen] = useState<boolean>(false);
   const [historyCount, setHistoryCount] = useState<number>(0);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
+  const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
+  const [catalogPkgId, setCatalogPkgId] = useState<string>('pkg-2500');
 
   // Check URL Hash and Path for Routing
   useEffect(() => {
@@ -116,7 +120,13 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handlers to open dedicated Quotation Page
+  // Handlers to open Pop-up Catalog Modal
+  const handleOpenCatalogModal = (pkgId?: string) => {
+    if (pkgId) setCatalogPkgId(pkgId);
+    setCatalogModalOpen(true);
+  };
+
+  // Handlers to open dedicated Quotation Page or scroll to builder
   const handleOpenBuilder = (pkg?: PackageTier, date?: string) => {
     if (pkg) {
       setSelectedPkgForBuilder(pkg);
@@ -124,13 +134,28 @@ export const App: React.FC = () => {
     if (date) {
       setSelectedDateForBuilder(date);
     }
-    setCurrentView('quotation');
-    window.location.hash = '#quotation';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const el = document.getElementById('quotation-builder');
+    if (el && currentView === 'site') {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      setCurrentView('quotation');
+      window.location.hash = '#quotation';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
-  const handleSelectPackageFromCards = (pkg: PackageTier) => {
-    handleOpenBuilder(pkg);
+  const handleSelectPackageFromCards = (pkg: PackageTier, mode: 'modal' | 'scroll' = 'scroll') => {
+    setSelectedPkgForBuilder(pkg);
+    if (mode === 'modal') {
+      handleOpenCatalogModal(pkg.id);
+    } else {
+      const el = document.getElementById('quotation-builder');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        handleOpenBuilder(pkg);
+      }
+    }
   };
 
   const handleQuotationGenerated = (quote: QuotationDoc) => {
@@ -165,6 +190,13 @@ export const App: React.FC = () => {
           isOpen={historyOpen}
           onClose={() => setHistoryOpen(false)}
         />
+        {/* Menu Catalog Modal */}
+        <MenuCatalogModal
+          isOpen={catalogModalOpen}
+          onClose={() => setCatalogModalOpen(false)}
+          initialPackageId={catalogPkgId}
+          onSelectForQuotation={(pkg) => handleSelectPackageFromCards(pkg, 'scroll')}
+        />
         {/* Real-time Live Chat Widget */}
         <LiveChatWidget onOpenBuilder={() => handleOpenBuilder()} />
         {/* Mobile Bottom Navigation Bar */}
@@ -177,7 +209,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // 3. Clean Main Home Landing Page (NO QuotationBuilder taking up home space)
+  // 3. Clean Main Home Landing Page
   return (
     <div className="min-h-screen bg-luxury-mesh text-slate-900 font-sans selection:bg-red-600 selection:text-white relative pb-20 sm:pb-0">
       
@@ -200,7 +232,22 @@ export const App: React.FC = () => {
         <ScheduleQueue onOpenBuilder={(date) => handleOpenBuilder(undefined, date)} />
         <NakhonPathomHeritageSection onOpenBuilder={() => handleOpenBuilder()} />
         <MenuShowcase />
-        <PackageSection onSelectPackage={handleSelectPackageFromCards} />
+        <PackageSection
+          onSelectPackage={handleSelectPackageFromCards}
+          onOpenCatalogModal={handleOpenCatalogModal}
+        />
+
+        {/* Interactive Quotation Calculator & Custom Menu Builder Section */}
+        <section id="quotation-builder" className="py-20 bg-gradient-to-b from-white via-amber-50/20 to-white relative scroll-mt-24 border-t border-amber-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <QuotationBuilder
+              initialPackage={selectedPkgForBuilder}
+              initialDate={selectedDateForBuilder}
+              onQuotationGenerated={handleQuotationGenerated}
+            />
+          </div>
+        </section>
+
         <PortfolioGallery />
         <OurClients />
         <CateringFeatures />
@@ -222,6 +269,14 @@ export const App: React.FC = () => {
       <QuotationHistory
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
+      />
+
+      {/* Menu Catalog Modal (Pop-up A4 Brochure & Dishes) */}
+      <MenuCatalogModal
+        isOpen={catalogModalOpen}
+        onClose={() => setCatalogModalOpen(false)}
+        initialPackageId={catalogPkgId}
+        onSelectForQuotation={(pkg) => handleSelectPackageFromCards(pkg, 'scroll')}
       />
 
       {/* Floating Bottom Live Visitor Traffic Badge (Desktop Only) */}

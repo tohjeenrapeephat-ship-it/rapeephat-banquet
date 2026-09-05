@@ -52,7 +52,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
     if (initialPackageId) {
       setSelectedPkgId(initialPackageId);
     }
-  }, [initialPackageId]);
+  }, [initialPackageId, isOpen]);
 
   // Compute scale to fit mobile & desktop screens without sideways overflow
   const getFitScale = () => {
@@ -287,11 +287,11 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
                   onSelectForQuotation(currentPkg);
                   onClose();
                 }}
-                className="hidden md:flex px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer"
-                title="นำเมนูนี้ไปเปิดในระบบคำนวณราคา & ออกใบเสนอราคา"
+                className="flex px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs items-center gap-1.5 shadow-md transition-transform hover:scale-102 cursor-pointer"
+                title="นำเมนูนี้ไปเปิดในระบบคำนวณราคา & จัดชุดเมนู"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                <span>ออกใบเสนอราคา</span>
+                <span>จัดชุดเมนู & คำนวณราคา</span>
               </button>
             )}
 

@@ -18,9 +18,16 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   }
 
   // --- 2. Desserts (ของหวานมงคล - ป้องกันการชนกับเมนูยำ / ข้าวผัด / ซุปหม้อไฟ / สลัด) ---
-  const isDessertContext = !d.includes('ยำ') && !d.includes('สลัด') && !d.includes('ข้าวผัด') && !d.includes('หม้อไฟ') && !d.includes('ต้ม') && !d.includes('แกง') && !d.includes('หัวปลา');
+  if (['ฟรุตสลัด', 'สลัดผลไม้', 'ผลไม้รวม', 'ฟรุ้ตสลัด'].some((k) => d.includes(k))) {
+    return '/images/dishes/desserts/dessert-fruitsalad-fresh-milk.jpg';
+  }
+
+  const isDessertContext = !d.includes('ผัด') && !d.includes('โหงวก๊วย') && !d.includes('ยำ') && !d.includes('สลัดกุ้ง') && !d.includes('สลัดปู') && !d.includes('ข้าวผัด') && !d.includes('หม้อไฟ') && !d.includes('ต้ม') && !d.includes('แกง') && !d.includes('หัวปลา') && !d.includes('ทอด');
 
   if (isDessertContext) {
+    if (!d.includes('วุ้นเส้น') && ['วุ้น', 'วุ้นมะพร้าว', 'วุ้นกะทิ', 'วุ้นใบเตย', 'วุ้นมะพร้าวอ่อน', 'วุ้นมะพร้าวน้ำหอม', 'วุ้นหวานเย็น', 'วุ้นรวมมิตร'].some((k) => d.includes(k))) {
+      return '/images/dishes/desserts/dessert-woon-maprao.jpg';
+    }
     if (['ฟรุตสลัด', 'สลัดผลไม้', 'ผลไม้รวม'].some((k) => d.includes(k))) {
       return '/images/dishes/desserts/dessert-fruitsalad-fresh-milk.jpg';
     }
@@ -39,13 +46,10 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
     if (['เงาะ', 'ลอยแก้ว'].some((k) => d.includes(k))) {
       return '/images/dishes/desserts/dessert-rambutan-loy-kaew-wood.jpg';
     }
-    if (['นมสด', 'มะพร้าวอ่อน', 'แปะก๊วยนมสด', 'เต้าฮู้นมสด', 'รังนก', 'แปะก๊วยรังนก', 'แปะก๊วยตุ๋น'].some((k) => d.includes(k))) {
+    if (['นมสด', 'มะพร้าวอ่อน', 'แปะก๊วยนมสด', 'เต้าฮู้นมสด', 'แปะก๊วยรังนก', 'แปะก๊วยตุ๋น'].some((k) => d.includes(k)) || (c.includes('ของหวาน') && d.includes('รังนก'))) {
       return '/images/dishes/desserts/dessert-ginkgo-fresh-milk-coconut.jpg';
     }
-    if (!d.includes('วุ้นเส้น') && ['วุ้น', 'หวานเย็น'].some((k) => d.includes(k))) {
-      return '/images/dishes/desserts/dessert-woon-ruam-mit.jpg';
-    }
-    if (['รวมมิตร'].some((k) => d.includes(k)) || (c.includes('ของหวาน') && d.includes('แปะก๊วย'))) {
+    if (['รวมมิตร', 'หวานเย็น'].some((k) => d.includes(k)) || (c.includes('ของหวาน') && d.includes('แปะก๊วย'))) {
       return '/images/dishes/desserts/dessert-ruam-mit-wood.jpg';
     }
   }
@@ -63,6 +67,10 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   // ไก่ตุ๋นเห็ดหอมยาจีน / ไก่ตุ๋นยาจีน / ไก่ตุ๋นเห็ดหอม / ปีกไก่ตุ๋น / ไก่ดำตุ๋นยาจีน
   if (['ไก่ตุ๋น', 'ไก่บ้านตุ๋น', 'ไก่ดำตุ๋น', 'ปีกไก่ตุ๋น', 'น่องไก่ตุ๋น'].some((k) => d.includes(k))) {
     return '/images/dishes/soups/soup-chicken-chinese-herb.jpg';
+  }
+  // แกงจืดหม้อไฟเครื่องในลูกชิ้น / แกงจืดลูกชิ้นหม้อไฟ / แกงจืดลูกชิ้น
+  if (['แกงจืดหม้อไฟ', 'เครื่องในลูกชิ้น', 'แกงจืดลูกชิ้น', 'ลูกชิ้นหม้อไฟ'].some((k) => d.includes(k)) || (d.includes('แกงจืด') && d.includes('ลูกชิ้น'))) {
+    return '/images/dishes/hotpots/hotpot-gaeng-jued-lookchin-2026.jpg';
   }
   // กระดูกหมูตุ๋นเห็ดหอมเยื่อไผ่ / ซี่โครงหมูตุ๋น / เยื่อไผ่ / เห็ดหอม
   if (['กระดูกหมู', 'ซี่โครงหมู', 'เยื่อไผ่', 'เห็ดหอม'].some((k) => d.includes(k))) {
@@ -128,8 +136,8 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['ข้าวผัดทะเล', 'ข้าวผัดซีฟู้ด', 'ข้าวผัดรวมมิตร'].some((k) => d.includes(k))) {
     return '/images/dishes/rice/fried-rice-seafood-red-platter.jpg';
   }
-  if (['ผัดหมี่', 'หมี่ฮ่องกง', 'บะหมี่', 'หมี่ซั่ว', 'โกยซีหมี่'].some((k) => d.includes(k))) {
-    return '/images/dishes/peking-duck/peking-duck-jadenoodles-platter.jpg';
+  if (['ผัดหมี่', 'หมี่ฮ่องกง', 'ผัดหมี่ฮ่องกง', 'หมี่ซั่ว', 'โกยซีหมี่', 'บะหมี่'].some((k) => d.includes(k))) {
+    return '/images/dishes/rice/pad-mee-hongkong-2026.jpg';
   }
   if (
     ['ข้าวห่อใบบัว', 'ข้าวผัด'].some((k) => d.includes(k)) ||
@@ -138,12 +146,19 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
     return '/images/dishes/rice/fried-rice-combination-red-platter.jpg';
   }
 
-  // --- 6. Fish Dishes (ปลานึ่ง / ปลาทอด / ปลาสดยำ) ---
-  if (['ปลาทับทิม', 'ปลากะพง', 'ปลาช่อน', 'ปลาหมึก', 'ปลาแซลมอน', 'ปลาเก๋า', 'ปลาหิมะ', 'ปลาดอลลี่', 'ปลากระบอก', 'เมี่ยงปลา'].some((k) => d.includes(k))) {
+  // --- 6. Fish Dishes (ปลานึ่ง / ปลาทอด / ปลาสดยำ / เมี่ยงปลา) ---
+  // เมี่ยงปลาทับทิม / เมี่ยงปลาช่อน / เมี่ยงปลา
+  if (['เมี่ยงปลา', 'เมี่ยงปลาทับทิม', 'เมี่ยงปลาช่อน', 'ปลาเมี่ยง', 'เมี่ยง'].some((k) => d.includes(k))) {
+    return '/images/dishes/fish/fish-ruby-miang-pla-herb-2026.jpg';
+  }
+  if (['ปลาทับทิม', 'ปลากะพง', 'ปลาช่อน', 'ปลาหมึก', 'ปลาแซลมอน', 'ปลาเก๋า', 'ปลาหิมะ', 'ปลาดอลลี่', 'ปลากระบอก'].some((k) => d.includes(k))) {
+    if (['ทอดสมุนไพร', 'สมุนไพร'].some((k) => d.includes(k))) {
+      return '/images/dishes/fish/fish-seabass-fried-herbal-2026.jpg';
+    }
     if (['สามรส', '3 รส', 'ราดพริก'].some((k) => d.includes(k))) {
       return '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg';
     }
-    if (['ทอดน้ำปลา', 'ยำมะม่วง', 'ทอดสมุนไพร', 'ราดน้ำปลา'].some((k) => d.includes(k))) {
+    if (['ทอดน้ำปลา', 'ยำมะม่วง', 'ราดน้ำปลา'].some((k) => d.includes(k))) {
       return '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg';
     }
     if (['นึ่งบ๊วย', 'นึ่งซีอิ๊ว', 'ต้มบ๊วย'].some((k) => d.includes(k))) {
@@ -163,8 +178,17 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['เป็ดยัดไส้', 'ยัดไส้หน่อไม้', 'ยัดไส้เกาลัด', 'ไก่ยัดไส้'].some((k) => d.includes(k))) {
     return '/images/dishes/ducks/duck-stuffed-bamboo-shoots.jpg';
   }
-  if (['เป็ดสับ', 'เป็ดย่าง', 'เป็ดอบ', 'เป็ดพะโล้', 'เป็ดยอดผัก', 'เป็ด'].some((k) => d.includes(k))) {
-    return '/images/dishes/ducks/duck-roast-imperial-plate.jpg';
+  // เป็ดอบยอดผัก / เป็ดยอดผัก / เป็ดอบ / เป็ดอบน้ำผึ้ง
+  if (['เป็ดอบยอดผัก', 'เป็ดยอดผัก', 'เป็ดอบ', 'ยอดผัก'].some((k) => d.includes(k)) && !d.includes('ไก่')) {
+    return '/images/dishes/ducks/ped-ob-yod-pak-braised-2026.jpg';
+  }
+  // เป็ดพะโล้ / เป็ดพะโล้ทรงเครื่อง
+  if (['เป็ดพะโล้', 'พะโล้'].some((k) => d.includes(k)) && !d.includes('หมู')) {
+    return '/images/dishes/ducks/ped-palo-braised-2026.jpg';
+  }
+  // เป็ดสับย่าง / เป็ดย่าง / เป็ดสับ / เป็ด
+  if (['เป็ดสับ', 'เป็ดย่าง', 'เป็ด'].some((k) => d.includes(k))) {
+    return '/images/dishes/ducks/ped-sap-yang-orchid-2026.jpg';
   }
   // ยำขาหมูสไลด์ / ยำขาหมู / ขาหมูสไลด์ (ต้องเช็คก่อนขาหมูตุ๋นทั่วไป)
   if (['ยำขาหมู', 'ขาหมูสไลด์', 'ยำขาหมูสไลด์'].some((k) => d.includes(k))) {
@@ -180,8 +204,9 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['กระเพาะหมู', 'เกี้ยมฉ่าย'].some((k) => d.includes(k)) && !d.includes('แกงจืด') && !d.includes('ต้ม')) {
     return '/images/dishes/pork/pork-stomach-pickled-mustard-red-platter.jpg';
   }
-  if (['หมูกรอบ'].some((k) => d.includes(k))) {
-    return '/images/dishes/pork/pork-knuckle-braised-shiitake-platter.jpg';
+  // หมูกรอบ / หมูกรอบเหล้าแดง
+  if (['หมูกรอบ', 'หมูกรอบเหล้าแดง'].some((k) => d.includes(k))) {
+    return '/images/dishes/pork/crispy-pork-belly-crackling-2026.jpg';
   }
 
   // --- 8. Appetizers / Dim Sum / Fried / Stir-fry / Prawn Dishes ---
@@ -192,6 +217,10 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['ออเดิร์ฟทะเล', 'ทะเลนึ่ง', 'เตาซึ้ง'].some((k) => d.includes(k))) {
     return '/images/dishes/appetizers/appetizer-seafood-steamer.jpg';
   }
+  // สี่สีไส้มังกร / สี่สีทอด / ไส้มังกร / หอยจ๊อปู / แฮ่กึ๊น
+  if (['สี่สีไส้มังกร', 'ไส้มังกร', 'สี่สีทอด', 'สี่สี'].some((k) => d.includes(k)) && !d.includes('ขนมจีบ') && !d.includes('หม้อไฟ')) {
+    return '/images/dishes/appetizers/see-see-sai-mungkorn-2026.jpg';
+  }
   // จานที่ 2 ของชุด 1,700.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น, สลัดกุ้งทอด, สลัดปลาทิพย์)
   if (
     (d.includes('ขนมจีบ') && (d.includes('สลัดกุ้ง') || d.includes('ปลาทิพย์'))) ||
@@ -200,27 +229,51 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
     return '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
   }
   // จานที่ 2 ของชุด 1,500.- / 1,400.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น) และออเดิร์ฟ 5 อย่างมาตรฐาน
-  if (['สี่สี', 'ไส้มังกร', 'หอยจ๊อ', 'แฮ่กึ๊น', 'ขนมจีบ', 'ติ่มซำ', 'ออเดิร์ฟ', 'เป๋าฮื้อ', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า'].some((k) => d.includes(k)) || c.includes('จานที่ 2') || c.includes('ออเดิร์ฟ')) {
+  if (['ขนมจีบ', 'ติ่มซำ', 'ออเดิร์ฟ', 'เป๋าฮื้อแผ่น', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า'].some((k) => d.includes(k)) || c.includes('จานที่ 2') || c.includes('ออเดิร์ฟ')) {
     return '/images/dishes/appetizers/appetizer-5-platter-marble.jpg';
   }
   // กุ้งอบวุ้นเส้น / ปูทะเลอบวุ้นเส้น / ทะเลอบวุ้นเส้น / อบวุ้นเส้น
   if (['อบวุ้นเส้น', 'กุ้งอบวุ้นเส้น', 'ปูทะเลอบวุ้นเส้น', 'ทะเลอบวุ้นเส้น'].some((k) => d.includes(k))) {
     return '/images/dishes/appetizers/appetizer-prawn-glass-noodles.jpg';
   }
-  if (!d.includes('สลัด') && ['ทอดมันกุ้ง', 'กุ้งอบ', 'กุ้งนึ่ง', 'กุ้งผัด', 'กุ้งทอด', 'กุ้งแชบ๊วย', 'กุ้ง', 'ทะเลอบ', 'ปูทะเลอบ'].some((k) => d.includes(k))) {
+  // ทอดมันกุ้ง / ทอดมันกุ้งสด / ทอดมัน
+  if (['ทอดมันกุ้ง', 'ทอดมัน'].some((k) => d.includes(k))) {
+    return '/images/dishes/appetizers/tod-mun-kung-crispy-2026.jpg';
+  }
+  // ยำตะไคร้กุ้งสด / ยำตะไคร้ / ยำกุ้งสด
+  if (['ยำตะไคร้', 'ตะไคร้กุ้งสด', 'ยำตะไคร้กุ้ง', 'ยำกุ้งสด'].some((k) => d.includes(k))) {
+    return '/images/dishes/salads/salad-yam-takrai-kung-sod-2026.jpg';
+  }
+  if (!d.includes('สลัด') && !d.includes('ยำ') && ['กุ้งอบ', 'กุ้งนึ่ง', 'กุ้งผัด', 'กุ้งทอด', 'กุ้งแชบ๊วย', 'กุ้ง', 'ทะเลอบ', 'ปูทะเลอบ'].some((k) => d.includes(k))) {
     return '/images/dishes/appetizers/appetizer-prawns-dip.jpg';
   }
-  if (['ผัดโหงวก๊วย', 'โหงวก๊วย', 'รังนก', 'บล็อกโคลี่', 'ไก่ผัด', 'ไก่ทอด', 'ไก่ต้ม', 'ไก่ตอน', 'ไก่อบ', 'ไก่แช่เหล้า', 'ไก่', 'ปีกไก่', 'สามเซียนผัด', 'หน่อไม้ทะเล', 'ผัดฉ่า', 'พริกไทยดำ'].some((k) => d.includes(k))) {
+  // ไก่ทอดอบซอสเหล้าแดง / ไก่อบซอสเหล้าแดง / ซอสเหล้าแดง
+  if (['เหล้าแดง', 'ซอสเหล้าแดง', 'ไก่ทอดอบซอสเหล้าแดง', 'ไก่อบซอสเหล้าแดง'].some((k) => d.includes(k)) && !d.includes('หมูกรอบ')) {
+    return '/images/dishes/appetizers/chicken-crispy-red-wine-sauce-custom-2026.jpg';
+  }
+  // ผัดโหงวก๊วยรังนก / ผัดโหงวก๊วย / โหงวก๊วยรังนก / โหงวก๊วย / กระทงรังนก
+  if (['โหงวก๊วย', 'ผัดโหงวก๊วย', 'โหงวก๊วยรังนก', 'กระทงรังนก', 'ห้าเซียน'].some((k) => d.includes(k))) {
+    return '/images/dishes/appetizers/pad-ngow-kuay-bird-nest-2026.jpg';
+  }
+  // ไก่ต้มน้ำปลา / ไก่น้ำปลา / ต้มน้ำปลา
+  if (['ไก่ต้มน้ำปลา', 'ต้มน้ำปลา', 'ไก่น้ำปลา'].some((k) => d.includes(k))) {
+    return '/images/dishes/appetizers/chicken-tom-nam-pla-platter-2026.jpg';
+  }
+  if (['บล็อกโคลี่', 'ไก่ผัด', 'ไก่ทอด', 'ไก่ต้ม', 'ไก่ตอน', 'ไก่อบ', 'ไก่แช่เหล้า', 'ไก่', 'ปีกไก่', 'สามเซียนผัด', 'หน่อไม้ทะเล', 'ผัดฉ่า', 'พริกไทยดำ'].some((k) => d.includes(k))) {
     return '/images/dishes/ducks/duck-abalone-shrimp-platter.jpg';
   }
 
   // --- 9. Salad & Spicy Yum (สลัด & ยำ) ---
-  // ยำหมูย่าง / หมูย่าง / คอหมูย่าง / หมูมะนาว
-  if (['ยำหมูย่าง', 'หมูย่าง', 'คอหมูย่าง', 'หมูมะนาว', 'หมูสะดุ้ง'].some((k) => d.includes(k))) {
+  // หมูมะนาว (จานโต๊ะจีนเรียงรายน้ำยำมะนาวพริกกระเทียมสด)
+  if (['หมูมะนาว'].some((k) => d.includes(k))) {
+    return '/images/dishes/salads/moo-manao-banquet-2026.jpg';
+  }
+  // ยำหมูย่าง / หมูย่าง / คอหมูย่าง / หมูสะดุ้ง
+  if (['ยำหมูย่าง', 'หมูย่าง', 'คอหมูย่าง', 'หมูสะดุ้ง'].some((k) => d.includes(k))) {
     return '/images/dishes/salads/salad-grilled-pork-yum.jpg';
   }
-  // ยำทะเล & ยำรวมมิตร & ยำกุ้งสด & ยำตะไคร้ & ยำซีฟู้ด
-  if (['ยำทะเล', 'ยำรวมมิตรทะเล', 'ยำรวมมิตร', 'ยำกุ้งสด', 'ยำตะไคร้', 'ยำซีฟู้ด'].some((k) => d.includes(k))) {
+  // ยำทะเล & ยำรวมมิตร & ยำซีฟู้ด
+  if (['ยำทะเล', 'ยำรวมมิตรทะเล', 'ยำรวมมิตร', 'ยำซีฟู้ด'].some((k) => d.includes(k))) {
     return '/images/dishes/salads/salad-seafood-mixed-red-platter.jpg';
   }
   // ยำสามกรอบ
@@ -266,7 +319,7 @@ export const getPackageHeroImage = (packageId: string): string => {
     case 'pkg-1400':
       return '/images/dishes/pork/pork-knuckle-braised-spoon-lift.jpg';
     case 'pkg-1700':
-      return '/images/dishes/ducks/duck-roast-imperial-plate.jpg';
+      return '/images/dishes/ducks/ped-sap-yang-orchid-2026.jpg';
     case 'pkg-2000':
       return '/images/dishes/fish/fish-seabass-steamed-lime-red-oval.jpg';
     case 'pkg-2500':

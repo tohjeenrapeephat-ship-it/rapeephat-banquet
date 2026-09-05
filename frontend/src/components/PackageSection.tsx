@@ -6,10 +6,11 @@ import { formatCurrency } from '../utils/currency.js';
 import { MenuCatalogModal } from './MenuCatalogModal.js';
 
 interface PackageSectionProps {
-  onSelectPackage: (pkg: PackageTier) => void;
+  onSelectPackage: (pkg: PackageTier, mode?: 'modal' | 'scroll') => void;
+  onOpenCatalogModal?: (pkgId?: string) => void;
 }
 
-export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage }) => {
+export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage, onOpenCatalogModal }) => {
   const [expandedPkgId, setExpandedPkgId] = useState<string | null>('pkg-1700');
   const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
   const [catalogPkgId, setCatalogPkgId] = useState<string>('pkg-2500');
@@ -19,8 +20,12 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
   };
 
   const handleOpenCatalog = (pkgId?: string) => {
-    if (pkgId) setCatalogPkgId(pkgId);
-    setCatalogModalOpen(true);
+    if (onOpenCatalogModal) {
+      onOpenCatalogModal(pkgId);
+    } else {
+      if (pkgId) setCatalogPkgId(pkgId);
+      setCatalogModalOpen(true);
+    }
   };
 
   return (
@@ -43,16 +48,31 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
             ทุกแพ็กเกจ <strong className="text-red-700 font-black">ฟรี!</strong> อุปกรณ์โต๊ะ เก้าอี้ ผ้าคลุมผูกโบว์ ชุดจานชาม และบริกรครบเซ็ต • <span className="text-amber-800 font-bold">สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะทันที</span>
           </p>
 
-          {/* Prominent Global Print Menu Catalogue CTA */}
-          <div className="pt-2">
+          {/* Quick Dual Actions: Pop-up Menu Brochure & Scroll Down to Calculator */}
+          <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => handleOpenCatalog('pkg-2500')}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white hover:bg-amber-50 border-2 border-amber-300 text-slate-900 hover:text-red-700 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer"
             >
               <Printer className="w-4 h-4 text-red-600" />
-              <span>🖨️ ดู & พิมพ์ใบรายการอาหารทุกราคา (PDF Brochure)</span>
+              <span>🖨️ ดูเมนูทุกราคาแบบ Pop-up (PDF Brochure)</span>
               <FileText className="w-4 h-4 text-amber-600" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('quotation-builder');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>⚡ เลื่อนลงไปจัดชุดเมนู & คำนวณราคา</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -101,6 +121,13 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                     </span>
                     <span className="text-xs font-bold text-slate-500">บาท / โต๊ะ</span>
                   </div>
+
+                  {pkg.highlight && (
+                    <div className="mt-3 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-[11px] font-bold flex items-center gap-1.5 shadow-2xs">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span className="line-clamp-1">{pkg.highlight}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Course List */}
@@ -112,7 +139,7 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                     </div>
 
                     <div className="space-y-1.5 text-xs text-slate-800">
-                      {(isExpanded ? pkg.courses : pkg.courses.slice(0, 4)).map((course, idx) => {
+                      {(isExpanded ? pkg.courses : pkg.courses.slice(0, 5)).map((course, idx) => {
                         const dishName = course.options[0]?.name || course.title;
                         return (
                           <div key={idx} className="flex items-start gap-2 leading-relaxed">
@@ -120,18 +147,23 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                             <span className="font-bold text-slate-800 text-xs">
                               <span className="text-amber-800 font-black mr-1">{idx + 1}.</span>
                               {dishName}
+                              {course.options.length > 1 && (
+                                <span className="text-slate-500 font-semibold text-[11px] ml-1">
+                                  (เลือกได้ {course.options.length} เมนู)
+                                </span>
+                              )}
                             </span>
                           </div>
                         );
                       })}
 
-                      {pkg.courses.length > 4 && (
+                      {pkg.courses.length > 5 && (
                         <button
                           type="button"
                           onClick={() => toggleExpand(pkg.id)}
                           className="text-[11.5px] font-black text-red-700 hover:text-red-800 flex items-center gap-1 pt-1 cursor-pointer"
                         >
-                          <span>{isExpanded ? 'ย่อรายการ' : `ดูอีก ${pkg.courses.length - 4} จานที่เหลือ...`}</span>
+                          <span>{isExpanded ? 'ย่อรายการ' : `ดูอีก ${pkg.courses.length - 5} จานที่เหลือ...`}</span>
                           {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                         </button>
                       )}
@@ -141,29 +173,29 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage 
                   {/* Action CTA Buttons (Select for Quotation & Print PDF) */}
                   <div className="pt-4 border-t border-amber-100 space-y-2">
                     
-                    {/* Primary Builder Button */}
+                    {/* Primary Builder Button (Scroll down to customize) */}
                     <button
                       type="button"
-                      onClick={() => onSelectPackage(pkg)}
-                      className={`w-full py-3 px-4 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all transform hover:scale-102 active:scale-95 shadow-sm ${
+                      onClick={() => onSelectPackage(pkg, 'scroll')}
+                      className={`w-full py-3 px-4 rounded-2xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all transform hover:scale-102 active:scale-95 shadow-sm cursor-pointer ${
                         isPopular
                           ? 'bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white shadow-red-glow border border-amber-300'
                           : 'bg-slate-900 hover:bg-black text-amber-300 border border-amber-500/40 hover:text-white'
                       }`}
                     >
                       <Sparkles className="w-4 h-4 text-amber-300" />
-                      <span>เลือกแพ็กเกจนี้ & ออกใบเสนอราคา</span>
+                      <span>⚡ จัดเมนู & คำนวณราคา (เลื่อนลงไปดู)</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
 
-                    {/* Print / Download PDF Button for This Specific Package */}
+                    {/* Pop-up Modal / Print PDF Button for This Specific Package */}
                     <button
                       type="button"
                       onClick={() => handleOpenCatalog(pkg.id)}
-                      className="w-full py-2 px-3 rounded-xl bg-amber-50/80 hover:bg-amber-100 text-slate-800 hover:text-red-700 font-bold text-xs flex items-center justify-center gap-1.5 border border-amber-300 transition-colors cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-slate-900 hover:text-red-700 font-black text-xs flex items-center justify-center gap-1.5 border border-amber-300 transition-colors shadow-2xs cursor-pointer"
                     >
                       <Printer className="w-3.5 h-3.5 text-amber-600" />
-                      <span>พิมพ์รายการอาหารนี้ (PDF A4)</span>
+                      <span>🔍 ดูเมนูแบบ Pop-up & พิมพ์ PDF (A4)</span>
                     </button>
 
                   </div>

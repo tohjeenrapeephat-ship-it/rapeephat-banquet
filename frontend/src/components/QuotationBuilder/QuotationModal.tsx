@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { QuotationDoc } from '../../types/quotation.js';
 import { formatCurrency, thaiBahtText } from '../../utils/currency.js';
-import { formatThaiDate } from '../../utils/thaiDate.js';
+import { formatThaiDate, formatCustomerNameWithPrefix } from '../../utils/thaiDate.js';
 import { generateA4Pdf } from '../../services/pdfService.js';
 import { uploadPdfToGoogleDrive } from '../../services/gasDriveService.js';
 import { QuotationApi } from '../../services/api.js';
@@ -173,7 +173,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                 </span>
               </h2>
               <p className="text-[11px] text-slate-400 font-medium">
-                เลขที่: <span className="text-amber-400 font-mono font-bold">{displayQuoteNo}</span> • เจ้าภาพ: <strong className="text-white">{quotation.customer.name}</strong>
+                เลขที่: <span className="text-amber-400 font-mono font-bold">{displayQuoteNo}</span> • เจ้าภาพ: <strong className="text-white">{formatCustomerNameWithPrefix(quotation.customer.name)}</strong>
               </p>
             </div>
           </div>
@@ -420,7 +420,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                     <span>ข้อมูลเจ้าภาพ / ผู้ว่าจ้าง:</span>
                   </div>
                   <div className="text-slate-900 font-medium text-[12.5px]" style={{ lineHeight: '1.45', overflow: 'visible' }}>
-                    <span className="text-slate-500 font-bold">ชื่อเจ้าภาพ:</span> <strong className="text-slate-950 font-black text-xs sm:text-[13px] ml-1">{quotation.customer.name}</strong>
+                    <span className="text-slate-500 font-bold">ชื่อเจ้าภาพ:</span> <strong className="text-slate-950 font-black text-xs sm:text-[13px] ml-1">{formatCustomerNameWithPrefix(quotation.customer.name)}</strong>
                   </div>
                   <div className="text-slate-900 font-medium text-[12.5px]" style={{ lineHeight: '1.45', overflow: 'visible' }}>
                     <span className="text-slate-500 font-bold">เบอร์โทรศัพท์:</span> <strong className="font-mono text-red-700 font-black text-xs sm:text-[13px] ml-1">{quotation.customer.phone}</strong>
@@ -747,40 +747,41 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
               </div>
 
               {/* 6. Signature Lines: Auspicious Signature & Matching Date */}
-              <div className="grid grid-cols-2 gap-6 pt-2 text-center text-xs text-slate-800">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 pt-3 text-center text-xs text-slate-800">
                 
                 {/* Quotation Provider: Signature + Matched Date */}
-                <div className="space-y-1 relative" style={{ overflow: 'visible' }}>
-                  <div className="flex items-end justify-center text-xs font-bold text-slate-800 gap-1 pb-1">
-                    <span>ลงชื่อ</span>
-                    <div className="relative inline-flex items-end justify-center min-w-[160px] border-b border-dotted border-slate-500 pb-0.5 px-2">
+                <div className="space-y-2 relative flex flex-col justify-between" style={{ overflow: 'visible' }}>
+                  <div className="flex flex-wrap items-center justify-center text-[10.5px] sm:text-xs font-bold text-slate-800 gap-1 pb-1">
+                    <span className="shrink-0">ลงชื่อ</span>
+                    <div className="relative inline-flex items-center justify-center w-32 sm:w-40 border-b border-dotted border-slate-400 pb-1 mx-1">
+                      {/* Signature floating with 3-4px clean clearance above dotted line */}
                       <img
                         src="/images/brand/signature-rapeephat-p.png"
                         alt="ลายเซ็น Rapeephat P."
-                        className="absolute -top-4 left-1/2 -translate-x-1/2 h-11 w-auto object-contain mix-blend-multiply filter contrast-250 brightness-65 scale-110 drop-shadow-xs select-none pointer-events-none z-10"
+                        className="absolute -top-5 left-1/2 -translate-x-1/2 h-9 sm:h-10 w-auto object-contain mix-blend-multiply filter contrast-250 brightness-65 scale-105 drop-shadow-xs select-none pointer-events-none z-10"
                       />
-                      <span className="invisible text-[10px]">...........................................</span>
+                      <span className="invisible text-[9px] select-none">...........................................</span>
                     </div>
-                    <span>ผู้เสนอราคา</span>
+                    <span className="shrink-0 text-[10px] sm:text-xs text-slate-700">ผู้เสนอราคา</span>
                   </div>
                   
-                  {/* Subtle Modern Official Shop Logo Watermark */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-14 h-14 opacity-25 pointer-events-none select-none flex items-center justify-center">
+                  {/* Subtle Modern Official Shop Logo Watermark - Safely Contained */}
+                  <div className="absolute right-0 sm:right-1 top-0 w-11 h-11 sm:w-13 sm:h-13 opacity-20 pointer-events-none select-none flex items-center justify-center overflow-hidden">
                     <img
                       src="/images/brand/logo.png"
                       alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
-                      className="w-full h-full object-contain filter contrast-125"
+                      className="w-full h-full object-contain"
                     />
                   </div>
 
-                  <div className="space-y-0.5 pt-0.5" style={{ overflow: 'visible' }}>
-                    <div className="font-black text-slate-900 text-xs" style={{ lineHeight: '1.5', overflow: 'visible' }}>
+                  <div className="space-y-0.5 relative z-10" style={{ overflow: 'visible' }}>
+                    <div className="font-black text-slate-900 text-xs sm:text-[12.5px]" style={{ lineHeight: '1.5', overflow: 'visible' }}>
                       ( นางสาวใบชา  สุขอยู่ )
                     </div>
-                    <div className="text-[10px] text-slate-800 font-bold" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                    <div className="text-[9.5px] sm:text-[10px] text-slate-700 font-bold" style={{ lineHeight: '1.4', overflow: 'visible' }}>
                       ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม
                     </div>
-                    <div className="text-[10px] text-slate-600 font-medium" style={{ lineHeight: '1.4', overflow: 'visible' }}>
+                    <div className="text-[9.5px] sm:text-[10px] text-slate-500 font-medium" style={{ lineHeight: '1.4', overflow: 'visible' }}>
                       วันที่ {formatThaiDate(quotation.createdAt || new Date().toISOString())}
                     </div>
                   </div>
@@ -795,7 +796,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
                     <div className="border-b border-slate-400 w-44 mx-auto" />
                   </div>
                   <div className="font-black text-slate-900 text-xs sm:text-sm pt-0.5" style={{ lineHeight: '1.6', overflow: 'visible' }}>
-                    ( {quotation.customer.name} )
+                    ( {formatCustomerNameWithPrefix(quotation.customer.name)} )
                   </div>
                   <div className="text-[10.5px] text-slate-700 font-bold" style={{ lineHeight: '1.6', overflow: 'visible' }}>
                     วันที่ {formatThaiDate(quotation.createdAt || new Date().toISOString())}

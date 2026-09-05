@@ -61,6 +61,18 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     }
   }, [initialDate]);
 
+  // Effect to update selectedPackage if initialPackage changes from outside
+  React.useEffect(() => {
+    if (initialPackage) {
+      setSelectedPackage(initialPackage);
+      const map: SelectedDishMap = {};
+      initialPackage.courses.forEach((c) => {
+        map[c.id] = c.defaultDishId;
+      });
+      setSelectedDishes(map);
+    }
+  }, [initialPackage]);
+
   // Generated Quotation Modal State
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationDoc | null>(null);
   

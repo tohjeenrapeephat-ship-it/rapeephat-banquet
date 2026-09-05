@@ -161,7 +161,7 @@ export const MenuShowcase: React.FC = () => {
       gallery: [
         '/images/dishes/peking-duck/peking-duck-plate-flatlay.jpg',
         '/images/dishes/ducks/duck-stuffed-bamboo-shoots.jpg',
-        '/images/dishes/ducks/duck-roast-imperial-plate.jpg',
+        '/images/dishes/ducks/ped-sap-yang-orchid-2026.jpg',
         '/images/dishes/ducks/duck-abalone-shrimp-platter.jpg',
         '/images/dishes/peking-duck/peking-duck-table-chopsticks.jpg',
         '/images/dishes/peking-duck/peking-duck-chopsticks-noodles.jpg',
@@ -311,16 +311,16 @@ export const MenuShowcase: React.FC = () => {
         '/images/dishes/rice/fried-rice-ham-red-platter.jpg',
       ],
     },
-            {
+    {
       category: 'dessert',
-      name: 'โอนี่แป๊ะก๊วยกะทิสด, ฟรุตสลัดนมสด, วุ้นรวมมิตร & ลิ้นจี่ลอยแก้ว (ชามใหญ่พิเศษ)',
-      description: 'รวมสุดยอดของหวานโต๊ะจีนมงคล 35 ปี เสิร์ฟในชามและถาดไม้สำหรับ 10 ท่าน สะอาด ถูกสุขอนามัย 100%: โอนี่แป๊ะก๊วยกะทิสด, ฟรุตสลัดนมสดหวานหอมสดชื่น, วุ้นรวมมิตรหวานเย็นหลากรส, ลิ้นจี่ลอยแก้วเนื้อฉ่ำหวานเย็น, เต้าทึงน้ำลำไยเย็นทรงเครื่อง, เงาะลอยแก้วสอดไส้สับปะรดเกล็ดหิมะ, รวมมิตรไทยกะทิสด และ แปะก๊วยนมสดมะพร้าวอ่อน ดับเลี่ยนหวานฉ่ำชื่นใจ ปิดท้ายงานมงคลอย่างสมบูรณ์แบบ 100%',
-      tag: '🍨 ของหวานมงคลชามขาวสะอาด (รวม 9 ภาพจริง)',
-      image: '/images/dishes/desserts/dessert-ohnee-ginkgo-coconut-wood.jpg',
+      name: 'วุ้นมะพร้าวน้ำหอมใบเตย, โอนี่แป๊ะก๊วยกะทิสด & ฟรุตสลัดนมสด',
+      description: 'รวมสุดยอดของหวานโต๊ะจีนมงคล 35 ปี เสิร์ฟสดใหม่ สะอาด ถูกสุขอนามัย 100%: วุ้นมะพร้าวน้ำหอมแท้สลับชั้นใบเตยหอมหวานมันพอดีคำ, โอนี่แป๊ะก๊วยกะทิสด, ฟรุตสลัดนมสดหวานหอมสดชื่น, ลิ้นจี่ลอยแก้วเนื้อฉ่ำหวานเย็น, เต้าทึงน้ำลำไยเย็นทรงเครื่อง, เงาะลอยแก้วสอดไส้สับปะรดเกล็ดหิมะ, รวมมิตรไทยกะทิสด และ แปะก๊วยนมสดมะพร้าวอ่อน ดับเลี่ยนหวานฉ่ำชื่นใจ ปิดท้ายงานมงคลอย่างสมบูรณ์แบบ 100%',
+      tag: '🥥 วุ้นมะพร้าว & ของหวานมงคล (รวม 9 ภาพจริง)',
+      image: '/images/dishes/desserts/dessert-woon-maprao.jpg',
       gallery: [
+        '/images/dishes/desserts/dessert-woon-maprao.jpg',
         '/images/dishes/desserts/dessert-ohnee-ginkgo-coconut-wood.jpg',
         '/images/dishes/desserts/dessert-fruitsalad-fresh-milk.jpg',
-        '/images/dishes/desserts/dessert-woon-ruam-mit.jpg',
         '/images/dishes/desserts/dessert-lychee-loy-kaew.jpg',
         '/images/dishes/desserts/dessert-taotung-nam-lamyai-wood.jpg',
         '/images/dishes/desserts/dessert-rambutan-loy-kaew-wood.jpg',

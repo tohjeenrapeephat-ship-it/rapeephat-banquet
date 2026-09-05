@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { WatermarkOverlay } from './WatermarkOverlay';
 import { GoogleReviewCard } from './GoogleReviewCard.js';
+import { InteractiveLocationMap } from './InteractiveLocationMap.js';
 
 export const ContactSection: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -417,118 +418,11 @@ export const ContactSection: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 📍 4. OFFICIAL OFFICES, CENTRAL KITCHEN & SERVICE COVERAGE */}
+        {/* 📍 4. OFFICIAL OFFICES, CENTRAL KITCHEN & INTERACTIVE GOOGLE MAPS */}
         {/* ========================================================================= */}
-        <div className="space-y-6 pt-4">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-50 via-white to-amber-50 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider shadow-2xs">
-              <MapPin className="w-3.5 h-3.5 text-red-600" />
-              <span>ช่องทางการติดต่อและพื้นที่ให้บริการ</span>
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              สำนักงานประสานงานหลัก & ฐานผลิตโรงครัวกลาง
-            </h3>
-            <p className="text-slate-600 text-xs sm:text-sm font-medium">
-              พร้อมดูแลประสานงาน ออกเอกสารสัญญา และปรุงสดจากครัวใหญ่นครปฐมส่งตรงถึงทุกงานเลี้ยงทั่วประเทศ
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            
-            {/* 🏢 Card 1: สำนักงานประสานงานหลัก */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border-2 border-amber-300/80 shadow-lg shadow-amber-900/5 hover:border-amber-500 transition-all flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-3 pb-4 border-b border-amber-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shrink-0 shadow-md">
-                      <Building2 className="w-6 h-6 text-amber-100" />
-                    </div>
-                    <div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-black text-[10.5px] uppercase tracking-wide border border-amber-300">
-                        สำนักงานหลัก
-                      </span>
-                      <h4 className="text-base sm:text-lg font-black text-slate-900 mt-1">
-                        สำนักงานประสานงานหลัก (สำหรับติดต่อ/ออกเอกสาร)
-                      </h4>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-bold text-red-700 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                    <span>ออฟฟิศคลองสาม ปทุมธานี</span>
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-medium">
-                    (ทีมงานพร้อมสแตนด์บายดูแลใบเสนอราคา สัญญาว่าจ้าง และวางแผนงานเลี้ยงให้เจ้าภาพทุกท่านอย่างใกล้ชิด)
-                  </p>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-[13px] text-slate-800 font-semibold flex items-start gap-2.5">
-                    <MapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-500 font-medium block text-[11px]">ที่อยู่สำนักงาน:</span>
-                      50/8 หมู่ 4 ถ. เลียบคลองสาม อ.คลองหลวง จ. ปทุมธานี
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                <a
-                  href="tel:0813311646"
-                  className="inline-flex items-center gap-2 text-xs font-bold text-red-700 hover:text-red-900 group-hover:translate-x-1 transition-transform"
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>โทรนัดหมายประสานงาน 081-331-1646 (คุณแป้ง)</span>
-                </a>
-              </div>
-            </div>
-
-            {/* 🍳 Card 2: ฐานผลิตและโรงครัวกลาง */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border-2 border-red-300/80 shadow-lg shadow-red-900/5 hover:border-red-500 transition-all flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-3 pb-4 border-b border-red-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 text-white flex items-center justify-center shrink-0 shadow-md">
-                      <ChefHat className="w-6 h-6 text-amber-200" />
-                    </div>
-                    <div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-900 font-black text-[10.5px] uppercase tracking-wide border border-red-300">
-                        โรงครัวกลางนครปฐม
-                      </span>
-                      <h4 className="text-base sm:text-lg font-black text-slate-900 mt-1">
-                        ฐานผลิตและโรงครัวกลาง (ต้นตำรับความอร่อย)
-                      </h4>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-bold text-red-700 flex items-center gap-1.5">
-                    <Flame className="w-4 h-4 text-amber-500 shrink-0" />
-                    <span>ครัวใหญ่นครปฐม (เมืองหลวงแห่งโต๊ะจีน)</span>
-                  </div>
-                  <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-medium">
-                    คัดสรรวัตถุดิบสดใหม่วันต่อวัน ปรุงร้อนจากเตาและขนย้ายอุปกรณ์กระจายงานเลี้ยงทั่วประเทศ
-                  </p>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-[13px] text-slate-800 font-semibold flex items-start gap-2.5">
-                    <MapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-500 font-medium block text-[11px]">ที่ตั้งโรงครัวกลาง:</span>
-                      72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>ปรุงสุกสดใหม่หน้างาน 100% มาตรฐาน 35 ปี</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
+        <div className="space-y-8 pt-4">
+          {/* Interactive Google Maps Hub */}
+          <InteractiveLocationMap />
 
           {/* ⭐ GOOGLE MAPS & BUSINESS REVIEW QR CODE CARD */}
           <GoogleReviewCard />
