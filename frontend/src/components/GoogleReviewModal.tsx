@@ -18,8 +18,9 @@ interface GoogleReviewModalProps {
   customReviewUrl?: string;
 }
 
-export const DEFAULT_GOOGLE_REVIEW_URL =
-  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000');
+export const DEFAULT_GOOGLE_REVIEW_URL = 'https://rapeephatcatering.com/review';
+export const GOOGLE_MAPS_DIRECT_URL =
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 นครปฐม');
 
 export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   isOpen,
@@ -32,7 +33,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
 
   const reviewUrl = customReviewUrl || DEFAULT_GOOGLE_REVIEW_URL;
 
-  // Generate ultra-high resolution QR Code via standard qrcode engine
+  // Generate ultra-high resolution QR Code with clean big blocks for instant scan
   useEffect(() => {
     if (!isOpen) return;
     let isMounted = true;

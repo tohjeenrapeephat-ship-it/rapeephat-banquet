@@ -69,6 +69,24 @@ export const App: React.FC = () => {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
       const search = window.location.search.toLowerCase();
+
+      // Instant redirect to Google Maps Review
+      if (
+        path === '/review' ||
+        path.startsWith('/review') ||
+        path === '/google-review' ||
+        path.startsWith('/google-review') ||
+        hash === '#review' ||
+        hash.includes('#review') ||
+        search.includes('review')
+      ) {
+        window.location.replace(
+          'https://www.google.com/maps/search/?api=1&query=' +
+            encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ นครปฐม')
+        );
+        return;
+      }
+
       if (
         hash.includes('admin') ||
         hash.includes('backend') ||

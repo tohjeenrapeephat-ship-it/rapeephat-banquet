@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
-import { DEFAULT_GOOGLE_REVIEW_URL, GoogleReviewModal } from './GoogleReviewModal.js';
+import { DEFAULT_GOOGLE_REVIEW_URL, GOOGLE_MAPS_DIRECT_URL, GoogleReviewModal } from './GoogleReviewModal.js';
 import {
   Star,
   ExternalLink,
@@ -117,7 +117,7 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
               {/* Primary Direct Review Button */}
               <a
-                href={reviewUrl}
+                href={GOOGLE_MAPS_DIRECT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-amber-600 text-white font-black text-sm shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:scale-102 active:scale-98 transition-all cursor-pointer border border-amber-300/40 group"
