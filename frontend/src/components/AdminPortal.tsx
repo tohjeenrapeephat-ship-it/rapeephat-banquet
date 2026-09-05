@@ -570,12 +570,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 onClick={() => setActiveTab('packages')}
                 className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
                   activeTab === 'packages'
-                    ? 'bg-red-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-red-600 text-white shadow-sm ring-2 ring-amber-300'
+                    : 'text-slate-800 hover:text-red-700 bg-amber-50/60 font-black'
                 }`}
               >
-                <Utensils className="w-3.5 h-3.5" />
-                <span>แพ็กเกจอาหาร</span>
+                <Utensils className="w-3.5 h-3.5 text-amber-600" />
+                <span>จัดการเมนูอาหาร & แพ็กเกจ</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-950 font-black">
+                  แก้ไขเมนู
+                </span>
               </button>
 
               <button
@@ -677,7 +680,38 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
               </div>
             </div>
           </div>
+        </div>
 
+        {/* 🍲 Quick Action Banner for Menu Management */}
+        <div
+          onClick={() => setActiveTab('packages')}
+          className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-red-600 via-red-700 to-amber-600 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:scale-[1.01] transition-all border-2 border-amber-300 ring-4 ring-amber-300/30"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-13 h-13 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 border border-white/40 shadow-inner">
+              <Utensils className="w-7 h-7 text-amber-200" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-xl font-black tracking-tight">
+                  🍲 ระบบจัดการเมนูอาหารในแต่ละจานของแพ็กเกจ (คลิกที่นี่)
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-300 text-slate-950 text-xs font-black shadow-xs">
+                  ✨ แนะนำ
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-amber-100 font-medium mt-0.5">
+                แก้ไขชื่อเมนู, เปลี่ยนรูปภาพอาหารประจำจาน, เพิ่ม/ลบเมนูทางเลือก และตั้งค่าเมนูเริ่มต้นได้ทุกระดับราคา
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="px-5 py-2.5 rounded-2xl bg-white hover:bg-amber-50 text-red-700 font-black text-xs sm:text-sm shrink-0 flex items-center justify-center gap-2 shadow-lg transition-transform hover:scale-105"
+          >
+            <span>เปิดระบบจัดการเมนูอาหาร</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         {/* TAB 1: Quotations Management Table */}
