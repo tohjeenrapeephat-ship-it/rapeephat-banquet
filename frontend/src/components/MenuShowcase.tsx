@@ -19,6 +19,8 @@ import {
   FileText
 } from 'lucide-react';
 import { MenuCatalogModal } from './MenuCatalogModal.js';
+import { useBanquetPackages, packageService } from '../services/packageService.js';
+import { getDishImage } from '../utils/dishImageHelper.js';
 
 interface MenuItem {
   category: string;
@@ -30,6 +32,7 @@ interface MenuItem {
 }
 
 export const MenuShowcase: React.FC = () => {
+  const { packages } = useBanquetPackages();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [galleryPhotoIndex, setGalleryPhotoIndex] = useState<number>(0);
@@ -382,10 +385,30 @@ export const MenuShowcase: React.FC = () => {
     });
   }, []);
 
+  // Helper to dynamically resolve photo for menu item (prioritizing custom back-office uploads)
+  const getItemPhoto = (item: MenuItem): string => {
+    const custom = packageService.getCustomDishImage(item.name);
+    if (custom) return custom;
+    return getDishImage(item.name) || item.image;
+  };
+
+  const getItemGallery = (item: MenuItem): string[] => {
+    const custom = packageService.getCustomDishImage(item.name);
+    if (!item.gallery) {
+      return custom ? [custom] : [item.image];
+    }
+    if (custom && !item.gallery.includes(custom)) {
+      return [custom, ...item.gallery];
+    }
+    return item.gallery;
+  };
+
   const activePreviewDish = previewIndex !== null ? filteredItems[previewIndex] : null;
-  const currentDisplayImage = activePreviewDish?.gallery 
-    ? activePreviewDish.gallery[galleryPhotoIndex] || activePreviewDish.image
-    : activePreviewDish?.image;
+  const activePreviewGallery = activePreviewDish ? getItemGallery(activePreviewDish) : [];
+  const activePreviewPrimary = activePreviewDish ? getItemPhoto(activePreviewDish) : '';
+  const currentDisplayImage = activePreviewGallery.length > 0
+    ? activePreviewGallery[galleryPhotoIndex] || activePreviewPrimary
+    : activePreviewPrimary;
 
   return (
     <section id="menu-showcase" className="py-20 relative border-t-2 border-amber-300/80 bg-gradient-to-b from-white via-amber-50/20 to-white overflow-hidden">
@@ -502,8 +525,9 @@ export const MenuShowcase: React.FC = () => {
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item, idx) => {
+            const itemGallery = getItemGallery(item);
             const activeCardImgIdx = cardPhotoIndexes[item.name] || 0;
-            const currentCardImg = item.gallery ? (item.gallery[activeCardImgIdx] || item.image) : item.image;
+            const currentCardImg = itemGallery.length > 0 ? (itemGallery[activeCardImgIdx] || getItemPhoto(item)) : getItemPhoto(item);
 
             return (
               <div
@@ -534,10 +558,10 @@ export const MenuShowcase: React.FC = () => {
 
                   {/* Top Right Zoom & Album Counter Badges */}
                   <div className="absolute top-3.5 right-3.5 z-20 flex items-center gap-1.5">
-                    {item.gallery && (
+                    {itemGallery.length > 1 && (
                       <span className="px-2.5 py-1 rounded-full bg-amber-500/95 backdrop-blur-md text-slate-950 text-[10px] font-black shadow-md flex items-center gap-1 border border-amber-300">
                         <Images className="w-3 h-3" />
-                        <span>{item.gallery.length} ภาพ</span>
+                        <span>{itemGallery.length} ภาพ</span>
                       </span>
                     )}
                     <span className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center border border-white/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors shadow-md">
@@ -554,9 +578,9 @@ export const MenuShowcase: React.FC = () => {
                 </div>
 
                 {/* 🖼️ Quick Inline Album Thumbnail Selector Bar */}
-                {item.gallery && item.gallery.length > 1 && (
+                {itemGallery.length > 1 && (
                   <div className="px-3 py-2 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-400/40 flex items-center gap-2 overflow-x-auto no-scrollbar">
-                    {item.gallery.map((gImg, gIdx) => (
+                    {itemGallery.map((gImg, gIdx) => (
                       <button
                         key={gIdx}
                         type="button"
@@ -578,7 +602,7 @@ export const MenuShowcase: React.FC = () => {
                       </button>
                     ))}
                     <span className="text-[10px] font-bold text-amber-300 whitespace-nowrap pl-1">
-                      {activeCardImgIdx + 1}/{item.gallery.length} ภาพ
+                      {activeCardImgIdx + 1}/{itemGallery.length} ภาพ
                     </span>
                   </div>
                 )}
@@ -636,9 +660,9 @@ export const MenuShowcase: React.FC = () => {
             {/* Left/Prev Navigation Button */}
             <button
               onClick={() => {
-                if (activePreviewDish.gallery && activePreviewDish.gallery.length > 1) {
+                if (activePreviewGallery.length > 1) {
                   setGalleryPhotoIndex((prev) =>
-                    prev > 0 ? prev - 1 : (activePreviewDish.gallery?.length || 1) - 1
+                    prev > 0 ? prev - 1 : activePreviewGallery.length - 1
                   );
                 } else {
                   setPreviewIndex((prev) =>
@@ -656,9 +680,9 @@ export const MenuShowcase: React.FC = () => {
             {/* Right/Next Navigation Button */}
             <button
               onClick={() => {
-                if (activePreviewDish.gallery && activePreviewDish.gallery.length > 1) {
+                if (activePreviewGallery.length > 1) {
                   setGalleryPhotoIndex((prev) =>
-                    prev < (activePreviewDish.gallery?.length || 1) - 1 ? prev + 1 : 0
+                    prev < activePreviewGallery.length - 1 ? prev + 1 : 0
                   );
                 } else {
                   setPreviewIndex((prev) =>
@@ -692,19 +716,19 @@ export const MenuShowcase: React.FC = () => {
                   </span>
                 </div>
 
-                {activePreviewDish.gallery && (
+                {activePreviewGallery.length > 1 && (
                   <div className="absolute bottom-4 right-4 z-20">
                     <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-bold border border-white/20">
-                      ภาพที่ {galleryPhotoIndex + 1} / {activePreviewDish.gallery.length}
+                      ภาพที่ {galleryPhotoIndex + 1} / {activePreviewGallery.length}
                     </span>
                   </div>
                 )}
               </div>
 
               {/* 🖼️ Multi-photo Thumbnail Strip (Only for items with gallery album) */}
-              {activePreviewDish.gallery && activePreviewDish.gallery.length > 1 && (
+              {activePreviewGallery.length > 1 && (
                 <div className="p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2.5 overflow-x-auto justify-center z-20">
-                  {activePreviewDish.gallery.map((imgUrl, gIdx) => (
+                  {activePreviewGallery.map((imgUrl, gIdx) => (
                     <button
                       key={gIdx}
                       onClick={() => setGalleryPhotoIndex(gIdx)}

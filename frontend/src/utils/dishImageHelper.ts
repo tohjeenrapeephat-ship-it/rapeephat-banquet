@@ -4,9 +4,17 @@
  * 100% verified across all package tiers (1,400 to 6,000 THB) with zero fallbacks.
  */
 
+import { packageService } from '../services/packageService.js';
+
 export const getDishImage = (dishName: string = '', courseTitle: string = ''): string => {
   const d = (dishName || '').toLowerCase().trim();
   const c = (courseTitle || '').toLowerCase().trim();
+
+  // --- -1. CUSTOM BACK-OFFICE OVERRIDE (รูปที่ผู้ใช้ตั้งค่า/อัปโหลดจากระบบหลังร้าน) ---
+  const customImg = packageService.getCustomDishImage(dishName);
+  if (customImg) {
+    return customImg;
+  }
 
   // --- 0. PRIORITY DISH MAPPING (แกงป่ารวมมิตร / แกงป่า / โฮกฮือ) ---
   if (d.includes('แกงป่า') || d.includes('โฮกฮือ')) {

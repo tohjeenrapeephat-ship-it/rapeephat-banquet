@@ -258,6 +258,63 @@ class PackageService {
   }
 
   /**
+   * Get a customized dish image by dish name if one has been set in any package course option.
+   */
+  public getCustomDishImage(dishName: string): string | undefined {
+    if (!dishName) return undefined;
+    const clean = dishName.trim().toLowerCase();
+    if (!clean) return undefined;
+
+    const pkgs = this.getPackages();
+    // 1. Exact match first
+    for (const pkg of pkgs) {
+      for (const course of pkg.courses) {
+        for (const opt of course.options) {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '') {
+            if (opt.name.trim().toLowerCase() === clean) {
+              return opt.imageUrl;
+            }
+          }
+        }
+      }
+    }
+
+    // 2. Partial match if exact not found
+    for (const pkg of pkgs) {
+      for (const course of pkg.courses) {
+        for (const opt of course.options) {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '') {
+            const optClean = opt.name.trim().toLowerCase();
+            if (optClean.includes(clean) || clean.includes(optClean)) {
+              return opt.imageUrl;
+            }
+          }
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Get map of all custom dish image overrides: { [dishNameLower]: imageUrl }
+   */
+  public getDishImageOverridesMap(): Record<string, string> {
+    const map: Record<string, string> = {};
+    const pkgs = this.getPackages();
+    for (const pkg of pkgs) {
+      for (const course of pkg.courses) {
+        for (const opt of course.options) {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '') {
+            map[opt.name.trim().toLowerCase()] = opt.imageUrl;
+          }
+        }
+      }
+    }
+    return map;
+  }
+
+  /**
    * Subscribe to package updates
    */
   public subscribe(callback: (packages: PackageTier[]) => void): () => void {
