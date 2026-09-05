@@ -67,6 +67,16 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
     currentUrl: string;
   } | null>(null);
 
+  // Large Image Preview Lightbox State
+  const [previewLargeImage, setPreviewLargeImage] = useState<{
+    url: string;
+    dishName: string;
+    courseTitle: string;
+    pkgId: string;
+    courseId: string;
+    dishId: string;
+  } | null>(null);
+
   const currentPkg = workingPackages.find((p) => p.id === selectedPkgId) || workingPackages[0];
 
   // =========================================================================
@@ -494,47 +504,85 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
                         {/* Left: Thumbnail & Name & Tag Editor */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* Dish Image Preview & Photo Library Trigger */}
-                          <div className="flex flex-col items-center gap-1 shrink-0">
-                            <div
-                              onClick={() =>
-                                setPhotoPickerTarget({
-                                  pkgId: currentPkg.id,
-                                  courseId: course.id,
-                                  dishId: dish.id,
-                                  dishName: dish.name,
-                                  currentUrl: dishImg,
-                                })
-                              }
-                              className="group/img relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-slate-300 hover:border-red-500 bg-slate-900 cursor-pointer shadow-xs transition-all hover:scale-105"
-                              title="คลิกเพื่อเปลี่ยนรูป หรืออัปโหลดรูปใหม่"
-                            >
+                          <div className="flex flex-col items-center gap-1.5 shrink-0">
+                            {/* Thumbnail with Click to View Large */}
+                            <div className="relative group/img w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 border-slate-300 hover:border-amber-400 bg-slate-900 shadow-xs transition-all">
                               <img
                                 src={dishImg}
                                 alt={dish.name}
-                                className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
+                                className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300 cursor-pointer"
                                 loading="lazy"
+                                onClick={() =>
+                                  setPreviewLargeImage({
+                                    url: dishImg,
+                                    dishName: dish.name,
+                                    courseTitle: course.title,
+                                    pkgId: currentPkg.id,
+                                    courseId: course.id,
+                                    dishId: dish.id,
+                                  })
+                                }
+                                title="🔍 คลิกเพื่อดูรูปขนาดใหญ่"
                               />
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-1 text-center">
-                                <ImageIcon className="w-4 h-4" />
-                                <span className="text-[8px] font-bold mt-0.5 leading-none">เปลี่ยนรูป</span>
+
+                              {/* Hover Action Overlay */}
+                              <div
+                                onClick={() =>
+                                  setPreviewLargeImage({
+                                    url: dishImg,
+                                    dishName: dish.name,
+                                    courseTitle: course.title,
+                                    pkgId: currentPkg.id,
+                                    courseId: course.id,
+                                    dishId: dish.id,
+                                  })
+                                }
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-1 text-center cursor-pointer"
+                              >
+                                <Eye className="w-4 h-4 text-amber-300 animate-pulse" />
+                                <span className="text-[9px] font-black mt-0.5 leading-none text-white">ดูรูปใหญ่</span>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setPhotoPickerTarget({
-                                  pkgId: currentPkg.id,
-                                  courseId: course.id,
-                                  dishId: dish.id,
-                                  dishName: dish.name,
-                                  currentUrl: dishImg,
-                                })
-                              }
-                              className="text-[10px] font-bold text-red-700 hover:text-red-800 hover:underline flex items-center gap-0.5 cursor-pointer"
-                            >
-                              <Upload className="w-2.5 h-2.5" />
-                              <span>อัปโหลดรูป</span>
-                            </button>
+
+                            {/* Action Buttons: View Large & Change Photo */}
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPreviewLargeImage({
+                                    url: dishImg,
+                                    dishName: dish.name,
+                                    courseTitle: course.title,
+                                    pkgId: currentPkg.id,
+                                    courseId: course.id,
+                                    dishId: dish.id,
+                                  })
+                                }
+                                className="px-1.5 py-0.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-0.5 cursor-pointer shadow-2xs transition-colors"
+                                title="คลิกดูรูปขนาดใหญ่เต็มตา"
+                              >
+                                <Eye className="w-2.5 h-2.5 text-amber-700" />
+                                <span>ดูรูปใหญ่</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPhotoPickerTarget({
+                                    pkgId: currentPkg.id,
+                                    courseId: course.id,
+                                    dishId: dish.id,
+                                    dishName: dish.name,
+                                    currentUrl: dishImg,
+                                  })
+                                }
+                                className="px-1.5 py-0.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-black border border-red-200 flex items-center gap-0.5 cursor-pointer shadow-2xs transition-colors"
+                                title="เปลี่ยนรูป หรืออัปโหลดรูปใหม่"
+                              >
+                                <Upload className="w-2.5 h-2.5" />
+                                <span>เปลี่ยนรูป</span>
+                              </button>
+                            </div>
                           </div>
 
                           {/* Inputs: Name & Tag */}
@@ -748,6 +796,92 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
               >
                 นำเข้าข้อมูลและบันทึก
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 🔍 LARGE IMAGE PREVIEW LIGHTBOX MODAL (คลิกดูรูปใหญ่ก่อนเปลี่ยนรูป) */}
+      {/* ========================================================================= */}
+      {previewLargeImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
+          onClick={() => setPreviewLargeImage(null)}
+        >
+          <div
+            className="relative bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border-2 border-amber-400 animate-scaleUp flex flex-col max-h-[92vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 text-white flex items-center justify-between border-b-2 border-amber-400 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center">
+                  <Eye className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm sm:text-base font-black text-amber-300">
+                    {previewLargeImage.dishName}
+                  </h4>
+                  <p className="text-[11px] text-slate-300">
+                    {previewLargeImage.courseTitle}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewLargeImage(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="ปิดหน้าต่าง"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* High-Resolution Image Preview Container */}
+            <div className="relative bg-slate-950 flex-1 flex items-center justify-center min-h-[300px] max-h-[60vh] p-3 overflow-hidden">
+              <img
+                src={previewLargeImage.url}
+                alt={previewLargeImage.dishName}
+                className="max-h-[56vh] max-w-full object-contain rounded-2xl shadow-2xl transition-transform duration-200"
+              />
+            </div>
+
+            {/* Modal Footer / Action Toolbar */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+              <div className="text-xs text-slate-600 truncate max-w-xs font-mono">
+                <span className="font-bold text-slate-800">ที่อยู่ไฟล์: </span>
+                <span className="text-[11px]">{previewLargeImage.url}</span>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPreviewLargeImage(null)}
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  ปิดหน้าต่าง
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = {
+                      pkgId: previewLargeImage.pkgId,
+                      courseId: previewLargeImage.courseId,
+                      dishId: previewLargeImage.dishId,
+                      dishName: previewLargeImage.dishName,
+                      currentUrl: previewLargeImage.url,
+                    };
+                    setPreviewLargeImage(null);
+                    setPhotoPickerTarget(target);
+                  }}
+                  className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform hover:scale-102"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>🖼️ เปลี่ยนรูปภาพนี้</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

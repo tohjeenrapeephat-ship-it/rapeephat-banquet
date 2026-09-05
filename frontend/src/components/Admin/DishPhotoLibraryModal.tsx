@@ -11,7 +11,8 @@ import {
   FolderHeart,
   Trash2,
   HelpCircle,
-  Plus
+  Plus,
+  Eye
 } from 'lucide-react';
 
 export interface PhotoPreset {
@@ -349,6 +350,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccessMsg, setUploadSuccessMsg] = useState<string>('');
   const [showHowTo, setShowHowTo] = useState<boolean>(false);
+  const [largePreviewPhoto, setLargePreviewPhoto] = useState<PhotoPreset | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -635,13 +637,19 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
-                    {preset.tag && (
-                      <span className={`absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-black shadow-xs ${
-                        isCustom ? 'bg-emerald-500 text-white' : 'bg-amber-400/95 text-amber-950'
-                      }`}>
-                        {preset.tag}
-                      </span>
-                    )}
+                    {/* Zoom / Preview Large Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLargePreviewPhoto(preset);
+                      }}
+                      className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-lg bg-black/70 hover:bg-amber-500 text-white flex items-center gap-1 text-[10px] font-bold shadow-md transition-colors z-10 cursor-pointer"
+                      title="คลิกดูรูปขนาดใหญ่เต็มตา"
+                    >
+                      <Eye className="w-3 h-3 text-amber-300" />
+                      <span>ดูรูปใหญ่</span>
+                    </button>
 
                     {isCustom && (
                       <button
@@ -725,6 +733,83 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Large Image Preview Modal inside Library */}
+        {largePreviewPhoto && (
+          <div
+            className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
+            onClick={() => setLargePreviewPhoto(null)}
+          >
+            <div
+              className="relative bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border-2 border-amber-400 animate-scaleUp flex flex-col max-h-[92vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 text-white flex items-center justify-between border-b-2 border-amber-400 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center">
+                    <Eye className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm sm:text-base font-black text-amber-300">
+                      {largePreviewPhoto.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-300">
+                      หมวดหมู่: {largePreviewPhoto.categoryLabel}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setLargePreviewPhoto(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  title="ปิดหน้าต่าง"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Image Preview Container */}
+              <div className="bg-slate-950 flex-1 flex items-center justify-center min-h-[300px] max-h-[60vh] p-3 overflow-hidden">
+                <img
+                  src={largePreviewPhoto.url}
+                  alt={largePreviewPhoto.name}
+                  className="max-h-[55vh] max-w-full object-contain rounded-2xl shadow-2xl"
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                <div className="text-xs text-slate-600 truncate max-w-xs font-mono">
+                  <span className="font-bold text-slate-800">URL: </span>
+                  <span className="text-[11px]">{largePreviewPhoto.url}</span>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setLargePreviewPhoto(null)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    ปิด
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = largePreviewPhoto.url;
+                      setLargePreviewPhoto(null);
+                      handleSelect(url);
+                    }}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform hover:scale-102"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>เลือกใช้รูปนี้ทันที</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
