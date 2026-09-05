@@ -104,7 +104,7 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
     return '/images/dishes/hotpots/hotpot-gaengsom-cha-om-kung.jpg';
   }
   if (['แกงป่า', 'โฮกฮือ', 'ต้มโคล้ง'].some((k) => d.includes(k))) {
-    return '/images/dishes/hotpots/hotpot-seafood-potaek-clear-herb.jpg';
+    return '/images/dishes/hotpots/hotpot-gaengpa-ruammit.jpg';
   }
 
   // --- 5. Rice & Noodles (ข้าวผัด & ผัดหมี่มงคล - ตรวจสอบความถูกต้องของทุกเมนูข้าวผัด) ---

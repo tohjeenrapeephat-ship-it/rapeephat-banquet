@@ -259,7 +259,7 @@ export const MenuShowcase: React.FC = () => {
         '/images/dishes/hotpots/hotpot-seafood-squid-mussel-steaming.jpg',
         '/images/dishes/hotpots/hotpot-seafood-mussel-squid-macro.jpg',
         '/images/dishes/hotpots/hotpot-tomyum-creamy-banquet.jpg',
-        '/images/dishes/hotpots/hotpot-seafood-potaek-clear-herb.jpg',
+        '/images/dishes/hotpots/hotpot-gaengpa-ruammit.jpg',
         '/images/dishes/hotpots/hotpot-seabass-grouper-flaming-chimney.jpg',
         '/images/dishes/hotpots/hotpot-tomyum-clear-banquet.jpg',
         '/images/dishes/hotpots/hotpot-tomyum-clear-prawn-brownwood.jpg',
