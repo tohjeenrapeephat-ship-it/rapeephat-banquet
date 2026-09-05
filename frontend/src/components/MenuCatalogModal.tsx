@@ -429,8 +429,9 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {currentPkg.courses.map((course, idx) => {
-                    const primaryDishName = course.options[0]?.name || course.title;
-                    const dishImg = getDishImage(primaryDishName, course.title);
+                    const firstOpt = course.options[0];
+                    const primaryDishName = firstOpt?.name || course.title;
+                    const dishImg = firstOpt?.imageUrl || getDishImage(primaryDishName, course.title);
                     return (
                       <div
                         key={course.id || idx}
