@@ -60,7 +60,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
   const [receiptType, setReceiptType] = useState<ReceiptType>('deposit_30');
   const [editingQuote, setEditingQuote] = useState<QuotationDoc | null>(null);
-  const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'settings'>('quotations');
+  const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'settings'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      if (hash.includes('package') || hash.includes('menu') || hash.includes('dish')) return 'packages';
+      if (hash.includes('queue')) return 'queue_manager';
+      if (hash.includes('chat') || hash.includes('lead')) return 'chat_leads';
+    }
+    return 'quotations';
+  });
   
   // Queue & Blocked Dates Management State
   const [bookingPolicy, setBookingPolicy] = useState<BookingPolicy>(() => QueueService.getBookingPolicy());
