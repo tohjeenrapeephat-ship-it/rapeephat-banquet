@@ -19,7 +19,7 @@ interface GoogleReviewModalProps {
 }
 
 export const DEFAULT_GOOGLE_REVIEW_URL =
-  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 นครปฐม');
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000');
 
 export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   isOpen,

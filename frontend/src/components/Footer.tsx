@@ -115,7 +115,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
                 <MapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-slate-900 font-bold">ฐานผลิต & โรงครัวกลาง:</strong><br />
-                  72/7 ต.นครปฐม อ.เมือง จ.นครปฐม
+                  72 หมู่ 1 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                 </div>
               </div>
             </div>

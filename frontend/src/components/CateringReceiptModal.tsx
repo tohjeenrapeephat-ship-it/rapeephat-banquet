@@ -325,7 +325,7 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                       <strong className="text-slate-950 font-bold">สำนักงานใหญ่:</strong> 50/8 ม. 4 ต. คลองสาม อ.คลองหลวง จ.ปทุมธานี 12120
                     </div>
                     <div>
-                      <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72/7 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
+                      <strong className="text-slate-950 font-bold">ฐานผลิตโรงครัวกลาง:</strong> 72 หมู่ 1 ต.นครปฐม อ.เมืองนครปฐม จ.นครปฐม 73000
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 pt-0.5">
                       <span><strong className="text-slate-950 font-bold">โทร:</strong> <strong className="text-emerald-800 font-black font-mono text-[12px]">081-331-1646</strong> (คุณแป้ง)</span>
