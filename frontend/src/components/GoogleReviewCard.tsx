@@ -31,11 +31,11 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
     let isMounted = true;
     QRCode.toDataURL(reviewUrl, {
       errorCorrectionLevel: 'M',
-      margin: 2,
-      width: 600,
+      margin: 3,
+      width: 700,
       color: {
-        dark: '#0f172a',
-        light: '#ffffff',
+        dark: '#000000',
+        light: '#FFFFFF',
       },
     })
       .then((url) => {
@@ -139,13 +139,13 @@ export const GoogleReviewCard: React.FC<GoogleReviewCardProps> = ({
 
         </div>
 
-        {/* Right Column: High-Resolution Scan QR Box (100% Unobstructed & Ultra Sharp) */}
+        {/* Right Column: High-Resolution Scan QR Box (Pure Black on White, Ultra Scannable) */}
         <div
           onClick={() => setModalOpen(true)}
-          className="shrink-0 p-3 rounded-2xl bg-white border-2 border-amber-300 shadow-md flex flex-col items-center gap-2 cursor-pointer hover:border-red-500 hover:shadow-lg transition-all group"
+          className="shrink-0 p-3.5 rounded-2xl bg-white border-2 border-amber-300 shadow-md flex flex-col items-center gap-2 cursor-pointer hover:border-red-500 hover:shadow-lg transition-all group"
           title="คลิกเพื่อเปิดดูป้าย QR Code ขยายใหญ่และสั่งพิมพ์"
         >
-          <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-xl bg-white p-1.5 border border-slate-200 shadow-inner flex items-center justify-center overflow-hidden">
+          <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-xl bg-white p-1 border-2 border-slate-200 shadow-inner flex items-center justify-center overflow-hidden">
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}

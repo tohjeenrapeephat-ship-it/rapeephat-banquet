@@ -19,7 +19,7 @@ interface GoogleReviewModalProps {
 }
 
 export const DEFAULT_GOOGLE_REVIEW_URL =
-  'https://maps.google.com/?q=ครัวรพีพัฒน์+(โต๊ะจีน+รพีพัฒน์)+72+หมู่+1+ตำบลนครปฐม+อำเภอเมืองนครปฐม+นครปฐม+73000';
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('ครัวรพีพัฒน์ โต๊ะจีน รพีพัฒน์ 72 หมู่ 1 นครปฐม');
 
 export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
   isOpen,
@@ -38,11 +38,11 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
     let isMounted = true;
     QRCode.toDataURL(reviewUrl, {
       errorCorrectionLevel: 'M',
-      margin: 2,
+      margin: 3,
       width: 700,
       color: {
-        dark: '#0f172a',
-        light: '#ffffff',
+        dark: '#000000',
+        light: '#FFFFFF',
       },
     })
       .then((url) => {
@@ -163,7 +163,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
 
             {/* QR Code Frame with Gold Corner Accents (100% Unobstructed Crisp PNG) */}
             <div className="flex justify-center py-2">
-              <div className="p-3 rounded-3xl bg-white border-3 border-amber-400 shadow-lg relative group">
+              <div className="p-3.5 rounded-3xl bg-white border-3 border-amber-400 shadow-lg relative group">
                 <div className="w-52 h-52 sm:w-60 sm:h-60 rounded-xl bg-white flex items-center justify-center overflow-hidden">
                   {qrDataUrl ? (
                     <img
