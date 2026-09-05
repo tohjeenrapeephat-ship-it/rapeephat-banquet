@@ -167,13 +167,17 @@ export const BookingStepsModal: React.FC<BookingStepsModalProps> = ({
 
           {/* ========================================================================= */}
           {/* STEP 1: Add LINE แจ้งคุณแป้ง */}
-          {/* ========================================================================= */}
           <div className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-green-400 shadow-sm space-y-3 relative overflow-hidden">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#06C755] text-white font-black text-base flex items-center justify-center shrink-0 shadow-md">
-                1
+            <div className="flex items-start gap-3.5">
+              <div className="relative shrink-0">
+                <img
+                  src="/images/brand/khun-pang.jpg"
+                  alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover ring-2 ring-emerald-400 shadow-md"
+                />
+                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" title="ออนไลน์พร้อมรับเรื่องค่ะ" />
               </div>
-              <div className="space-y-1 flex-1">
+              <div className="space-y-1 flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h4 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-1.5">
                     <MessageCircle className="w-4 h-4 text-[#06C755]" />

@@ -237,41 +237,88 @@ export const ContactSection: React.FC = () => {
             {/* Left Column: Direct Contact Cards (5 Cols) */}
             <div className="lg:col-span-5 space-y-4">
               
-              {/* Phone Card */}
-              <a
-                href="tel:0813311646"
-                className="p-5 rounded-3xl bg-white border-2 border-amber-300 hover:border-amber-500 flex items-center gap-4 transition-all group shadow-md shadow-amber-900/5 transform hover:-translate-y-0.5"
-              >
-                <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-md border border-amber-300">
-                  <Phone className="w-6 h-6 animate-bounce text-amber-300" />
-                </div>
-                <div>
-                  <div className="text-xs text-amber-900 font-black">โทรศัพท์สายด่วน</div>
-                  <div className="text-xl font-black text-slate-900 group-hover:text-red-700 transition-colors font-mono">
-                    081-331-1646
-                  </div>
-                  <div className="text-[11.5px] text-red-700 font-black">ติดต่อคุณแป้ง (รับสายตลอดเวลา)</div>
-                </div>
-              </a>
+              {/* VIP Executive Coordinator Profile Card */}
+              <div className="p-6 rounded-3xl bg-gradient-to-b from-white via-amber-50/40 to-white border-2 border-amber-400 shadow-xl shadow-amber-900/10 relative overflow-hidden group">
+                {/* Gold Glow Top Right */}
+                <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-amber-400/20 to-red-500/10 rounded-full blur-2xl pointer-events-none" />
 
-              {/* LINE Official Card */}
-              <a
-                href="https://line.me/ti/p/~pang_baichaa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-5 rounded-3xl bg-white border-2 border-amber-300 hover:border-green-500 flex items-center gap-4 transition-all group shadow-md shadow-amber-900/5 transform hover:-translate-y-0.5"
-              >
-                <div className="w-13 h-13 rounded-2xl bg-[#06C755] text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-md">
-                  <MessageCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500 font-bold">LINE ติดต่อสอบถาม</div>
-                  <div className="text-lg font-black text-slate-900 group-hover:text-green-600 transition-colors">
-                    pang_baichaa
+                {/* Profile Header: Photo + Info */}
+                <div className="flex items-center gap-4 relative z-10">
+                  {/* Photo with Luxury Ring & Online Pulse */}
+                  <div className="relative shrink-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden ring-4 ring-amber-400 shadow-lg border-2 border-white bg-slate-100">
+                      <img
+                        src="/images/brand/khun-pang.jpg"
+                        alt="คุณแป้ง - ผู้บริหารฝ่ายประสานงานจัดเลี้ยง โต๊ะจีน รพีพัฒน์"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    {/* Verified Crown Badge */}
+                    <div className="absolute -bottom-1.5 -right-1.5 bg-gradient-to-r from-red-600 to-amber-600 text-white p-1 rounded-full ring-2 ring-white shadow-md" title="ผู้บริหาร/ผู้ประสานงานหลักตัวจริง 100%">
+                      <Crown className="w-3.5 h-3.5 text-amber-200" />
+                    </div>
                   </div>
-                  <div className="text-[11.5px] text-green-600 font-bold">แอดไลน์ ส่งรูปสถานที่ หรือคุยรายละเอียด</div>
+
+                  {/* Title & Status */}
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-[10.5px] font-black uppercase">
+                      <Sparkles className="w-3 h-3 text-amber-600" />
+                      <span>ผู้บริหาร & ฝ่ายประสานงานจัดเลี้ยง</span>
+                    </div>
+                    <h4 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                      คุณแป้ง <span className="text-red-700 text-base font-bold">(รพีพัฒน์)</span>
+                    </h4>
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-extrabold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>พร้อมรับสาย & ตอบแชทตลอด 24 ชม.</span>
+                    </div>
+                  </div>
                 </div>
-              </a>
+
+                {/* Personal Greeting / Quote */}
+                <div className="mt-4 p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs sm:text-[13px] text-slate-700 leading-relaxed relative z-10 font-medium">
+                  &ldquo;ยินดีต้อนรับเจ้าภาพทุกท่านค่ะ แป้งพร้อมให้คำปรึกษา แนะนำการจัดเซ็ตเมนูอาหาร และประเมินงบประมาณจัดเลี้ยงให้อย่างคุ้มค่าที่สุด เพื่อให้วันสำคัญของท่านประทับใจแขกผู้มีเกียรติทุกคนค่ะ&rdquo;
+                </div>
+
+                {/* Action Buttons: Phone & LINE */}
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5 relative z-10">
+                  {/* Phone Direct */}
+                  <a
+                    href="tel:0813311646"
+                    className="py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all border border-red-400 cursor-pointer transform hover:scale-[1.02] active:scale-98"
+                  >
+                    <Phone className="w-4 h-4 text-amber-300 animate-bounce" />
+                    <span>โทร 081-331-1646</span>
+                  </a>
+
+                  {/* LINE Direct */}
+                  <a
+                    href="https://line.me/ti/p/~pang_baichaa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-3 px-4 rounded-2xl bg-gradient-to-r from-[#06C755] to-emerald-600 hover:from-[#05b34c] hover:to-emerald-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all border border-emerald-400 cursor-pointer transform hover:scale-[1.02] active:scale-98"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-white" />
+                    <span>แอด LINE: pang_baichaa</span>
+                  </a>
+                </div>
+
+                {/* Micro guarantees */}
+                <div className="mt-3 pt-3 border-t border-amber-200/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600 font-bold relative z-10">
+                  <span className="flex items-center gap-1 text-red-800">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    รับสายเองทุกสาย
+                  </span>
+                  <span className="flex items-center gap-1 text-amber-900">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    ประเมินราคาฟรี
+                  </span>
+                  <span className="flex items-center gap-1 text-slate-800">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    ดูแลคิวจัดเลี้ยง 100%
+                  </span>
+                </div>
+              </div>
 
               {/* Email Official Card */}
               <div className="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-300 hover:border-red-500 flex items-start gap-4 transition-all group shadow-md shadow-amber-900/5">

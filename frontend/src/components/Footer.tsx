@@ -47,9 +47,25 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
           {/* Contact Details & Locations */}
           <div className="space-y-3">
             <div className="text-base font-black text-slate-900 mb-3 pb-1 border-b border-amber-200">ติดต่อและที่ตั้งสำนักงาน</div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-red-600 shrink-0" />
-              <a href="tel:0813311646" className="text-slate-900 hover:text-red-700 font-black font-mono text-base">081-331-1646 (คุณแป้ง)</a>
+            
+            {/* Direct Coordinator Card with Khun Pang */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50/90 via-white to-amber-50/50 border border-amber-300 shadow-xs flex items-center gap-3">
+              <div className="relative shrink-0">
+                <img
+                  src="/images/brand/khun-pang.jpg"
+                  alt="คุณแป้ง - ผู้ประสานงานโต๊ะจีน รพีพัฒน์"
+                  className="w-12 h-12 rounded-xl object-cover ring-2 ring-amber-400 shadow-xs"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" title="ออนไลน์พร้อมรับสายค่ะ" />
+              </div>
+              <div className="flex-1 min-w-0 space-y-0.5">
+                <div className="text-[10.5px] font-black text-amber-900 uppercase">ฝ่ายประสานงานจัดเลี้ยง</div>
+                <div className="text-xs sm:text-sm font-black text-slate-900 truncate">คุณแป้ง (รพีพัฒน์)</div>
+                <a href="tel:0813311646" className="text-xs font-black text-red-700 hover:text-red-900 flex items-center gap-1 font-mono">
+                  <Phone className="w-3 h-3 text-red-600" />
+                  <span>081-331-1646 (รับสายตลอด 24 ชม.)</span>
+                </a>
+              </div>
             </div>
             
             {/* Social Follow Links */}

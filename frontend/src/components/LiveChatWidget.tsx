@@ -267,15 +267,24 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
           {/* Greeting Tooltip Bubble */}
           <div
             onClick={handleOpenChat}
-            className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-slate-900 border-2 border-amber-300 shadow-xl shadow-amber-900/10 cursor-pointer hover:border-red-500 transition-all transform hover:-translate-x-1 animate-fadeIn group"
+            className="hidden md:flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-white text-slate-900 border-2 border-amber-300 shadow-xl shadow-amber-900/10 cursor-pointer hover:border-red-500 transition-all transform hover:-translate-x-1 animate-fadeIn group"
           >
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+            <div className="relative shrink-0">
+              <img
+                src="/images/brand/khun-pang.jpg"
+                alt="คุณแป้ง"
+                className="w-9 h-9 rounded-full object-cover ring-2 ring-amber-400 shadow-xs"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+            </div>
             <div className="text-xs">
-              <span className="font-bold text-red-700">
-                {isOwnerOnline ? '👑 คุณแป้ง ออนไลน์พร้อมตอบค่ะ' : '💬 แชทสด โต๊ะจีนรพีพัฒน์'}
-              </span>
-              {' • '}
-              <span className="text-emerald-700 font-extrabold">ออนไลน์ตลอด 24 ชม.</span>
+              <div className="font-bold text-red-700 flex items-center gap-1">
+                <span>คุณแป้ง (โต๊ะจีนรพีพัฒน์)</span>
+              </div>
+              <div className="text-[10.5px] text-emerald-700 font-extrabold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                <span>ปรึกษาจัดเลี้ยงออนไลน์ตลอด 24 ชม.</span>
+              </div>
             </div>
           </div>
 
@@ -317,29 +326,27 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
           <div className="p-3.5 sm:p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 text-white flex items-center justify-between border-b-2 border-amber-400 shrink-0">
             
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-11 h-11 flex items-center justify-center">
-                  <img
-                    src="/images/brand/logo.png"
-                    alt="รพีพัฒน์ โต๊ะจีน"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-900" />
+              <div className="relative shrink-0">
+                <img
+                  src="/images/brand/khun-pang.jpg"
+                  alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-amber-400 shadow-md"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-900 animate-pulse" />
               </div>
 
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="text-sm font-black text-white">
-                    {isOwnerOnline ? 'คุณแป้ง (โต๊ะจีนรพีพัฒน์)' : 'แชทสด โต๊ะจีนรพีพัฒน์'}
+                    คุณแป้ง (ฝ่ายจัดเลี้ยงรพีพัฒน์)
                   </h3>
                   <span className="px-1.5 py-0.2 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded text-[9px] font-black uppercase">
-                    {isOwnerOnline ? '👑 ฝ่ายจัดเลี้ยง' : '24/7 ONLINE'}
+                    👑 ผู้บริหาร
                   </span>
                 </div>
                 <p className="text-[10.5px] text-emerald-400 font-bold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {isOwnerOnline ? 'คุณแป้ง ร่วมสนทนาสด 🟢' : 'ออนไลน์ตลอด 24 ชม. (ไม่มีหลับ/พร้อมตอบทันที) 🟢'}
+                  {isOwnerOnline ? 'คุณแป้ง ร่วมสนทนาสด 🟢' : 'ยินดีให้คำปรึกษาจัดเลี้ยงตลอด 24 ชม. 🟢'}
                 </p>
               </div>
             </div>
@@ -385,12 +392,19 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                     className={`flex flex-col ${msg.sender === 'customer' ? 'items-end' : 'items-start'}`}
                   >
                     {/* Sender Label */}
-                    <span className="text-[10px] text-slate-400 font-bold mb-1 px-1 flex items-center gap-1">
+                    <span className="text-[10px] text-slate-400 font-bold mb-1 px-1 flex items-center gap-1.5">
                       {msg.sender === 'owner' && (
-                        <span className="text-amber-600 font-black flex items-center gap-0.5">
-                          <Crown className="w-3 h-3 text-amber-600" />
-                          คุณแป้ง:
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <img
+                            src="/images/brand/khun-pang.jpg"
+                            alt="คุณแป้ง"
+                            className="w-4 h-4 rounded-full object-cover ring-1 ring-amber-400 shadow-xs shrink-0"
+                          />
+                          <span className="text-amber-700 font-black flex items-center gap-0.5">
+                            <Crown className="w-3 h-3 text-amber-600" />
+                            คุณแป้ง:
+                          </span>
+                        </div>
                       )}
                       {msg.sender === 'customer' && 'คุณ'}
                       {msg.sender === 'bot' && 'โต๊ะจีนรพีพัฒน์'}
@@ -427,14 +441,16 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ onOpenBuilder })
                 {/* Animated Typing Indicator */}
                 {isTyping && (
                   <div className="flex items-center gap-2 text-slate-500 text-xs py-1">
-                    <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center text-[10px] font-black text-red-700">
-                      รพี
-                    </div>
+                    <img
+                      src="/images/brand/khun-pang.jpg"
+                      alt="คุณแป้ง"
+                      className="w-6 h-6 rounded-full object-cover ring-1 ring-amber-400 shadow-xs shrink-0"
+                    />
                     <div className="bg-white border border-amber-200 px-3.5 py-2 rounded-2xl rounded-bl-xs flex items-center gap-1.5 shadow-2xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce" style={{ animationDelay: '300ms' }} />
-                      <span className="text-[10.5px] text-slate-400 font-bold ml-1">กำลังพิมพ์ตอบ...</span>
+                      <span className="text-[10.5px] text-slate-500 font-bold ml-1">คุณแป้งกำลังพิมพ์ตอบ...</span>
                     </div>
                   </div>
                 )}

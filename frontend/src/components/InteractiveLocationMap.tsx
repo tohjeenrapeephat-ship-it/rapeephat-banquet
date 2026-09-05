@@ -279,17 +279,30 @@ export const InteractiveLocationMap: React.FC = () => {
               </div>
 
               {/* Phone & Working Hours */}
-              <div className="pt-2 border-t border-white/10 space-y-2 text-xs">
-                <a
-                  href={`tel:${activeLoc.phone.replace(/[^0-9]/g, '')}`}
-                  className="flex items-center gap-2 text-amber-300 hover:text-amber-200 font-bold transition-colors"
-                >
-                  <Phone className="w-3.5 h-3.5 text-amber-400" />
-                  <span>สายด่วน: <strong className="font-mono text-white text-sm font-black">{activeLoc.phone}</strong> (คุณแป้ง)</span>
-                </a>
-                <div className="flex items-center gap-2 text-slate-400 font-medium">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{activeLoc.hours}</span>
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/images/brand/khun-pang.jpg"
+                    alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-amber-400 shrink-0 shadow-xs"
+                  />
+                  <div>
+                    <div className="text-[10px] text-amber-300 font-black">สายด่วนคุณแป้ง (24 ชม.)</div>
+                    <a
+                      href={`tel:${activeLoc.phone.replace(/[^0-9]/g, '')}`}
+                      className="font-mono text-white text-xs sm:text-sm font-black hover:text-amber-300 transition-colors flex items-center gap-1"
+                    >
+                      <Phone className="w-3 h-3 text-amber-400" />
+                      <span>{activeLoc.phone}</span>
+                    </a>
+                  </div>
+                </div>
+                <div className="text-[10.5px] text-slate-400 font-medium text-right shrink-0">
+                  <div className="flex items-center gap-1 text-emerald-400 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>พร้อมรับสาย</span>
+                  </div>
+                  <div>{activeLoc.hours}</div>
                 </div>
               </div>
 

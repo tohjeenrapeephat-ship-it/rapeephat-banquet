@@ -308,14 +308,46 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
             <span>📄 ดู & พิมพ์ใบเสนอราคามาตรฐาน A4 ฉบับจริง</span>
           </button>
 
-          {/* Direct Phone Call Button */}
-          <a
-            href="tel:0813311646"
-            className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-amber-500/40 shadow-xs transition-colors cursor-pointer"
-          >
-            <PhoneCall className="w-4 h-4 text-amber-400 animate-bounce" />
-            <span>โทรสายตรงปรึกษาคุณแป้ง: <strong className="text-white font-mono font-black">081-331-1646</strong></span>
-          </a>
+          {/* Direct Consultation with Khun Pang Card */}
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 via-white to-amber-50 border-2 border-amber-300/80 shadow-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="relative shrink-0">
+                <img
+                  src="/images/brand/khun-pang.jpg"
+                  alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
+                  className="w-11 h-11 rounded-xl object-cover ring-2 ring-amber-400 shadow-xs"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" title="พร้อมให้คำปรึกษาค่ะ" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10.5px] font-black text-amber-900 uppercase">ปรึกษาจัดเลี้ยงโดยตรง</div>
+                <div className="text-xs font-black text-slate-900 truncate">คุณแป้ง (รพีพัฒน์)</div>
+                <div className="text-[10.5px] text-emerald-700 font-bold">รับสายตลอด 24 ชม.</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <a
+                href="tel:0813311646"
+                className="p-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs flex items-center gap-1 shadow-xs transition-transform transform hover:scale-105 cursor-pointer"
+                title="โทร 081-331-1646"
+              >
+                <PhoneCall className="w-3.5 h-3.5 text-amber-200 animate-bounce" />
+                <span className="font-mono text-xs">โทรด่วน</span>
+              </a>
+
+              <a
+                href="https://line.me/ti/p/~pang_baichaa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs flex items-center gap-1 shadow-xs transition-transform transform hover:scale-105 cursor-pointer"
+                title="LINE: pang_baichaa"
+              >
+                <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                <span>LINE</span>
+              </a>
+            </div>
+          </div>
         </div>
 
       </div>
