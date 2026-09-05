@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QuotationDoc } from '../types/quotation.js';
 import { QuotationApi } from '../services/api.js';
-import { BANQUET_PACKAGES } from '../data/packages.js';
 import { formatCurrency } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
 import { QueueService, BlockedDateEntry, BookingPolicy, formatThaiDateShort, getDayOfWeekThai } from '../services/queueService.js';
@@ -9,6 +8,7 @@ import { QuotationModal } from './QuotationBuilder/QuotationModal.js';
 import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
 import { EditQuotationModal } from './EditQuotationModal.js';
+import { PackageMenuEditor } from './Admin/PackageMenuEditor.js';
 import {
   LayoutDashboard,
   FileText,
@@ -1991,40 +1991,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
           </div>
         )}
 
-        {/* TAB 3: Packages & Menus Management Overview */}
+        {/* TAB: Packages & Dynamic Menus Management */}
         {activeTab === 'packages' && (
-          <div className="space-y-6">
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
-              <div>
-                <h3 className="text-xl font-black text-slate-900">แพ็กเกจโต๊ะจีน & รายการอาหารมาตรฐาน ({BANQUET_PACKAGES.length} แพ็กเกจ)</h3>
-                <p className="text-xs text-slate-500 font-medium">ตรวจสอบราคาและรายการอาหารมาตรฐานของแบรนด์ โต๊ะจีน รพีพัฒน์</p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {BANQUET_PACKAGES.map((pkg) => (
-                <div key={pkg.id} className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-red-700 px-3 py-1 rounded-full bg-red-50 border border-red-200">
-                      {pkg.dishCount} จาน
-                    </span>
-                    <span className="text-xl font-black text-slate-900">{formatCurrency(pkg.price)}</span>
-                  </div>
-                  <h4 className="text-lg font-black text-slate-900">{pkg.name}</h4>
-                  <p className="text-xs text-slate-600 font-medium">{pkg.description}</p>
-                  
-                  <div className="pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
-                    <div className="font-bold text-slate-800 text-[11px] uppercase">รายการอาหาร:</div>
-                    {pkg.courses.map((c, i) => (
-                      <div key={i} className="truncate font-medium">
-                        • {c.title}: <span className="text-slate-800">{c.options[0]?.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PackageMenuEditor onPreviewSite={onBackToSite} />
         )}
 
         {/* TAB 3: Google Drive & GAS Settings */}

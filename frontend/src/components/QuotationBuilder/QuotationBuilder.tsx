@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BANQUET_PACKAGES } from '../../data/packages.js';
+import { useBanquetPackages } from '../../services/packageService.js';
 import { BEVERAGE_SETS } from '../../data/beverages.js';
 import { PackageTier, BeverageSet, CustomerInfo, SelectedDishMap, QuotationDoc } from '../../types/quotation.js';
 import { CustomerForm } from './CustomerForm.js';
@@ -24,19 +24,29 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
   initialDate,
   onQuotationGenerated,
 }) => {
+  const { packages } = useBanquetPackages();
+
   // State
-  const [selectedPackage, setSelectedPackage] = useState<PackageTier>(
-    initialPackage || BANQUET_PACKAGES.find((p) => p.isPopular) || BANQUET_PACKAGES[2]
-  );
+  const [selectedPackage, setSelectedPackage] = useState<PackageTier>(() => {
+    return initialPackage || packages.find((p) => p.isPopular) || packages[2] || packages[0];
+  });
   
   const [selectedDishes, setSelectedDishes] = useState<SelectedDishMap>(() => {
     const map: SelectedDishMap = {};
-    const pkg = initialPackage || BANQUET_PACKAGES[2];
-    pkg.courses.forEach((c) => {
+    const pkg = initialPackage || packages.find((p) => p.isPopular) || packages[2] || packages[0];
+    pkg?.courses.forEach((c) => {
       map[c.id] = c.defaultDishId;
     });
     return map;
   });
+
+  // Keep selectedPackage synchronized with any dynamic menu edits from admin
+  React.useEffect(() => {
+    const updated = packages.find((p) => p.id === selectedPackage.id);
+    if (updated) {
+      setSelectedPackage(updated);
+    }
+  }, [packages]);
 
   const [tableCount, setTableCount] = useState<number>(10);
   const [selectedBeverage, setSelectedBeverage] = useState<BeverageSet>(BEVERAGE_SETS[1]); // Default 250
@@ -282,7 +292,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
                 <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                   <span>เลือกแพ็กเกจราคาโต๊ะจีน</span>
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                    {BANQUET_PACKAGES.length} ระดับราคา
+                    {packages.length} ระดับราคา
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
@@ -301,7 +311,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
 
           {/* Horizontal Package Price Cards Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-11 gap-2.5">
-            {BANQUET_PACKAGES.map((pkg) => {
+            {packages.map((pkg) => {
               const isSelected = selectedPackage.id === pkg.id;
 
               return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { QuotationDoc } from '../types/quotation.js';
-import { BANQUET_PACKAGES } from '../data/packages.js';
+import { useBanquetPackages } from '../services/packageService.js';
 import { formatCurrency } from '../utils/currency.js';
 import { RealtimeLocationMap } from './QuotationBuilder/RealtimeLocationMap.js';
 import {
@@ -39,6 +39,8 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { packages } = useBanquetPackages();
+
   if (!isOpen || !quotation) return null;
 
   // Form State initialized with current quotation values
@@ -75,7 +77,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
     if (quotation.selectedDishes && quotation.selectedDishes.length > 0) {
       return quotation.selectedDishes.map((d) => ({ ...d }));
     }
-    const pkg = BANQUET_PACKAGES.find((p) => p.id === quotation.package?.id) || BANQUET_PACKAGES[0];
+    const pkg = packages.find((p) => p.id === quotation.package?.id) || packages[0];
     return pkg.courses.map((c) => {
       const defDish = c.options.find((o) => o.id === c.defaultDishId) || c.options[0];
       return {
@@ -94,12 +96,12 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   const depositAmount = Math.round(grandTotal * 0.3);
   const finalAmount = grandTotal - depositAmount;
 
-  const currentPackageData = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || BANQUET_PACKAGES[0];
+  const currentPackageData = packages.find((p) => p.id === selectedPackageId) || packages[0];
 
   const handlePackageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const pkgId = e.target.value;
     setSelectedPackageId(pkgId);
-    const found = BANQUET_PACKAGES.find((p) => p.id === pkgId);
+    const found = packages.find((p) => p.id === pkgId);
     if (found) {
       setPackagePrice(found.price);
       setPackageName(found.name);
@@ -170,7 +172,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
 
   const handleResetToPackageDefaults = () => {
     if (!confirm('ต้องการรีเซ็ตรายการอาหารกลับเป็นค่าเริ่มต้นตามแพ็กเกจหรือไม่?')) return;
-    const pkg = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || BANQUET_PACKAGES[0];
+    const pkg = packages.find((p) => p.id === selectedPackageId) || packages[0];
     const defaultDishes = pkg.courses.map((c) => {
       const defDish = c.options.find((o) => o.id === c.defaultDishId) || c.options[0];
       return {
@@ -185,7 +187,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
   const handleFormSubmit = (e: React.FormEvent, openPreview: boolean = false) => {
     e.preventDefault();
 
-    const selectedPkg = BANQUET_PACKAGES.find((p) => p.id === selectedPackageId) || quotation.package;
+    const selectedPkg = packages.find((p) => p.id === selectedPackageId) || quotation.package;
     const isBkk = locationZone !== 'upcountry';
     const isFree = tableCount >= 20 && isBkk;
 
@@ -394,7 +396,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                   onChange={handlePackageChange}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-bold text-slate-900 outline-none"
                 >
-                  {BANQUET_PACKAGES.map((pkg) => (
+                  {packages.map((pkg) => (
                     <option key={pkg.id} value={pkg.id}>
                       {pkg.name} ({formatCurrency(pkg.price)}.-)
                     </option>

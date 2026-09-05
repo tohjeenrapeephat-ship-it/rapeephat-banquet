@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BANQUET_PACKAGES } from '../data/packages.js';
+import { useBanquetPackages } from '../services/packageService.js';
 import { PackageTier } from '../types/quotation.js';
 import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText } from 'lucide-react';
 import { formatCurrency } from '../utils/currency.js';
@@ -11,6 +11,7 @@ interface PackageSectionProps {
 }
 
 export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage, onOpenCatalogModal }) => {
+  const { packages } = useBanquetPackages();
   const [expandedPkgId, setExpandedPkgId] = useState<string | null>('pkg-1700');
   const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
   const [catalogPkgId, setCatalogPkgId] = useState<string>('pkg-2500');
@@ -79,7 +80,7 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage,
 
         {/* Packages Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {BANQUET_PACKAGES.map((pkg) => {
+          {packages.map((pkg) => {
             const isPopular = pkg.isPopular;
             const isExpanded = expandedPkgId === pkg.id;
 

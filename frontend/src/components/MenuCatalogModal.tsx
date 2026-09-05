@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BANQUET_PACKAGES } from '../data/packages.js';
+import { useBanquetPackages } from '../services/packageService.js';
 import { PackageTier } from '../types/quotation.js';
 import { generateA4Pdf } from '../services/pdfService.js';
 import { formatCurrency } from '../utils/currency.js';
@@ -112,9 +112,11 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
     }
   }, [isOpen, onClose]);
 
+  const { packages } = useBanquetPackages();
+
   if (!isOpen) return null;
 
-  const currentPkg = BANQUET_PACKAGES.find((p) => p.id === selectedPkgId) || BANQUET_PACKAGES[0];
+  const currentPkg = packages.find((p) => p.id === selectedPkgId) || packages[0];
 
   // Handle PDF Download (Standard A4 Format)
   const handleDownloadPdf = async () => {
@@ -168,7 +170,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
                 aria-label="เลือกแพ็กเกจราคาโต๊ะจีน"
                 className="w-full bg-amber-50/90 border-2 border-amber-300 rounded-xl px-2.5 sm:px-3 py-1 text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer truncate"
               >
-                {BANQUET_PACKAGES.map((pkg) => (
+                {packages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
                     {pkg.name} ({formatCurrency(pkg.price)} บ./โต๊ะ - {pkg.courses.length} จาน)
                   </option>
