@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CustomerInfo } from '../../types/quotation.js';
 import { QueueService, formatThaiDateShort } from '../../services/queueService.js';
 import { AvailableQueueModal } from '../AvailableQueueModal.js';
+import { RealtimeLocationMap } from './RealtimeLocationMap.js';
 import { User, Phone, Mail, Calendar, Clock, MapPin, Sparkles, FileText, Truck, Building2, Navigation, CheckCircle2, AlertCircle, MessageCircle, Crown } from 'lucide-react';
 
 interface CustomerFormProps {
@@ -293,6 +294,13 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({ formData, onChange }
         </div>
 
       </div>
+
+      {/* Real-time Location Map Preview & GPS Pinning */}
+      <RealtimeLocationMap
+        location={formData.eventLocation}
+        onLocationChange={(newLocation) => onChange({ eventLocation: newLocation })}
+        zone={formData.locationZone}
+      />
 
       {/* Date Available Capacity Banner (งานไม่เต็ม รับได้ตามจำนวน) */}
       {blockedCheck.isAvailableCapacity && (

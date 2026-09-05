@@ -28,6 +28,7 @@ interface SummaryCardProps {
   customTravelFee?: number;
   onGenerateQuotation: () => void;
   onSendLineOrder?: () => void;
+  onBookNow?: () => void;
   isValid: boolean;
 }
 
@@ -41,6 +42,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   customTravelFee,
   onGenerateQuotation,
   onSendLineOrder,
+  onBookNow,
   isValid,
 }) => {
   // Calculations
@@ -95,12 +97,12 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. แถมโปรโมชั่นสุดฮอต !!! */}
+        {/* 2. แถมโปรโมชั่นสุดฮอต & เงื่อนไขการมัดจำล็อกคิว */}
         {/* ========================================================================= */}
         <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border-2 border-amber-300 space-y-2.5 shadow-2xs">
           <div className="flex items-center gap-2 text-sm sm:text-base font-black text-amber-950">
             <Gift className="w-5 h-5 text-amber-600 shrink-0" />
-            <span>แถมโปรโมชั่นสุดฮอต !!!</span>
+            <span>แถมโปรโมชั่นสุดฮอต & เงื่อนไขการมัดจำ</span>
           </div>
           <ul className="space-y-2 pl-6 list-disc text-sm sm:text-base text-slate-800 font-bold leading-relaxed">
             <li className="font-black text-red-700">สั่ง 20 โต๊ะ แถมฟรี 1 โต๊ะ (ราคาเดียวกัน)</li>
@@ -108,6 +110,9 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
             <li>สั่งไม่ถึง 20 โต๊ะ ค่าเดินทาง 1,500 บาท (กทม.และปริมณฑล)</li>
             <li>ต่างจังหวัด มีค่าเดินทางคำนวณตามระยะทางจริง (ประสานงานคุณแป้ง)</li>
             <li>ฟรี ผ้าปูโต๊ะ ผ้าคลุมเก้าอี้ ผูกโบว์ (ทุกราคา)</li>
+            <li className="text-red-700 font-black">
+              มัดจำล็อกคิวงาน 30% (หากมีการล็อกคิวงานแล้ว ทางร้านขอสงวนสิทธิ์ไม่คืนเงินมัดจำทุกกรณี หากมีการยกเลิกงาน)
+            </li>
           </ul>
         </div>
 
@@ -280,26 +285,37 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 6. ปุ่มส่งออร์เดอร์เข้า LINE & ออกใบเสนอราคา A4 */}
+        {/* 6. ปุ่มสั่งจองล็อกคิวงาน, ดูใบเสนอราคา & โทรสายตรง */}
         {/* ========================================================================= */}
         <div className="space-y-2.5">
+          {/* Main Booking Button */}
           <button
             type="button"
-            onClick={onSendLineOrder || onGenerateQuotation}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-500 hover:to-green-600 text-white font-black text-base sm:text-lg shadow-xl flex items-center justify-center gap-2.5 transition-all transform hover:scale-[1.02] active:scale-98 cursor-pointer border-2 border-green-300"
+            onClick={onBookNow || onSendLineOrder || onGenerateQuotation}
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-500 hover:to-green-600 text-white font-black text-base sm:text-lg shadow-xl flex items-center justify-center gap-2.5 transition-all transform hover:scale-[1.02] active:scale-98 cursor-pointer border-2 border-green-300 group"
           >
-            <MessageCircle className="w-6 h-6 text-white" />
-            <span>📲 ส่งออร์เดอร์นี้เข้า LINE คุณแป้ง (ล็อกคิวงาน)</span>
+            <Sparkles className="w-6 h-6 text-amber-200 animate-pulse shrink-0" />
+            <span className="text-white">🎉 สั่งจองจัดเลี้ยง / ล็อกคิวงานทันที</span>
           </button>
 
+          {/* Quotation A4 Button */}
           <button
             type="button"
             onClick={onGenerateQuotation}
-            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm sm:text-base shadow-md flex items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-98 cursor-pointer border border-amber-300"
+            className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm sm:text-base shadow-md flex items-center justify-center gap-2 transition-all transform hover:scale-[1.01] active:scale-98 cursor-pointer border border-amber-300"
           >
             <FileText className="w-4 h-4 text-amber-300" />
             <span>📄 ดู & พิมพ์ใบเสนอราคามาตรฐาน A4 ฉบับจริง</span>
           </button>
+
+          {/* Direct Phone Call Button */}
+          <a
+            href="tel:0813311646"
+            className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-amber-500/40 shadow-xs transition-colors cursor-pointer"
+          >
+            <PhoneCall className="w-4 h-4 text-amber-400 animate-bounce" />
+            <span>โทรสายตรงปรึกษาคุณแป้ง: <strong className="text-white font-mono font-black">081-331-1646</strong></span>
+          </a>
         </div>
 
       </div>

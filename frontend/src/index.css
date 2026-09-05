@@ -103,11 +103,15 @@
   background: #DC2626;
 }
 
-/* 📄 Strict 1-Page A4 Print Stylesheet */
+/* 📄 Strict 1-Page A4 Print Stylesheet (Crisp & Perfectly Fitted for Desktop & Mobile) */
 @media print {
   @page {
     size: A4 portrait;
     margin: 4mm 6mm;
+  }
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   html, body {
     background: white !important;
@@ -115,26 +119,49 @@
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
+    overflow: visible !important;
   }
-  .no-print {
+  .no-print, .print\:hidden, [class*="no-print"] {
     display: none !important;
   }
   .print-only {
     display: block !important;
   }
+  /* Remove modal backdrop & containers so only the clean A4 sheet prints */
+  .fixed.inset-0 {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+  }
+  .max-w-4xl, .max-w-5xl, .rounded-3xl, .rounded-2xl, .shadow-2xl, .shadow-xl {
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
   .print-a4-page {
-    width: 100% !important;
+    width: 210mm !important;
+    min-width: 210mm !important;
     max-width: 210mm !important;
-    padding: 2mm 4mm !important;
+    min-height: 297mm !important;
+    padding: 4mm 6mm !important;
     margin: 0 auto !important;
     background: white !important;
     color: #111 !important;
     box-shadow: none !important;
     border: none !important;
+    transform: none !important;
     page-break-after: avoid !important;
     page-break-inside: avoid !important;
     page-break-before: avoid !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
   }
 }
 

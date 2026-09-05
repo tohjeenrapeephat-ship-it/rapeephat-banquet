@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { QuotationDoc } from '../types/quotation.js';
 import { formatCurrency, thaiBahtText } from '../utils/currency.js';
 import { formatThaiDate } from '../utils/thaiDate.js';
 import { generateA4Pdf } from '../services/pdfService.js';
+import { EventLocationQrBadge } from './QuotationBuilder/EventLocationQrBadge.js';
 import {
   Printer,
   Download,
@@ -17,7 +18,9 @@ import {
   Building,
   QrCode,
   ShieldCheck,
-  Award
+  Award,
+  Smartphone,
+  Monitor
 } from 'lucide-react';
 
 export type ReceiptType = 'deposit_30' | 'final_70' | 'full_100';
@@ -37,7 +40,26 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
 }) => {
   const [receiptType, setReceiptType] = useState<ReceiptType>(initialType);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [viewMode, setViewMode] = useState<'fit' | 'desktop'>('fit');
   const printRef = useRef<HTMLDivElement>(null);
+
+  // Auto-calculate scale factor for mobile screens
+  useEffect(() => {
+    const handleResize = () => {
+      const padding = window.innerWidth < 640 ? 16 : 32;
+      const availableWidth = window.innerWidth - padding;
+      const targetWidth = 794;
+      if (availableWidth < targetWidth) {
+        setScale(availableWidth / targetWidth);
+      } else {
+        setScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (!isOpen || !quotation) return null;
 
@@ -97,23 +119,26 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-1 sm:p-4">
       
       {/* Container Card */}
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border-2 border-emerald-400 overflow-hidden my-4">
+      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border-2 border-emerald-400 overflow-hidden my-2 sm:my-4 flex flex-col">
         
         {/* Top Control Action Bar (Hidden in Print) */}
-        <div className="print:hidden bg-slate-900 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 text-white border-b-2 border-emerald-400">
+        <div className="print:hidden bg-slate-900 px-3.5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2.5 text-white border-b-2 border-emerald-400">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md">
-              <Receipt className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md shrink-0">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-sm font-black text-emerald-300">
-                {receiptTitle} (A4 Official Receipt)
+              <h3 className="text-xs sm:text-sm font-black text-emerald-300 flex items-center gap-1.5">
+                <span>{receiptTitle}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold hidden sm:inline">
+                  A4 1 หน้า
+                </span>
               </h3>
-              <p className="text-[10.5px] text-slate-400 font-mono">
-                เลขที่: {receiptNo} • อ้างอิง: CTR-{rawNo}
+              <p className="text-[10px] sm:text-[10.5px] text-slate-400 font-mono">
+                เลขที่: <span className="text-emerald-300 font-bold">{receiptNo}</span> • CTR-{rawNo}
               </p>
             </div>
           </div>
@@ -123,7 +148,7 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
             <button
               type="button"
               onClick={() => setReceiptType('deposit_30')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                 receiptType === 'deposit_30'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-300 hover:text-white'
@@ -134,37 +159,60 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
             <button
               type="button"
               onClick={() => setReceiptType('final_70')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                 receiptType === 'final_70'
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              🔵 ยอดคงเหลือ 70%
+              🔵 ยอดจบ 70%
             </button>
             <button
               type="button"
               onClick={() => setReceiptType('full_100')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                 receiptType === 'full_100'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              🟣 เต็มจำนวน 100%
+              🟣 เต็มจำนวน
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* View Mode Toggle (Mobile / Desktop) */}
+            <button
+              type="button"
+              onClick={() => setViewMode(viewMode === 'desktop' ? 'fit' : 'desktop')}
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold flex items-center gap-1.5 border border-amber-400/40 shadow-xs transition-all cursor-pointer"
+              title="สลับมุมมองพอดีจอมือถือ / ขนาดจริง 100%"
+            >
+              {viewMode === 'desktop' ? (
+                <>
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="hidden sm:inline">ดูแบบพอดีจอมือถือ</span>
+                  <span className="sm:hidden">พอดีจอ</span>
+                </>
+              ) : (
+                <>
+                  <Monitor className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">ดูแบบคอมพิวเตอร์</span>
+                  <span className="sm:hidden">แบบคอม</span>
+                </>
+              )}
+            </button>
+
             {/* Native Browser Print */}
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-colors shadow-xs"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-colors shadow-xs cursor-pointer"
               title="สั่งพิมพ์ใบเสร็จออกเครื่องพิมพ์โดยตรง (A4 เต็มหน้าพอดี 1 แผ่น)"
             >
-              <Printer className="w-4 h-4 text-emerald-400" />
-              <span>พิมพ์ใบเสร็จ (A4 เต็มหน้า)</span>
+              <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+              <span className="hidden sm:inline">พิมพ์ใบเสร็จ</span>
+              <span className="sm:hidden">พิมพ์</span>
             </button>
 
             {/* Download PDF */}
@@ -172,10 +220,10 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
               type="button"
               onClick={handleDownloadPdf}
               disabled={isGeneratingPdf}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all border border-emerald-500"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-black flex items-center gap-1.5 shadow-md transition-all border border-emerald-500 cursor-pointer"
               title="ดาวน์โหลดไฟล์ PDF ใบเสร็จรับเงิน"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>{isGeneratingPdf ? 'กำลังสร้าง...' : 'ดาวน์โหลด PDF'}</span>
             </button>
 
@@ -183,23 +231,67 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+              className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors cursor-pointer"
               title="ปิดหน้าต่าง"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
-        {/* Scrollable Printable A4 Area */}
-        <div className="max-h-[85vh] overflow-y-auto p-3 sm:p-6 bg-slate-200 flex justify-center">
-          
-          {/* Exact Full A4 Printable Sheet (210mm x 297mm Standard) */}
-          <div
-            ref={printRef}
-            className="print-a4-page bg-white w-full max-w-[794px] min-h-[1123px] p-6 sm:p-7 text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-5 print:border-none print:shadow-none print:min-h-0"
-            style={{ fontFamily: "'Sarabun', 'Noto Sans Thai', sans-serif" }}
+        {/* Mobile View Mode Switcher Info Banner */}
+        <div className="print:hidden sm:hidden px-3.5 py-2 bg-slate-800 border-b border-slate-700 flex items-center justify-between gap-2 text-xs">
+          <span className="text-slate-300 font-bold flex items-center gap-1.5 text-[11px]">
+            {viewMode === 'desktop' ? (
+              <>
+                <Monitor className="w-3.5 h-3.5 text-amber-400" />
+                <span>มุมมอง: <strong className="text-amber-300">ขนาดจริง A4</strong></span>
+              </>
+            ) : (
+              <>
+                <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>มุมมอง: <strong className="text-emerald-300">พอดีจอมือถือ 📱</strong></span>
+              </>
+            )}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === 'desktop' ? 'fit' : 'desktop')}
+            className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-[10.5px] flex items-center gap-1 shadow-xs cursor-pointer"
           >
+            {viewMode === 'desktop' ? 'ดูแบบพอดีจอ' : 'ดูขนาดจริง 100%'}
+          </button>
+        </div>
+
+        {/* Scrollable Printable A4 Area with Responsive Fit */}
+        <div className="p-2 sm:p-4 bg-slate-200/90 flex justify-center items-start overflow-x-auto max-h-[85vh] overflow-y-auto">
+          <div
+            style={
+              viewMode === 'fit' && scale < 1
+                ? {
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top center',
+                    marginBottom: `-${(1 - scale) * 1123}px`,
+                  }
+                : {}
+            }
+            className="transition-transform duration-200 shrink-0"
+          >
+            {/* Exact Full A4 Printable Sheet (210mm x 297mm Standard) */}
+            <div
+              ref={printRef}
+              className="print-a4-page bg-white text-slate-900 rounded-2xl shadow-xl border-2 border-emerald-300 flex flex-col justify-between relative print:m-0 print:p-5 print:border-none print:shadow-none print:min-h-0"
+              style={{
+                width: '794px',
+                minWidth: '794px',
+                minHeight: '1123px',
+                padding: '20px 24px',
+                boxSizing: 'border-box',
+                backgroundColor: '#ffffff',
+                fontFamily: "'Sarabun', 'Noto Sans Thai', sans-serif",
+              }}
+            >
             {/* Background Watermark */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
               <img src="/images/brand/logo.png" alt="" className="w-[420px] h-[420px] object-contain" />
@@ -266,24 +358,34 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                 </div>
               </div>
 
-              {/* 2. Customer & Event Details */}
-              <div className="grid grid-cols-2 gap-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                <div className="space-y-1.5">
+              {/* 2. Customer, Event Details & Google Maps QR Code */}
+              <div className="grid grid-cols-12 gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs items-stretch">
+                <div className="col-span-5 space-y-1.5">
                   <div className="font-black text-emerald-900 text-[11.5px] border-b border-slate-200 pb-1 flex items-center gap-1.5">
                     <User className="w-4 h-4 text-emerald-700" /> ได้รับเงินจาก (ผู้ว่าจ้าง / ลูกค้า):
                   </div>
-                  <div><span className="text-slate-500 font-medium">ชื่อลูกค้า / หน่วยงาน:</span> <strong className="text-slate-950 font-bold text-sm ml-1">{quotation.customer?.name || 'ลูกค้าผู้มีเกียรติ'}</strong></div>
+                  <div><span className="text-slate-500 font-medium">ชื่อลูกค้า:</span> <strong className="text-slate-950 font-bold text-sm ml-1">{quotation.customer?.name || 'ลูกค้าผู้มีเกียรติ'}</strong></div>
                   <div><span className="text-slate-500 font-medium">เบอร์โทรศัพท์:</span> <strong className="font-mono text-emerald-800 text-xs font-black ml-1">{quotation.customer?.phone || '-'}</strong></div>
-                  <div><span className="text-slate-500 font-medium">ประเภทงานจัดเลี้ยง:</span> <strong className="text-slate-900 font-bold ml-1">{quotation.customer?.eventType || 'งานจัดเลี้ยงมงคล'}</strong></div>
+                  <div><span className="text-slate-500 font-medium">ประเภทงาน:</span> <strong className="text-slate-900 font-bold ml-1">{quotation.customer?.eventType || 'งานจัดเลี้ยงมงคล'}</strong></div>
                 </div>
 
-                <div className="space-y-1.5 border-l border-slate-200 pl-3.5">
+                <div className="col-span-4 space-y-1.5 border-l border-slate-200 pl-2.5">
                   <div className="font-black text-emerald-900 text-[11.5px] border-b border-slate-200 pb-1 flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-emerald-700" /> ข้อมูลงานจัดเลี้ยง:
                   </div>
-                  <div><span className="text-slate-500 font-medium">วันจัดงาน:</span> <strong className="text-slate-950 font-bold">{formatThaiDate(quotation.customer?.eventDate || new Date().toISOString())}</strong></div>
-                  <div><span className="text-slate-500 font-medium">เวลาเริ่มงาน:</span> <strong className="text-slate-950 font-bold">{quotation.customer?.eventTime || '11:00 น.'}</strong></div>
-                  <div className="truncate"><span className="text-slate-500 font-medium">สถานที่:</span> <strong className="text-slate-950 font-bold">{quotation.customer?.eventLocation || 'ตามที่ลูกค้ากำหนด'}</strong></div>
+                  <div><span className="text-slate-500 font-medium">วันจัดงาน:</span> <strong className="text-slate-950 font-bold ml-1">{formatThaiDate(quotation.customer?.eventDate || new Date().toISOString())}</strong></div>
+                  <div><span className="text-slate-500 font-medium">เวลาเริ่มงาน:</span> <strong className="text-slate-950 font-bold ml-1">{quotation.customer?.eventTime || '11:00 น.'}</strong></div>
+                  <div><span className="text-slate-500 font-medium">สถานที่:</span> <strong className="text-slate-950 font-bold ml-1">{quotation.customer?.eventLocation || 'ตามที่ลูกค้ากำหนด'}</strong></div>
+                </div>
+
+                <div className="col-span-3 border-l border-slate-200 pl-2.5 flex items-stretch">
+                  <EventLocationQrBadge
+                    location={quotation.customer?.eventLocation || ''}
+                    size={70}
+                    variant="vertical"
+                    theme="emerald"
+                    className="w-full"
+                  />
                 </div>
               </div>
 
@@ -445,26 +547,32 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
                   </div>
                 </div>
 
-                <div className="text-center space-y-3 relative">
-                  <div className="text-xs font-bold text-slate-700">ลงชื่อ ................................... ผู้รับเงิน (โต๊ะจีนรพีพัฒน์)</div>
-                  
-                  {/* Signature and Seal */}
-                  <div className="relative h-10 flex items-center justify-center">
-                    <img
-                      src="/images/brand/signature-rapeephat-p.png"
-                      alt="ลายเซ็น Rapeephat P."
-                      className="h-10 w-auto object-contain mix-blend-multiply filter contrast-200 brightness-75 drop-shadow-xs select-none pointer-events-none"
-                    />
-                    <div className="absolute right-4 -top-2 w-11 h-11 rounded-full border-2 border-emerald-600 border-dashed flex flex-col items-center justify-center text-emerald-700 transform rotate-12 pointer-events-none select-none">
-                      <span className="text-[7.5px] font-black leading-none uppercase">รับเงินแล้ว</span>
-                      <span className="text-[8.5px] leading-none my-0.5 font-bold">★ {stampLabel} ★</span>
-                      <span className="text-[6.5px] font-black leading-none">{stampTag}</span>
+                <div className="text-center space-y-2 relative">
+                  <div className="flex items-end justify-center text-xs font-bold text-slate-700 gap-1 pb-1">
+                    <span>ลงชื่อ</span>
+                    <div className="relative inline-flex items-end justify-center min-w-[170px] border-b border-dotted border-slate-500 pb-0.5 px-2">
+                      <img
+                        src="/images/brand/signature-rapeephat-p.png"
+                        alt="ลายเซ็น Rapeephat P."
+                        className="absolute -top-3.5 left-1/2 -translate-x-1/2 h-10 w-auto object-contain mix-blend-multiply filter contrast-200 brightness-75 drop-shadow-xs select-none pointer-events-none z-10"
+                      />
+                      <span className="invisible text-[10px]">...........................................</span>
                     </div>
+                    <span>ผู้รับเงิน (โต๊ะจีนรพีพัฒน์)</span>
+                  </div>
+                  
+                  {/* Subtle Modern Official Shop Logo Watermark */}
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-14 h-14 opacity-25 pointer-events-none select-none flex items-center justify-center">
+                    <img
+                      src="/images/brand/logo.png"
+                      alt="ตราสัญลักษณ์ โต๊ะจีน รพีพัฒน์"
+                      className="w-full h-full object-contain filter contrast-125"
+                    />
                   </div>
 
                   <div className="space-y-0.5">
-                    <div className="text-xs font-black text-emerald-900">( นางสาวใบชา สุขอยู่ )</div>
-                    <div className="text-[10px] text-slate-900 font-bold">ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม</div>
+                    <div className="text-xs font-black text-slate-900">( นางสาวใบชา สุขอยู่ )</div>
+                    <div className="text-[10px] text-slate-700 font-bold">ผู้ประกอบการ / เจ้าของแบรนด์ โต๊ะจีนรพีพัฒน์ พรีเมียม</div>
                   </div>
                 </div>
               </div>
@@ -476,12 +584,10 @@ export const CateringReceiptModal: React.FC<CateringReceiptModalProps> = ({
               {receiptTitle}ฉบับนี้ออกโดย โต๊ะจีน รพีพัฒน์ พรีเมียม • ขอบพระคุณที่ไว้วางใจให้เราดูแลวันสำคัญของคุณ
             </div>
 
+            </div>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 };

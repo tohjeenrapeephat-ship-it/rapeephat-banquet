@@ -521,10 +521,17 @@ const QRUtil = {
  */
 export function generateQrMatrix(text: string, errorCorrectionLevel: number = 1): boolean[][] {
   const bytes = QRUtil.toUtf8ByteArray(text);
-  let type = 4;
-  if (bytes.length > 80) type = 6;
-  if (bytes.length > 130) type = 8;
-  if (bytes.length > 180) type = 10;
+  let type = 3;
+  if (bytes.length <= 17) type = 2;
+  else if (bytes.length <= 34) type = 3;
+  else if (bytes.length <= 55) type = 4;
+  else if (bytes.length <= 80) type = 5;
+  else if (bytes.length <= 108) type = 6;
+  else if (bytes.length <= 130) type = 7;
+  else if (bytes.length <= 160) type = 8;
+  else if (bytes.length <= 192) type = 9;
+  else if (bytes.length <= 271) type = 10;
+  else throw new Error('String length exceeds QR Matrix capacity, fallback to vector/image stream');
 
   const qr = new QRCodeModel(type, errorCorrectionLevel);
   qr.addData(text);

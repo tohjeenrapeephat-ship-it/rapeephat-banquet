@@ -87,6 +87,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
           { id: 'd7-1', name: 'ข้าวผัดทรงเครื่อง', tag: 'หอมกระทะ' },
           { id: 'd7-2', name: 'ข้าวผัดปูโรยหมูหยอง' },
           { id: 'd7-3', name: 'ข้าวผัดปู' },
+          { id: 'd7-4', name: 'ข้าวผัดไก่' },
         ],
       },
       {
@@ -200,9 +201,9 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 8: ข้าวผัด / หมี่ (เลือก 1 อย่าง)',
         defaultDishId: 'd8-1',
         options: [
-          { id: 'd8-1', name: 'ข้าวผัดปูใส่กรอก (ไส้กรอก)', tag: 'ยอดฮิต' },
+          { id: 'd8-1', name: 'ข้าวผัดปูใส่ไส้กรอก', tag: 'ยอดฮิต' },
           { id: 'd8-2', name: 'ข้าวผัดปู' },
-          { id: 'd8-3', name: 'ข้าวผัดไก่' },
+          { id: 'd8-3', name: 'ข้าวผัดไก่', tag: 'เนื้อนุ่มหอมกรุ่น' },
           { id: 'd8-4', name: 'ข้าวผัดหมู' },
         ],
       },

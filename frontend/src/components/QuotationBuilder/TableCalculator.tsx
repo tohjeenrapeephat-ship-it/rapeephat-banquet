@@ -36,8 +36,60 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
   const freeTableCount = Math.floor(tableCount / 20);
   const tablesUntilNextFree = 20 - (tableCount % 20);
 
-  const increment = () => onTableCountChange(tableCount + 1);
-  const decrement = () => onTableCountChange(Math.max(minTables, tableCount - 1));
+  // Local state for smooth typing without premature clamping
+  const [rawTableInput, setRawTableInput] = useState<string>(String(tableCount));
+
+  useEffect(() => {
+    setRawTableInput(String(tableCount));
+  }, [tableCount]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const cleaned = value.replace(/[^0-9]/g, '');
+    setRawTableInput(cleaned);
+
+    if (cleaned !== '') {
+      const parsed = parseInt(cleaned, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        onTableCountChange(parsed);
+      }
+    }
+  };
+
+  const handleInputBlur = () => {
+    const parsed = parseInt(rawTableInput, 10);
+    if (isNaN(parsed) || parsed < minTables) {
+      setRawTableInput(String(minTables));
+      onTableCountChange(minTables);
+    } else {
+      const clamped = Math.min(parsed, 750);
+      setRawTableInput(String(clamped));
+      onTableCountChange(clamped);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+
+  const increment = () => {
+    const next = tableCount + 1;
+    setRawTableInput(String(next));
+    onTableCountChange(next);
+  };
+
+  const decrement = () => {
+    const next = Math.max(minTables, tableCount - 1);
+    setRawTableInput(String(next));
+    onTableCountChange(next);
+  };
+
+  const setPresetCount = (count: number) => {
+    setRawTableInput(String(count));
+    onTableCountChange(count);
+  };
 
   return (
     <div className="space-y-6">
@@ -113,24 +165,26 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
         </div>
 
         <div className="grid sm:grid-cols-12 gap-5 items-center">
-          {/* Stepper Input */}
-          <div className="sm:col-span-6 space-y-2">
+          {/* Stepper & Direct Typing Input */}
+          <div className="sm:col-span-6 space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-sm sm:text-base font-black text-slate-900">
-                ระบุจำนวนโต๊ะที่ต้องการ (ขั้นต่ำ {minTables} โต๊ะ):
+              <label className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-1.5">
+                <span>ระบุจำนวนโต๊ะที่ต้องการ:</span>
+                <span className="text-xs text-slate-500 font-bold">(กดพิมพ์ตัวเลขได้โดยตรง)</span>
               </label>
               {tableCount < minTables && (
-                <span className="text-[11px] text-red-600 font-black bg-red-50 px-2 py-0.5 rounded-md border border-red-200">
-                  ต้องไม่น้อยกว่า {minTables} โต๊ะ
+                <span className="text-[11px] text-red-600 font-black bg-red-50 px-2 py-0.5 rounded-md border border-red-200 animate-pulse">
+                  ขั้นต่ำ {minTables} โต๊ะ
                 </span>
               )}
             </div>
+
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={decrement}
                 disabled={tableCount <= minTables}
-                className="w-14 h-14 rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 text-slate-900 flex items-center justify-center font-black text-2xl disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs active:scale-95 cursor-pointer"
+                className="w-14 h-14 rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-amber-300 text-slate-900 flex items-center justify-center font-black text-2xl disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0"
                 title="ลดจำนวนโต๊ะ"
               >
                 <Minus className="w-6 h-6 text-red-700 stroke-[3]" />
@@ -138,14 +192,19 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
 
               <div className="relative flex-1">
                 <input
-                  type="number"
-                  min={minTables}
-                  max="750"
-                  value={tableCount}
-                  onChange={(e) => onTableCountChange(Math.max(minTables, parseInt(e.target.value, 10) || minTables))}
-                  className="w-full h-14 bg-white border-2 border-amber-300 rounded-2xl text-center text-3xl font-black text-slate-900 focus:outline-hidden focus:border-red-500 shadow-inner font-mono"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={rawTableInput}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={handleKeyDown}
+                  placeholder={String(minTables)}
+                  className="w-full h-14 bg-white border-2 border-amber-300 hover:border-amber-400 focus:border-red-600 focus:ring-4 focus:ring-red-100 rounded-2xl text-center text-3xl font-black text-slate-900 shadow-inner font-mono transition-all outline-none pl-4 pr-12 cursor-text"
+                  title="คลิกเพื่อพิมพ์ตัวเลขจำนวนโต๊ะได้โดยตรง"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm sm:text-base text-amber-950 font-black">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm sm:text-base text-amber-950 font-black pointer-events-none select-none">
                   โต๊ะ
                 </span>
               </div>
@@ -153,11 +212,30 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
               <button
                 type="button"
                 onClick={increment}
-                className="w-14 h-14 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-700 text-white flex items-center justify-center font-black text-2xl shadow-red-glow transition-all active:scale-95 border-2 border-amber-300 cursor-pointer"
+                className="w-14 h-14 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-700 text-white flex items-center justify-center font-black text-2xl shadow-red-glow transition-all active:scale-95 border-2 border-amber-300 cursor-pointer shrink-0"
                 title="เพิ่มจำนวนโต๊ะ"
               >
                 <Plus className="w-6 h-6 text-amber-300 stroke-[3]" />
               </button>
+            </div>
+
+            {/* Quick Selection Preset Chips */}
+            <div className="pt-1 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-bold text-slate-500 mr-1">เลือกด่วน:</span>
+              {[10, 15, 20, 30, 50, 100].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setPresetCount(num)}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer border ${
+                    tableCount === num
+                      ? 'bg-red-700 text-white border-red-800 shadow-xs scale-105'
+                      : 'bg-amber-50 hover:bg-amber-100 text-slate-800 border-amber-300'
+                  }`}
+                >
+                  {num} โต๊ะ {num === 20 && '🎁'}
+                </button>
+              ))}
             </div>
           </div>
 

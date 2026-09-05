@@ -35,6 +35,44 @@ export const MenuShowcase: React.FC = () => {
   const [galleryPhotoIndex, setGalleryPhotoIndex] = useState<number>(0);
   const [cardPhotoIndexes, setCardPhotoIndexes] = useState<Record<string, number>>({});
   const [catalogModalOpen, setCatalogModalOpen] = useState<boolean>(false);
+  
+  const tabsContainerRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
+  const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
+
+  const checkScroll = () => {
+    if (tabsContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsContainerRef.current;
+      setCanScrollLeft(scrollLeft > 8);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 8);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (tabsContainerRef.current) {
+      const scrollAmount = 260;
+      tabsContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+      setTimeout(checkScroll, 300);
+    }
+  };
+
+  const handleTabClick = (catId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    setActiveTab(catId);
+    e.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
 
   const categories = [
     { id: 'all', name: 'เมนูทั้งหมด', icon: '🍽️' },
@@ -62,10 +100,13 @@ export const MenuShowcase: React.FC = () => {
       category: 'appetizer',
       name: 'ออเดิร์ฟจักรพรรดิ 5 อย่าง & ออเดิร์ฟทะเลนึ่งเตาซึ้งร้อนๆ',
       description: 'รวมสุดยอดออเดิร์ฟโต๊ะจีนสูตรภัตตาคาร 35 ปี: ออเดิร์ฟทะเลนึ่งเตาซึ้งร้อนๆ (ก้ามปู, ปูอัด, ลูกชิ้นปลาเยาวราช, เต้าหู้ปลา, กุ้งลวก โรยกระเทียมเจียวสีทอง เสิร์ฟพร้อมน้ำจิ้มซีฟู้ดมะนาวสดแท้) และออเดิร์ฟ 5 ช่องจักรพรรดิ (แฮ่กึ๊นทอดกรอบ, หอยจ๊อปู, ขนมจีบหมู, เม็ดมะม่วงหิมพานต์, ไส้กรอกแดงผ่าดอก)',
-      tag: '🥟 รวม 11 ภาพจริง',
-      image: '/images/dishes/appetizers/appetizer-5-platter-marble.jpg',
+      tag: '🥟 รวม 12 ภาพจริง',
+      image: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg',
       gallery: [
+        '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg',
         '/images/dishes/appetizers/appetizer-5-platter-marble.jpg',
+        '/images/dishes/appetizers/chicken-cashew-stirfry.jpg',
+        '/images/dishes/appetizers/appetizer-prawn-glass-noodles.jpg',
         '/images/dishes/appetizers/appetizer-seafood-steamer.jpg',
         '/images/dishes/dish-appetizer-seafood-macro.jpg',
         '/images/dishes/appetizers/appetizer-5-platter-luxury.jpg',
@@ -80,24 +121,30 @@ export const MenuShowcase: React.FC = () => {
     },
     {
       category: 'salad',
-      name: 'ยำสามกรอบรสเด็ดจักรพรรดิ (ครบเครื่อง 3 กรอบพรีเมียม)',
-      description: 'ยำสามกรอบรสเด็ดสูตรภัตตาคาร 35 ปี ครบเครื่อง 3 กรอบพรีเมียม: กระเพาะปลาแท้ทอดกรอบฟู, ปลาหมึกแห้งทอดกรอบสีทอง, เม็ดมะม่วงหิมพานต์คั่วหอม และแคบหมูกรอบ คลุกเคล้าน้ำยำพริกมะนาวสดแท้ รสชาติจัดจ้าน เปรี้ยวหวานเผ็ดกลมกล่อม',
-      tag: '🥗 อัลบั้มเมนูยำ (รวม 3 ภาพจริง)',
+      name: 'ยำสามกรอบจักรพรรดิ, ยำขาหมูสไลด์ & สลัดกุ้งทอด',
+      description: 'รวมสุดยอดเมนูยำและสลัดโต๊ะจีนสูตรเด็ด 35 ปี: ยำสามกรอบเม็ดมะม่วงหิมพานต์, ยำขาหมูสไลด์รสแซ่บจัดจ้าน, สลัดกุ้งทอดซอสครีม, สลัดปลาทิพย์ทอดกรอบสีทอง, ยำหมูย่างสไลด์นุ่มฉ่ำรสแซ่บ, สลัดกุ้งทอดกระทงเผือก และยำรวมมิตรทะเลสด คลุกเคล้าน้ำยำมะนาวแท้ 100% หอมสมุนไพรสดและพริกขี้หนูสวน',
+      tag: '🥗 รวมอัลบั้ม 7 ภาพจริง',
       image: '/images/dishes/salads/salad-samkrob-cashew-lattice.jpg',
       gallery: [
         '/images/dishes/salads/salad-samkrob-cashew-lattice.jpg',
-        '/images/dishes/salads/salad-samkrob-orchid-plate.jpg',
-        '/images/dishes/salads/salad-samkrob-macro-crispy.jpg',
+        '/images/dishes/salads/salad-pork-knuckle-sliced-red-platter.jpg',
+        '/images/dishes/salads/salad-prawn-lime-dip.jpg',
+        '/images/dishes/salads/salad-plathip-crispy.jpg',
+        '/images/dishes/salads/salad-grilled-pork-yum.jpg',
+        '/images/dishes/salads/salad-prawn-taro-nest.jpg',
+        '/images/dishes/salads/salad-seafood-mixed-red-platter.jpg',
       ],
     },
     {
       category: 'soup',
-      name: 'กระเพาะปลาน้ำแดงเนื้อปู / หูฉลามน้ำแดงเห็ดหอม',
-      description: 'กระเพาะปลาแท้เกรดพรีเมียมและหูฉลามน้ำแดง เคี่ยวน้ำซุปสูตรภัตตาคารฮ่องกงโบราณ 8 ชั่วโมง โรยเนื้อปูก้อนสดหวาน เห็ดหอม และผักชีสด หอมละมุน กลมกล่อม ซดคล่องคอ',
-      tag: '🍲 รวมอัลบั้ม 6 ภาพจริง',
+      name: 'กระเพาะปลาน้ำแดงเนื้อปู, ไก่ตุ๋นยาจีน & กระดูกหมูตุ๋นเห็ดหอมเยื่อไผ่',
+      description: 'กระเพาะปลาแท้เกรดพรีเมียม, หูฉลามน้ำแดง, ไก่ตุ๋นเห็ดหอมยาจีน และกระดูกหมูตุ๋นเยื่อไผ่ เคี่ยวน้ำซุปสูตรภัตตาคารฮ่องกงโบราณ 8 ชั่วโมง โรยเนื้อปูก้อนสดหวาน เห็ดหอม และผักชีสด หอมละมุน กลมกล่อม ซดคล่องคอ',
+      tag: '🍲 รวมอัลบั้ม 8 ภาพจริง',
       image: '/images/dishes/soups/soup-fishmaw-spoon-lift.jpg',
       gallery: [
         '/images/dishes/soups/soup-fishmaw-spoon-lift.jpg',
+        '/images/dishes/soups/soup-chicken-chinese-herb.jpg',
+        '/images/dishes/soups/soup-pork-rib-bamboo-fungus.jpg',
         '/images/dishes/soups/soup-fishmaw-crab-macro.jpg',
         '/images/dishes/soups/soup-fishmaw-bowl-table.jpg',
         '/images/dishes/soups/soup-fishmaw-bowl-blue.jpg',
@@ -107,12 +154,13 @@ export const MenuShowcase: React.FC = () => {
     },
     {
       category: 'poultry',
-      name: 'เป็ดปักกิ่งหนังกรอบ & เป็ดอบยอดผักจักรพรรดิ (บะหมี่หยก / แปะก๊วย)',
-      description: 'รวมสุดยอดเมนูเป็ดภัตตาคาร 35 ปี: เป็ดปักกิ่งย่างเตาถ่านหนังกรอบสีทอง เสิร์ฟคู่บะหมี่หยกมงคลเส้นเหนียวนุ่ม, เป็ดอบยอดผักน้ำแดงเนื้อนุ่มชุ่มฉ่ำ เห็ดหอม แปะก๊วยทองคำ และเป็ดอบยอดผักล้อมกุ้งสด จัดเสิร์ฟอย่างประณีตในจานกังไสสีแดงลายครามจักรพรรดิ (สีเดียวกับจานข้าวเกรียบตรงตามต้นตำรับโต๊ะจีน)',
-      tag: '🦆 อัลบั้มรวมเมนูเป็ด 13 ภาพจริง',
+      name: 'เป็ดปักกิ่งหนังกรอบ, เป็ดยัดไส้หน่อไม้จีน & เป็ดอบยอดผักจักรพรรดิ',
+      description: 'รวมสุดยอดเมนูเป็ดภัตตาคาร 35 ปี: เป็ดยัดไส้หน่อไม้จีนสูตรโบราณตุ๋นเข้าเนื้อนุ่มละมุน, เป็ดปักกิ่งย่างเตาถ่านหนังกรอบสีทอง เสิร์ฟคู่บะหมี่หยกมงคลเส้นเหนียวนุ่ม, เป็ดอบยอดผักน้ำแดงเนื้อนุ่มชุ่มฉ่ำ เห็ดหอม แปะก๊วยทองคำ และเป็ดอบยอดผักล้อมกุ้งสด จัดเสิร์ฟอย่างประณีตในจานกังไสสีแดงลายครามจักรพรรดิ 100%',
+      tag: '🦆 อัลบั้มรวมเมนูเป็ด 14 ภาพจริง',
       image: '/images/dishes/peking-duck/peking-duck-plate-flatlay.jpg',
       gallery: [
         '/images/dishes/peking-duck/peking-duck-plate-flatlay.jpg',
+        '/images/dishes/ducks/duck-stuffed-bamboo-shoots.jpg',
         '/images/dishes/ducks/duck-roast-imperial-plate.jpg',
         '/images/dishes/ducks/duck-abalone-shrimp-platter.jpg',
         '/images/dishes/peking-duck/peking-duck-table-chopsticks.jpg',
@@ -129,11 +177,13 @@ export const MenuShowcase: React.FC = () => {
     },
     {
       category: 'pork',
-      name: 'ขาหมูน้ำแดงยอดผักจักรพรรดิ & ขาหมูเยอรมัน (หมั่นโถว)',
-      description: 'ขาหมูคัดไซส์ใหญ่พิเศษ ตุ๋นน้ำแดงยาจีนสูตรภัตตาคาร 35 ปี จนหนังนุ่มละมุนเนื้อเปื่อยชุ่มฉ่ำ เสิร์ฟในจานกังไสสีแดงจักรพรรดิ (สีโต๊ะจีนมงคล) คู่ยอดผักคะน้าฮ่องกงและเห็ดหอม พร้อมขาหมูเยอรมันทอดกรอบฟูและหมั่นโถวนึ่งร้อนๆ',
-      tag: '🍖 จานกังไสสีแดง (รวม 6 ภาพจริง)',
-      image: '/images/dishes/pork/pork-knuckle-braised-spoon-lift.jpg',
+      name: 'ขาหมูน้ำแดงยอดผักจักรพรรดิ, กระเพาะหมูผัดเกี้ยมฉ่าย & ขาหมูเยอรมัน',
+      description: 'ขาหมูคัดไซส์ใหญ่พิเศษ ตุ๋นน้ำแดงยาจีนสูตรภัตตาคาร 35 ปี จนหนังนุ่มละมุนเนื้อเปื่อยชุ่มฉ่ำ, กระเพาะหมูผัดเกี้ยมฉ่ายเห็ดหอมรสกลมกล่อม เสิร์ฟในจานกังไสสีแดงจักรพรรดิ พร้อมขาหมูเยอรมันทอดกรอบฟูและหมั่นโถวนึ่งร้อนๆ',
+      tag: '🍖 รวม 8 ภาพจริง',
+      image: '/images/dishes/pork/pork-knuckle-braised-peanut-platter.jpg',
       gallery: [
+        '/images/dishes/pork/pork-knuckle-braised-peanut-platter.jpg',
+        '/images/dishes/pork/pork-stomach-pickled-mustard-red-platter.jpg',
         '/images/dishes/pork/pork-knuckle-braised-spoon-lift.jpg',
         '/images/dishes/pork/pork-knuckle-braised-red-plate-dining.jpg',
         '/images/dishes/pork/pork-knuckle-braised-shiitake-platter.jpg',
@@ -144,30 +194,62 @@ export const MenuShowcase: React.FC = () => {
     },
     {
       category: 'fish',
-      name: 'ปลากะพง & ปลาทับทิมจักรพรรดิ 9 ขีด (นึ่งมะนาว / สามรส / นึ่งบ๊วย / ทอดน้ำปลา)',
-      description: 'รวมสุดยอดเมนูปลาภัตตาคาร 35 ปี คัดไซส์ใหญ่พิเศษ 9 ขีด: ปลากะพงนึ่งมะนาวพริกสด, ปลาทับทิมนึ่งมะนาว, ปลาทับทิมสามรสซอสฉ่ำ, ปลาทับทิมนึ่งบ๊วยขิงซอย และปลาทับทิมทอดน้ำปลาคู่ยำมะม่วง เสิร์ฟในจานวงรีสีแดงลายครามจักรพรรดิ (สีโต๊ะจีนมงคล)',
-      tag: '🐟 ปลา 9 ขีด จานวงรีสีแดง (รวม 9 ภาพจริง)',
+      name: 'ปลากะพง & ปลาทับทิมนึ่งมะนาวพริกสด (จานวงรีสีแดง 9 ขีด)',
+      description: 'ปลากะพงและปลาทับทิมคัดไซส์ใหญ่พิเศษ 9 ขีด สดใหม่ส่งตรงจากแพ นึ่งร้อนๆ ราดน้ำยำพริกขี้หนูสวนมะนาวแท้ 100% กระเทียมสด รสชาติจัดจ้าน เปรี้ยว เผ็ด กลมกล่อม แขกทุกโต๊ะประทับใจ เสิร์ฟในจานวงรีสีแดงลายครามจักรพรรดิ (สีโต๊ะจีนมงคล)',
+      tag: '🐟 ปลานึ่งมะนาวพริกสด (รวม 6 ภาพจริง)',
       image: '/images/dishes/fish/fish-seabass-steamed-lime-red-oval.jpg',
       gallery: [
         '/images/dishes/fish/fish-seabass-steamed-lime-red-oval.jpg',
         '/images/dishes/fish/fish-ruby-steamed-lime-red-oval.jpg',
-        '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg',
-        '/images/dishes/fish/fish-ruby-steamed-plum-red-oval.jpg',
-        '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg',
-        '/images/dishes/fish/fish-steamed-lime-slate.jpg',
         '/images/dishes/fish/fish-steamed-lime-chopsticks.jpg',
         '/images/dishes/fish/fish-steamed-lime-kitchen.jpg',
         '/images/dishes/fish/fish-steamed-lime-macro.jpg',
+        '/images/dishes/fish/fish-steamed-lime-slate.jpg',
+      ],
+    },
+    {
+      category: 'fish',
+      name: 'ปลาทับทิมราดพริกสามรส & ซอสเปรี้ยวหวานจักรพรรดิ (จานวงรีสีแดง 9 ขีด)',
+      description: 'ปลาทับทิมคัดไซส์ 9 ขีด บั้งลวดลายสวยงาม ทอดจนหนังกรอบสีทองเนื้อในนุ่มหวาน ราดด้วยน้ำซอสสามรสสูตรเด็ดภัตตาคาร 35 ปี พริกชี้ฟ้า สับปะรด เปรี้ยวหวานเค็มครบรส กลมกล่อมลงตัว เสิร์ฟในจานวงรีสีแดงมงคล',
+      tag: '🐟 ปลาทับทิมสามรส (ภาพจริงจานแดง)',
+      image: '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg',
+      gallery: [
+        '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg',
+        '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg',
+      ],
+    },
+    {
+      category: 'fish',
+      name: 'ปลาทับทิมทอดน้ำปลาแท้เมืองระยอง & ยำมะม่วงสด (จานวงรีสีแดง 9 ขีด)',
+      description: 'ปลาทับทิมสดใหม่ทอดน้ำมันเดือดจนสีเหลืองทองกรอบนอกนุ่มฉ่ำใน ราดน้ำปลาเคี่ยวหวานหอมสูตรลับ เสิร์ฟคู่กับยำมะม่วงซอยพริกสด รสชาติจัดจ้านตัดเลี่ยนยอดเยี่ยม เสิร์ฟในจานวงรีสีแดงมงคล',
+      tag: '🐟 ปลาทับทิมทอดน้ำปลา (ภาพจริงจานแดง)',
+      image: '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg',
+      gallery: [
+        '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg',
+        '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg',
+      ],
+    },
+    {
+      category: 'fish',
+      name: 'ปลาทับทิมนึ่งบ๊วยขิงซอย & เห็ดหอมเต้าเจี้ยว (จานวงรีสีแดง 9 ขีด)',
+      description: 'ปลาทับทิมนึ่งสมุนไพรจีนโบราณ บ๊วยดองแท้ ขิงซอยเส้น เห็ดหอม และหมูสับเส้น รสชาติเค็มหวานกลมกล่อมหอมละมุน ซดน้ำซุปคล่องคอ สไตล์โต๊ะจีนกวางตุ้งแท้ เสิร์ฟในจานวงรีสีแดงมงคล',
+      tag: '🐟 ปลานึ่งบ๊วยขิงซอย (ภาพจริงจานแดง)',
+      image: '/images/dishes/fish/fish-ruby-steamed-plum-red-oval.jpg',
+      gallery: [
+        '/images/dishes/fish/fish-ruby-steamed-plum-red-oval.jpg',
+        '/images/dishes/fish/fish-ruby-steamed-lime-red-oval.jpg',
       ],
     },
     
     {
       category: 'hotpot',
-      name: 'ต้มยำกุ้งแม่น้ำน้ำข้น & ต้มยำทะเลโป๊ะแตกหม้อไฟ (เสิร์ฟหม้อไฟร้อนๆ ควันฉุย)',
-      description: 'รวมสุดยอดเมนูหม้อไฟต้มยำโต๊ะจีนภัตตาคาร 35 ปี เสิร์ฟในหม้อไฟสแตนเลสร้อนฉ่าควันพวยพุ่งตลอดงาน: ต้มยำกุ้งแม่น้ำน้ำข้นตัวโตมันเยิ้ม, ต้มยำซีฟู้ดรวมมิตรน้ำข้น, ทะเลโป๊ะแตกหม้อไฟสมุนไพรไทยแท้ มะนาวสด 100% พริกขี้หนูสวน และต้มยำปลากะพงหม้อไฟปล่องสูง รสชาติจัดจ้าน เข้มข้น ซดคล่องคอร้อนๆ อร่อยถึงใจ 100%',
-      tag: '🔥 ต้มยำ & โป๊ะแตก (รวม 14 ภาพจริง)',
-      image: '/images/dishes/hotpots/hotpot-seafood-potaek-steaming-1.jpg',
+      name: 'แกงส้มชะอมไข่ทอดใส่กุ้ง, ต้มยำกุ้งแม่น้ำ & ทะเลโป๊ะแตกหม้อไฟ (เสิร์ฟหม้อไฟร้อนๆ ควันฉุย)',
+      description: 'รวมสุดยอดเมนูหม้อไฟโต๊ะจีนภัตตาคาร 35 ปี เสิร์ฟในหม้อไฟสแตนเลสร้อนฉ่าควันพวยพุ่งตลอดงาน: แกงส้มชะอมไข่ทอดใส่กุ้งสดตัวโตน้ำแกงส้มเข้มข้นจัดจ้าน, ต้มยำขาหมูคากิตุ๋นเปื่อยนุ่มรสแซ่บ, ต้มยำกุ้งแม่น้ำน้ำข้นตัวโตมันเยิ้ม, ต้มยำซีฟู้ดรวมมิตรน้ำข้น, ทะเลโป๊ะแตกหม้อไฟสมุนไพรไทยแท้ มะนาวสด 100% พริกขี้หนูสวน และต้มยำปลากะพงหม้อไฟปล่องสูง รสชาติจัดจ้าน เข้มข้น ซดคล่องคอร้อนๆ อร่อยถึงใจ 100%',
+      tag: '🔥 หม้อไฟ & ต้มยำ (รวม 16 ภาพจริง)',
+      image: '/images/dishes/hotpots/hotpot-gaengsom-cha-om-kung.jpg',
       gallery: [
+        '/images/dishes/hotpots/hotpot-gaengsom-cha-om-kung.jpg',
+        '/images/dishes/hotpots/hotpot-tomyum-pork-knuckle.jpg',
         '/images/dishes/hotpots/hotpot-seafood-potaek-steaming-1.jpg',
         '/images/dishes/hotpots/hotpot-tomyum-creamy-prawn-macro-4.jpg',
         '/images/dishes/hotpots/hotpot-seafood-potaek-ladle-5.jpg',
@@ -215,11 +297,12 @@ export const MenuShowcase: React.FC = () => {
     },
     {
       category: 'rice',
-      name: 'ข้าวผัดทรงเครื่องกุนเชียงจักรพรรดิ & ข้าวผัดปูก้อน (จานเปลสีแดงขนาดใหญ่)',
-      description: 'รวมสุดยอดข้าวผัดโต๊ะจีนสูตรภัตตาคาร 35 ปี ผัดกระทะเหล็กไฟแรงหอมกลิ่นควันกระทะ: ข้าวผัดทรงเครื่องกุนเชียงจักรพรรดิ, ข้าวผัดปูก้อนโตเนื้อแน่น, ข้าวผัดปูโรยหมูหยองทองกรอบฟู, ข้าวผัดฮ่องกง, ข้าวผัดทะเลรวมมิตร และข้าวผัดแฮมไข่ทองคำ เสิร์ฟในจานเปลสีแดงลายครามจักรพรรดิขนาดใหญ่ (สีโต๊ะจีนมงคล) 100% ทุกรายการ',
-      tag: '🍚 จานเปลสีแดงขนาดใหญ่ (รวม 6 ภาพจริง)',
-      image: '/images/dishes/rice/fried-rice-combination-red-platter.jpg',
+      name: 'ข้าวผัดทรงเครื่องกุนเชียงจักรพรรดิ, ข้าวผัดไก่ & ข้าวผัดปูก้อน (จานเปลสีแดงขนาดใหญ่)',
+      description: 'รวมสุดยอดข้าวผัดโต๊ะจีนสูตรภัตตาคาร 35 ปี ผัดกระทะเหล็กไฟแรงหอมกลิ่นควันกระทะ: ข้าวผัดไก่เนื้อนุ่มหอมกรุ่น, ข้าวผัดทรงเครื่องกุนเชียงจักรพรรดิ, ข้าวผัดปูก้อนโตเนื้อแน่น, ข้าวผัดปูโรยหมูหยองทองกรอบฟู, ข้าวผัดฮ่องกง, ข้าวผัดทะเลรวมมิตร และข้าวผัดแฮมไข่ทองคำ เสิร์ฟในจานเปลสีแดงลายครามจักรพรรดิขนาดใหญ่ (สีโต๊ะจีนมงคล) 100% ทุกรายการ',
+      tag: '🍚 จานเปลสีแดงขนาดใหญ่ (รวม 7 ภาพจริง)',
+      image: '/images/dishes/rice/fried-rice-chicken-red-platter.jpg',
       gallery: [
+        '/images/dishes/rice/fried-rice-chicken-red-platter.jpg',
         '/images/dishes/rice/fried-rice-combination-red-platter.jpg',
         '/images/dishes/rice/fried-rice-lump-crab-red-platter.jpg',
         '/images/dishes/rice/fried-rice-crab-porkfloss-red-platter.jpg',
@@ -230,12 +313,15 @@ export const MenuShowcase: React.FC = () => {
     },
             {
       category: 'dessert',
-      name: 'โอนี่แป๊ะก๊วยกะทิสด, รวมมิตรไทย, เต้าทึงน้ำลำไย, เงาะลอยแก้ว, สตรอว์เบอร์รี & แปะก๊วยนมสด (ชามใหญ่พิเศษ)',
-      description: 'รวมสุดยอดของหวานโต๊ะจีนมงคล 35 ปี เสิร์ฟในชามเซรามิกสีขาวบริสุทธิ์ขนาดใหญ่พิเศษสำหรับ 10 ท่าน สะอาด ถูกสุขอนามัย 100% พร้อมช้อนตักสีขาว จัดวางบนพื้นไม้ธรรมชาติทุกรายการ: โอนี่แป๊ะก๊วยกะทิสด (ข้าวเหนียวมูนเผือกกวนเนื้อเนียนสีม่วงทรงเจดีย์ แปะก๊วยทอง พุทราจีน ราดกะทิสดมะพร้าวอ่อน), รวมมิตรไทยกะทิสดทรงเครื่อง, เต้าทึงน้ำลำไยเย็นทรงเครื่อง, เงาะลอยแก้วสอดไส้สับปะรดเกล็ดหิมะ, สตรอว์เบอร์รีลอยแก้ว และ แปะก๊วยนมสดมะพร้าวอ่อน ดับเลี่ยนหวานฉ่ำชื่นใจ ปิดท้ายงานมงคลอย่างสมบูรณ์แบบ 100%',
-      tag: '🍨 ของหวานมงคลชามขาวสะอาด (รวม 6 ภาพจริง)',
+      name: 'โอนี่แป๊ะก๊วยกะทิสด, ฟรุตสลัดนมสด, วุ้นรวมมิตร & ลิ้นจี่ลอยแก้ว (ชามใหญ่พิเศษ)',
+      description: 'รวมสุดยอดของหวานโต๊ะจีนมงคล 35 ปี เสิร์ฟในชามและถาดไม้สำหรับ 10 ท่าน สะอาด ถูกสุขอนามัย 100%: โอนี่แป๊ะก๊วยกะทิสด, ฟรุตสลัดนมสดหวานหอมสดชื่น, วุ้นรวมมิตรหวานเย็นหลากรส, ลิ้นจี่ลอยแก้วเนื้อฉ่ำหวานเย็น, เต้าทึงน้ำลำไยเย็นทรงเครื่อง, เงาะลอยแก้วสอดไส้สับปะรดเกล็ดหิมะ, รวมมิตรไทยกะทิสด และ แปะก๊วยนมสดมะพร้าวอ่อน ดับเลี่ยนหวานฉ่ำชื่นใจ ปิดท้ายงานมงคลอย่างสมบูรณ์แบบ 100%',
+      tag: '🍨 ของหวานมงคลชามขาวสะอาด (รวม 9 ภาพจริง)',
       image: '/images/dishes/desserts/dessert-ohnee-ginkgo-coconut-wood.jpg',
       gallery: [
         '/images/dishes/desserts/dessert-ohnee-ginkgo-coconut-wood.jpg',
+        '/images/dishes/desserts/dessert-fruitsalad-fresh-milk.jpg',
+        '/images/dishes/desserts/dessert-woon-ruam-mit.jpg',
+        '/images/dishes/desserts/dessert-lychee-loy-kaew.jpg',
         '/images/dishes/desserts/dessert-taotung-nam-lamyai-wood.jpg',
         '/images/dishes/desserts/dessert-rambutan-loy-kaew-wood.jpg',
         '/images/dishes/desserts/dessert-ruam-mit-wood.jpg',
@@ -278,6 +364,23 @@ export const MenuShowcase: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [previewIndex, filteredItems.length]);
+
+  // Instant preloader for all dish images into browser cache
+  useEffect(() => {
+    const allImages: string[] = [];
+    menuItems.forEach((item) => {
+      if (item.image) allImages.push(item.image);
+      if (item.gallery) {
+        item.gallery.forEach((img) => allImages.push(img));
+      }
+    });
+
+    allImages.forEach((src) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    });
+  }, []);
 
   const activePreviewDish = previewIndex !== null ? filteredItems[previewIndex] : null;
   const currentDisplayImage = activePreviewDish?.gallery 
@@ -339,27 +442,58 @@ export const MenuShowcase: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 🎛️ CATEGORY TABS (Sleek Modern Capsule Bar) */}
+        {/* 🎛️ CATEGORY TABS (Sleek Modern Capsule Bar with Left/Right Navigation) */}
         {/* ========================================================================= */}
-        <div className="p-2 rounded-3xl bg-white/90 border-2 border-amber-200 shadow-md backdrop-blur-md">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 justify-start lg:justify-center no-scrollbar">
-            {categories.map((cat) => {
-              const isActive = activeTab === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveTab(cat.id)}
-                  className={`px-4 py-2.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg border-2 border-amber-300 scale-102'
-                      : 'bg-transparent text-slate-700 hover:text-red-700 hover:bg-amber-50/80 border border-transparent'
-                  }`}
-                >
-                  <span>{cat.icon}</span>
-                  <span>{cat.name}</span>
-                </button>
-              );
-            })}
+        <div className="relative max-w-5xl mx-auto px-1 sm:px-0">
+          {/* Left Scroll Button */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              onClick={() => handleScroll('left')}
+              className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-xl flex items-center justify-center transition-all border-2 border-amber-300 cursor-pointer"
+              title="เลื่อนเมนูก่อนหน้า"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* Right Scroll Button */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => handleScroll('right')}
+              className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-xl flex items-center justify-center transition-all border-2 border-amber-300 cursor-pointer"
+              title="เลื่อนเมนูถัดไป"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          )}
+
+          <div className="p-1.5 sm:p-2 rounded-3xl bg-white/95 border-2 border-amber-200 shadow-md backdrop-blur-md">
+            <div
+              ref={tabsContainerRef}
+              onScroll={checkScroll}
+              className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 justify-start no-scrollbar scroll-smooth px-1"
+            >
+              {categories.map((cat) => {
+                const isActive = activeTab === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={(e) => handleTabClick(cat.id, e)}
+                    className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-black whitespace-nowrap transition-all duration-300 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md border-2 border-amber-300 scale-102 ring-2 ring-red-300/40'
+                        : 'bg-transparent text-slate-700 hover:text-red-700 hover:bg-amber-50/80 border border-transparent'
+                    }`}
+                  >
+                    <span>{cat.icon}</span>
+                    <span>{cat.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -382,6 +516,8 @@ export const MenuShowcase: React.FC = () => {
                   <img
                     src={currentCardImg}
                     alt={item.name}
+                    loading="eager"
+                    decoding="async"
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 select-none pointer-events-none"
                     onContextMenu={(e) => e.preventDefault()}
                   />

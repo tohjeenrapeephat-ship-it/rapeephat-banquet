@@ -7,6 +7,7 @@ import { CourseSelector } from './CourseSelector.js';
 import { TableCalculator } from './TableCalculator.js';
 import { SummaryCard } from './SummaryCard.js';
 import { QuotationModal } from './QuotationModal.js';
+import { BookingStepsModal } from './BookingStepsModal.js';
 import { QuotationApi } from '../../services/api.js';
 import { sendOrderToLine } from '../../utils/lineOrderHelper.js';
 import { Calculator, Sparkles, Utensils, CheckCircle, ChevronRight, Flame, Crown, Check } from 'lucide-react';
@@ -62,6 +63,9 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
 
   // Generated Quotation Modal State
   const [generatedQuotation, setGeneratedQuotation] = useState<QuotationDoc | null>(null);
+  
+  // Booking Steps Modal State
+  const [bookingModalDoc, setBookingModalDoc] = useState<QuotationDoc | null>(null);
 
   // Handle Package Switch
   const handlePackageChange = (pkg: PackageTier) => {
@@ -209,6 +213,25 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     } catch (e) {
       sendOrderToLine(quoteDoc);
       setGeneratedQuotation(quoteDoc);
+      if (onQuotationGenerated) onQuotationGenerated(quoteDoc);
+    }
+  };
+
+  // Open Booking Steps & Deposit Modal
+  const handleOpenBookingModal = async () => {
+    if (!isValid) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วน: ชื่อผู้ติดต่อ, เบอร์โทร, วันที่จัดงาน และสถานที่จัดงาน เพื่อดำเนินการสั่งจองนะคะ');
+      return;
+    }
+
+    const quoteDoc = buildQuoteDoc();
+
+    try {
+      const saved = await QuotationApi.create(quoteDoc);
+      setBookingModalDoc(saved);
+      if (onQuotationGenerated) onQuotationGenerated(saved);
+    } catch (e) {
+      setBookingModalDoc(quoteDoc);
       if (onQuotationGenerated) onQuotationGenerated(quoteDoc);
     }
   };
@@ -369,6 +392,7 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
               customTravelFee={customerData.customTravelFee}
               onGenerateQuotation={handleGenerateQuotation}
               onSendLineOrder={handleSendLineOrder}
+              onBookNow={handleOpenBookingModal}
               isValid={isValid}
             />
 
@@ -377,6 +401,19 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
         </div>
 
       </div>
+
+      {/* Booking Steps & Deposit Modal */}
+      {bookingModalDoc && (
+        <BookingStepsModal
+          quotation={bookingModalDoc}
+          isOpen={Boolean(bookingModalDoc)}
+          onClose={() => setBookingModalDoc(null)}
+          onViewQuotation={() => {
+            setGeneratedQuotation(bookingModalDoc);
+            setBookingModalDoc(null);
+          }}
+        />
+      )}
 
       {/* Quotation Document Modal */}
       {generatedQuotation && (

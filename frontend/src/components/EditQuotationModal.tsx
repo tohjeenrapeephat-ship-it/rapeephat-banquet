@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { QuotationDoc } from '../types/quotation.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { formatCurrency } from '../utils/currency.js';
+import { RealtimeLocationMap } from './QuotationBuilder/RealtimeLocationMap.js';
 import {
   X,
   Save,
@@ -360,7 +361,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 space-y-2">
                 <label className="block text-xs font-bold text-slate-700 mb-1">สถานที่จัดงาน / อำเภอ จังหวัด *</label>
                 <input
                   type="text"
@@ -369,6 +370,10 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                   onChange={(e) => setEventLocation(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-medium text-slate-900 outline-none"
                   placeholder="เช่น หอประชุมเทศบาลเมืองนครปฐม ถ.เทศา อ.เมือง จ.นครปฐม"
+                />
+                <RealtimeLocationMap
+                  location={eventLocation}
+                  onLocationChange={(newLoc) => setEventLocation(newLoc)}
                 />
               </div>
             </div>
@@ -446,8 +451,8 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                 <input
                   type="number"
                   min="1"
-                  value={tableCount}
-                  onChange={(e) => handleTableCountChange(Number(e.target.value))}
+                  value={tableCount === 0 ? '' : tableCount}
+                  onChange={(e) => handleTableCountChange(e.target.value === '' ? 0 : Number(e.target.value))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-mono font-bold text-slate-900 outline-none"
                 />
               </div>
@@ -458,7 +463,7 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                   type="number"
                   min="0"
                   value={freeTableCount}
-                  onChange={(e) => setFreeTableCount(Number(e.target.value))}
+                  onChange={(e) => setFreeTableCount(e.target.value === '' ? 0 : Number(e.target.value))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-mono font-bold text-emerald-700 outline-none"
                 />
               </div>
@@ -468,8 +473,8 @@ export const EditQuotationModal: React.FC<EditQuotationModalProps> = ({
                 <input
                   type="number"
                   min="0"
-                  value={discount}
-                  onChange={(e) => setDiscount(Number(e.target.value))}
+                  value={discount === 0 ? '' : discount}
+                  onChange={(e) => setDiscount(e.target.value === '' ? 0 : Number(e.target.value))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-red-600 text-sm font-mono font-bold text-red-600 outline-none"
                 />
               </div>
