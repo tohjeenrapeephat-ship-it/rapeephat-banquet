@@ -28,7 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBuilder, onOpenHistory, on
     { href: '#portfolio', label: 'ผลงานจัดเลี้ยง' },
     { href: '#fleet-logistics', label: '🚚 รถบริการทั่วไทย' },
     { href: '#testimonials', label: 'รีวิวลูกค้า 👍' },
-    { href: '#contact', label: 'ติดต่อเรา' },
+    { href: '#contact', label: '📍 แผนที่ & ติดต่อเรา' },
   ];
 
   return (

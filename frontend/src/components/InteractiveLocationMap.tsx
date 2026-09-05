@@ -107,7 +107,7 @@ export const InteractiveLocationMap: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div id="map" className="space-y-6 scroll-mt-28">
       
       {/* 🌟 Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-2.5">
