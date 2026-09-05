@@ -494,29 +494,47 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
                         {/* Left: Thumbnail & Name & Tag Editor */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* Dish Image Preview & Photo Library Trigger */}
-                          <div
-                            onClick={() =>
-                              setPhotoPickerTarget({
-                                pkgId: currentPkg.id,
-                                courseId: course.id,
-                                dishId: dish.id,
-                                dishName: dish.name,
-                                currentUrl: dishImg,
-                              })
-                            }
-                            className="group/img relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-slate-300 hover:border-red-500 bg-slate-900 shrink-0 cursor-pointer shadow-xs transition-all"
-                            title="คลิกเพื่อเลือกภาพจากคลังรูปภาพ"
-                          >
-                            <img
-                              src={dishImg}
-                              alt={dish.name}
-                              className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
-                              <ImageIcon className="w-3.5 h-3.5" />
-                              <span className="text-[8px] font-bold mt-0.5">เปลี่ยนรูป</span>
+                          <div className="flex flex-col items-center gap-1 shrink-0">
+                            <div
+                              onClick={() =>
+                                setPhotoPickerTarget({
+                                  pkgId: currentPkg.id,
+                                  courseId: course.id,
+                                  dishId: dish.id,
+                                  dishName: dish.name,
+                                  currentUrl: dishImg,
+                                })
+                              }
+                              className="group/img relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-slate-300 hover:border-red-500 bg-slate-900 cursor-pointer shadow-xs transition-all hover:scale-105"
+                              title="คลิกเพื่อเปลี่ยนรูป หรืออัปโหลดรูปใหม่"
+                            >
+                              <img
+                                src={dishImg}
+                                alt={dish.name}
+                                className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
+                                loading="lazy"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-1 text-center">
+                                <ImageIcon className="w-4 h-4" />
+                                <span className="text-[8px] font-bold mt-0.5 leading-none">เปลี่ยนรูป</span>
+                              </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPhotoPickerTarget({
+                                  pkgId: currentPkg.id,
+                                  courseId: course.id,
+                                  dishId: dish.id,
+                                  dishName: dish.name,
+                                  currentUrl: dishImg,
+                                })
+                              }
+                              className="text-[10px] font-bold text-red-700 hover:text-red-800 hover:underline flex items-center gap-0.5 cursor-pointer"
+                            >
+                              <Upload className="w-2.5 h-2.5" />
+                              <span>อัปโหลดรูป</span>
+                            </button>
                           </div>
 
                           {/* Inputs: Name & Tag */}
