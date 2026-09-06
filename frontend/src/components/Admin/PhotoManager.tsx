@@ -93,6 +93,176 @@ const processImageFile = (file: File, autoTrim: boolean = true): Promise<string>
   });
 };
 
+// Smart dish and course matching helper for Thai banquet catering
+export const checkDishMatch = (
+  photoName: string = '',
+  optName: string = '',
+  courseTitle: string = '',
+  optTag: string = ''
+): boolean => {
+  const photoNorm = normalizeThaiDishName(photoName);
+  const photoBase = extractDishBaseName(photoName);
+  const optNorm = normalizeThaiDishName(optName);
+  const optBase = extractDishBaseName(optName);
+  const courseNorm = normalizeThaiDishName(courseTitle);
+  const tagNorm = optTag ? normalizeThaiDishName(optTag) : '';
+
+  if (!photoNorm || !optNorm) return false;
+
+  // 1. Direct or base equality / substring
+  if (optNorm === photoNorm) return true;
+  if (photoBase && optBase && photoBase === optBase) return true;
+  if (photoNorm && optNorm.includes(photoNorm)) return true;
+  if (optNorm && photoNorm.includes(optNorm)) return true;
+  if (photoBase && optNorm.includes(photoBase)) return true;
+  if (optBase && photoNorm.includes(optBase)) return true;
+
+  // 2. Course title & Tag matching
+  if (courseNorm && photoNorm && courseNorm.includes(photoNorm)) return true;
+  if (courseNorm && photoBase && courseNorm.includes(photoBase)) return true;
+  if (tagNorm && photoNorm && tagNorm.includes(photoNorm)) return true;
+
+  // 3. Appetizers & 5-dish Platter matching
+  const isPhotoAppetizer =
+    photoNorm.includes('ออเดิร์ฟ') ||
+    photoNorm.includes('5 อย่าง') ||
+    photoNorm.includes('ของทานเล่น') ||
+    photoNorm.includes('จานรวมมิตร');
+
+  const isCourseAppetizer =
+    courseNorm.includes('ออเดิร์ฟ') ||
+    courseNorm.includes('จานที่ 2') ||
+    courseNorm.includes('5 อย่าง');
+
+  const isOptAppetizer =
+    optNorm.includes('ขนมจีบ') ||
+    optNorm.includes('ไข่เยี่ยวม้า') ||
+    optNorm.includes('ไส้กรอก') ||
+    optNorm.includes('หมูแผ่น') ||
+    optNorm.includes('แฮม') ||
+    optNorm.includes('ออเดิร์ฟ') ||
+    optNorm.includes('5 อย่าง') ||
+    optNorm.includes('ติ่มซำ');
+
+  if (isPhotoAppetizer && (isCourseAppetizer || isOptAppetizer)) return true;
+
+  // 4. Crackers
+  if (
+    photoNorm.includes('ข้าวเกรียบ') &&
+    (optNorm.includes('ข้าวเกรียบ') || courseNorm.includes('จานที่ 1') || courseNorm.includes('ข้าวเกรียบ'))
+  ) return true;
+
+  // 5. Fish Maw Soup
+  if (
+    photoNorm.includes('กระเพาะปลา') &&
+    (optNorm.includes('กระเพาะปลา') || courseNorm.includes('กระเพาะปลา') || courseNorm.includes('จานที่ 3'))
+  ) return true;
+
+  // 6. Shark Fin
+  if (
+    photoNorm.includes('หูฉลาม') &&
+    (optNorm.includes('หูฉลาม') || courseNorm.includes('หูฉลาม'))
+  ) return true;
+
+  // 7. Pork Knuckle
+  if (
+    photoNorm.includes('ขาหมู') &&
+    (optNorm.includes('ขาหมู') || courseNorm.includes('ขาหมู'))
+  ) return true;
+
+  // 8. Duck
+  if (
+    photoNorm.includes('เป็ด') &&
+    (optNorm.includes('เป็ด') || courseNorm.includes('เป็ด'))
+  ) return true;
+
+  // 9. Fish
+  if (photoNorm.includes('ปลากะพง') && (optNorm.includes('กะพง') || optNorm.includes('ปลากะพง'))) return true;
+  if (photoNorm.includes('ปลาทับทิม') && (optNorm.includes('ทับทิม') || optNorm.includes('ปลาทับทิม'))) return true;
+  if (photoNorm.includes('ปลา') && (courseNorm.includes('เมนูปลา') || optNorm.includes('ปลา'))) return true;
+
+  // 10. Hotpot / Soup
+  if (
+    photoNorm.includes('ต้มยำ') &&
+    (optNorm.includes('ต้มยำ') || courseNorm.includes('ต้มยำ'))
+  ) return true;
+  if (
+    (photoNorm.includes('แกงจืด') || photoNorm.includes('ต้มจืด')) &&
+    (optNorm.includes('จืด') || courseNorm.includes('จืด'))
+  ) return true;
+
+  // 11. Rice & Noodles
+  if (
+    photoNorm.includes('ข้าวผัด') &&
+    (optNorm.includes('ข้าวผัด') || courseNorm.includes('ข้าวผัด'))
+  ) return true;
+  if (
+    (photoNorm.includes('หมี่') || photoNorm.includes('ซั่ว')) &&
+    (optNorm.includes('หมี่') || optNorm.includes('ซั่ว') || courseNorm.includes('หมี่'))
+  ) return true;
+
+  // 12. Desserts
+  if (
+    photoNorm.includes('ลอยแก้ว') &&
+    (optNorm.includes('ลอยแก้ว') || optNorm.includes('เงาะ') || optNorm.includes('ลิ้นจี่') || courseNorm.includes('ของหวาน'))
+  ) return true;
+  if (
+    (photoNorm.includes('โอวนี้') || photoNorm.includes('โอนี่') || photoNorm.includes('แปะก๊วย') || photoNorm.includes('เผือก')) &&
+    (optNorm.includes('โอวนี้') || optNorm.includes('โอนี่') || optNorm.includes('แปะก๊วย') || optNorm.includes('เผือก'))
+  ) return true;
+  if (
+    photoNorm.includes('เต้าทึง') &&
+    (optNorm.includes('เต้าทึง') || courseNorm.includes('ของหวาน'))
+  ) return true;
+  if (
+    photoNorm.includes('ผลไม้') &&
+    (optNorm.includes('ผลไม้') || courseNorm.includes('ผลไม้'))
+  ) return true;
+
+  return false;
+};
+
+// Smart default course detector
+export const detectCourseNumberFromDish = (photoName: string = '', category: string = ''): number => {
+  const norm = normalizeThaiDishName(photoName);
+  if (norm.includes('ข้าวเกรียบ') || norm.includes('ถั่วอบ')) return 1;
+  if (
+    norm.includes('ออเดิร์ฟ') ||
+    norm.includes('5 อย่าง') ||
+    norm.includes('ติ่มซำ') ||
+    norm.includes('ซีฟู้ดนึ่งเตาซึ้ง') ||
+    norm.includes('สี่สี') ||
+    norm.includes('ทอดมันกุ้ง') ||
+    norm.includes('โหงวก๊วย') ||
+    norm.includes('เหล้าแดง')
+  ) return 2;
+  if (norm.includes('กระเพาะปลา') || norm.includes('หูฉลาม') || norm.includes('เยื่อไผ่') || norm.includes('ไก่ตุ๋น')) return 3;
+  if (norm.includes('ยำ') || norm.includes('สลัด') || norm.includes('เป็ดย่าง') || norm.includes('ขาหมู')) return 4;
+  if (norm.includes('ปลา') || norm.includes('ปลากะพง') || norm.includes('ปลาทับทิม')) return 5;
+  if (norm.includes('ต้มยำ') || norm.includes('แกงส้ม') || norm.includes('หม้อไฟ') || norm.includes('ต้มจืด') || norm.includes('โป๊ะแตก')) return 6;
+  if (norm.includes('ข้าวผัด') || norm.includes('ผัดหมี่') || norm.includes('หมี่ซั่ว')) return 7;
+  if (
+    norm.includes('ของหวาน') ||
+    norm.includes('ลอยแก้ว') ||
+    norm.includes('โอวนี้') ||
+    norm.includes('โอนี่') ||
+    norm.includes('แปะก๊วย') ||
+    norm.includes('เต้าทึง') ||
+    norm.includes('ผลไม้') ||
+    norm.includes('วุ้นมะพร้าว')
+  ) return 8;
+
+  if (category === 'appetizers') return 2;
+  if (category === 'soups') return 3;
+  if (category === 'mains') return 4;
+  if (category === 'fish') return 5;
+  if (category === 'hotpot') return 6;
+  if (category === 'rice') return 7;
+  if (category === 'desserts') return 8;
+
+  return 1;
+};
+
 export const PhotoManager: React.FC = () => {
   const [customPhotos, setCustomPhotos] = useState<PhotoPreset[]>([]);
   const [presetOverrides, setPresetOverrides] = useState<Record<string, string>>(() => {
@@ -398,22 +568,12 @@ export const PhotoManager: React.FC = () => {
     const currentPkgs = packageService.getPackages();
     setPackages(currentPkgs);
 
-    const photoNorm = normalizeThaiDishName(photo.name);
-    const photoBase = extractDishBaseName(photo.name);
-
     // Find which packages contain this dish
     const matched = currentPkgs.filter((pkg) =>
       pkg.courses.some((course) =>
-        course.options.some((opt) => {
-          const optNorm = normalizeThaiDishName(opt.name);
-          const optBase = extractDishBaseName(opt.name);
-          return (
-            optNorm === photoNorm ||
-            optNorm.includes(photoNorm) ||
-            photoNorm.includes(optNorm) ||
-            (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)))
-          );
-        })
+        course.options.some((opt) =>
+          checkDishMatch(photo.name, opt.name, course.title, opt.tag)
+        )
       )
     );
 
@@ -424,23 +584,20 @@ export const PhotoManager: React.FC = () => {
     }
 
     setAssignCourseMode('match_name');
-    setTargetCourseNumber(1);
+    setTargetCourseNumber(detectCourseNumberFromDish(photo.name, photo.category));
   };
 
   // Assign photo to multiple packages at once
-  const handleAssignToCourse = () => {
+  const handleAssignToCourse = async () => {
     if (!assigningPhoto) return;
     if (selectedPkgIds.length === 0) {
-      showNotification('กรุณาเลือกอย่างน้อย 1 แพ็กเกจราคาที่ต้องการผูกรูปภาพ', true);
+      alert('⚠️ กรุณาเลือกอย่างน้อย 1 แพ็กเกจราคาที่ต้องการผูกรูปภาพค่ะ');
       return;
     }
 
     const currentPkgs = packageService.getPackages();
     let updatedDishesCount = 0;
     let updatedPackagesCount = 0;
-
-    const photoNorm = normalizeThaiDishName(assigningPhoto.name);
-    const photoBase = extractDishBaseName(assigningPhoto.name);
 
     const newPkgs = currentPkgs.map((pkg) => {
       if (!selectedPkgIds.includes(pkg.id)) return pkg;
@@ -452,33 +609,20 @@ export const PhotoManager: React.FC = () => {
           (course.courseIndex === targetCourseNumber || cIdx + 1 === targetCourseNumber);
 
         const newOptions = course.options.map((opt) => {
-          const optNorm = normalizeThaiDishName(opt.name);
-          const optBase = extractDishBaseName(opt.name);
-
-          const isMatch =
-            optNorm === photoNorm ||
-            optNorm.includes(photoNorm) ||
-            photoNorm.includes(optNorm) ||
-            (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)));
-
+          let isMatch = false;
           if (assignCourseMode === 'match_name') {
-            if (isMatch) {
-              pkgChanged = true;
-              updatedDishesCount++;
-              return {
-                ...opt,
-                imageUrl: assigningPhoto.url,
-              };
-            }
+            isMatch = checkDishMatch(assigningPhoto.name, opt.name, course.title, opt.tag);
           } else if (assignCourseMode === 'specific_course') {
-            if (isTargetCourse || isMatch) {
-              pkgChanged = true;
-              updatedDishesCount++;
-              return {
-                ...opt,
-                imageUrl: assigningPhoto.url,
-              };
-            }
+            isMatch = isTargetCourse;
+          }
+
+          if (isMatch) {
+            pkgChanged = true;
+            updatedDishesCount++;
+            return {
+              ...opt,
+              imageUrl: assigningPhoto.url,
+            };
           }
           return opt;
         });
@@ -499,17 +643,28 @@ export const PhotoManager: React.FC = () => {
       return pkg;
     });
 
+    if (updatedDishesCount === 0) {
+      alert(
+        `⚠️ ไม่พบชื่อเมนูที่ตรงกับ "${assigningPhoto.name}" ในแพ็กเกจที่เลือก\n\n💡 แนะนำให้เลือกหัวข้อ "🎯 กำหนดใส่จานลำดับที่ระบุ" (เช่น จานที่ 1, จานที่ 2, จานที่ 3...) แล้วกดยืนยันอีกครั้งค่ะ`
+      );
+      return;
+    }
+
     // Also register image override globally
-    imageStore.setOverride(assigningPhoto.name, assigningPhoto.url);
+    await imageStore.setOverride(assigningPhoto.name, assigningPhoto.url);
+    const photoBase = extractDishBaseName(assigningPhoto.name);
     if (photoBase) {
-      imageStore.setOverride(photoBase, assigningPhoto.url);
+      await imageStore.setOverride(photoBase, assigningPhoto.url);
     }
 
     packageService.savePackages(newPkgs);
     setPackages(newPkgs);
 
+    alert(
+      `✓ ผูกรูปภาพสำเร็จเรียบร้อยแล้วค่ะ!\n\nอัปเดตเมนูอาหารไปทั้งหมด ${updatedDishesCount} เมนู ใน ${updatedPackagesCount} แพ็กเกจราคา`
+    );
     showNotification(
-      `✓ ผูกรูป "${assigningPhoto.name}" เข้ากับ ${selectedPkgIds.length} แพ็กเกจราคาเรียบร้อยแล้วค่ะ!`
+      `✓ ผูกรูป "${assigningPhoto.name}" เข้ากับ ${updatedPackagesCount} แพ็กเกจ (${updatedDishesCount} เมนู) เรียบร้อยแล้วค่ะ!`
     );
     setAssigningPhoto(null);
   };
@@ -998,25 +1153,43 @@ export const PhotoManager: React.FC = () => {
       {/* 🔗 MULTI-PACKAGE ASSIGN PHOTO TO MENU MODAL */}
       {/* ========================================================================= */}
       {assigningPhoto && (() => {
-        const photoNorm = normalizeThaiDishName(assigningPhoto.name);
-        const photoBase = extractDishBaseName(assigningPhoto.name);
-
-        // Auto-detected matched packages
+        // Auto-detected matched packages using smart matching
         const matchedPkgs = packages.filter((pkg) =>
           pkg.courses.some((course) =>
-            course.options.some((opt) => {
-              const optNorm = normalizeThaiDishName(opt.name);
-              const optBase = extractDishBaseName(opt.name);
-              return (
-                optNorm === photoNorm ||
-                optNorm.includes(photoNorm) ||
-                photoNorm.includes(optNorm) ||
-                (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)))
-              );
-            })
+            course.options.some((opt) =>
+              checkDishMatch(assigningPhoto.name, opt.name, course.title, opt.tag)
+            )
           )
         );
         const matchedPkgIds = matchedPkgs.map((p) => p.id);
+
+        // Calculate list of dishes that WILL be changed in real-time
+        const dishesToChange: { pkgPrice: number; courseTitle: string; optName: string }[] = [];
+        selectedPkgIds.forEach((pkgId) => {
+          const pkg = packages.find((p) => p.id === pkgId);
+          if (!pkg) return;
+          pkg.courses.forEach((course, cIdx) => {
+            const isTargetCourse =
+              assignCourseMode === 'specific_course' &&
+              (course.courseIndex === targetCourseNumber || cIdx + 1 === targetCourseNumber);
+
+            course.options.forEach((opt) => {
+              let isMatch = false;
+              if (assignCourseMode === 'match_name') {
+                isMatch = checkDishMatch(assigningPhoto.name, opt.name, course.title, opt.tag);
+              } else if (assignCourseMode === 'specific_course') {
+                isMatch = isTargetCourse;
+              }
+              if (isMatch) {
+                dishesToChange.push({
+                  pkgPrice: pkg.price,
+                  courseTitle: course.title,
+                  optName: opt.name,
+                });
+              }
+            });
+          });
+        });
 
         const togglePackage = (pkgId: string) => {
           setSelectedPkgIds((prev) =>
@@ -1042,7 +1215,7 @@ export const PhotoManager: React.FC = () => {
 
         return (
           <div
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn"
+            className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn"
             onClick={() => setAssigningPhoto(null)}
           >
             <div
@@ -1247,8 +1420,8 @@ export const PhotoManager: React.FC = () => {
 
                   {/* Course index dropdown when Option B is active */}
                   {assignCourseMode === 'specific_course' && (
-                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 animate-fadeIn">
-                      <label className="font-bold text-slate-700 block text-xs">
+                    <div className="p-3.5 bg-slate-50 border-2 border-amber-300 rounded-2xl space-y-2 animate-fadeIn">
+                      <label className="font-black text-slate-800 block text-xs">
                         เลือกจานลำดับที่ต้องการผูกในทุกแพ็กเกจที่เลือก:
                       </label>
                       <select
@@ -1269,21 +1442,70 @@ export const PhotoManager: React.FC = () => {
                       </select>
                     </div>
                   )}
+
+                  {/* Step 3: Live Preview of Matched Dishes */}
+                  <div className="pt-2">
+                    {dishesToChange.length > 0 ? (
+                      <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-2">
+                        <div className="flex items-center justify-between font-black text-emerald-950 text-xs">
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            <span>พบเมนูที่จะเปลี่ยนรูปภาพทั้งหมด {dishesToChange.length} รายการ:</span>
+                          </span>
+                          <span className="text-[11px] text-emerald-700">({selectedPkgIds.length} แพ็กเกจ)</span>
+                        </div>
+                        <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
+                          {dishesToChange.map((item, idx) => (
+                            <div key={idx} className="px-2.5 py-1.5 rounded-xl bg-white border border-emerald-200 text-[11px] flex items-center justify-between gap-2 shadow-2xs">
+                              <span className="font-black text-red-600 shrink-0">{item.pkgPrice.toLocaleString()}.-</span>
+                              <span className="text-slate-600 truncate flex-1">
+                                {item.courseTitle}: <strong className="text-slate-900">{item.optName}</strong>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-2xl space-y-2 text-amber-950">
+                        <div className="flex items-start gap-2 text-xs font-bold">
+                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <div>ไม่พบชื่อเมนูที่ตรงกับ <strong className="text-red-700 font-black">"{assigningPhoto.name}"</strong> ใน {selectedPkgIds.length} แพ็กเกจที่เลือก</div>
+                            <p className="text-[11px] text-amber-800 font-normal mt-1">
+                              💡 <b>คำแนะนำ:</b> กรุณากดเลือก <b>"🎯 กำหนดใส่จานลำดับที่ระบุ"</b> ด้านบน เพื่อเลือกจาน (เช่น จานที่ 1, 2, 3...) แล้วกดยืนยันได้ทันทีค่ะ
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setAssignCourseMode('specific_course')}
+                          className="w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>คลิกที่นี่เพื่อเปลี่ยนเป็น "🎯 กำหนดใส่จานลำดับที่ระบุ"</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                 </div>
               </div>
 
               {/* Footer Toolbar */}
-              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
-                <div className="text-xs text-slate-600">
-                  <span className="font-bold text-slate-800">จำนวนที่เลือก: </span>
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                <div className="text-xs text-slate-600 flex items-center gap-2">
+                  <span className="font-bold text-slate-800">จำนวนที่เลือก:</span>
                   <span className="text-red-600 font-black">{selectedPkgIds.length} แพ็กเกจราคา</span>
+                  {dishesToChange.length > 0 && (
+                    <span className="text-emerald-700 font-black">({dishesToChange.length} เมนูที่จะอัปเดต)</span>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => setAssigningPhoto(null)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
                   >
                     ยกเลิก
                   </button>
@@ -1291,10 +1513,13 @@ export const PhotoManager: React.FC = () => {
                     type="button"
                     onClick={handleAssignToCourse}
                     disabled={selectedPkgIds.length === 0}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 disabled:opacity-50 text-white text-xs font-black flex items-center gap-2 shadow-md transition-all cursor-pointer transform hover:scale-102"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:from-red-700 active:to-amber-700 disabled:opacity-50 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform active:scale-95"
                   >
                     <Check className="w-4 h-4" />
-                    <span>ยืนยันการผูกรูปภาพ ({selectedPkgIds.length} ราคา)</span>
+                    <span>
+                      ยืนยันการผูกรูปภาพ ({selectedPkgIds.length} ราคา
+                      {dishesToChange.length > 0 ? ` • ${dishesToChange.length} เมนู` : ''})
+                    </span>
                   </button>
                 </div>
               </div>
