@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WatermarkOverlay } from './WatermarkOverlay';
+import { SmartDishImage } from './SmartDishImage.js';
 import {
   UtensilsCrossed,
   Flame,
@@ -537,7 +538,7 @@ export const MenuShowcase: React.FC = () => {
               >
                 {/* Image Container with Zoom & Album Badges */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-950">
-                  <img
+                  <SmartDishImage
                     src={currentCardImg}
                     alt={item.name}
                     loading="eager"
@@ -598,7 +599,7 @@ export const MenuShowcase: React.FC = () => {
                         }`}
                         title={`ดูรูปที่ ${gIdx + 1}`}
                       >
-                        <img src={gImg} alt="รูปในเซ็ต" className="w-full h-full object-cover" />
+                        <SmartDishImage src={gImg} alt="รูปในเซ็ต" className="w-full h-full object-cover" />
                       </button>
                     ))}
                     <span className="text-[10px] font-bold text-amber-300 whitespace-nowrap pl-1">
@@ -702,10 +703,10 @@ export const MenuShowcase: React.FC = () => {
               
               {/* Main Photo Display */}
               <div className="relative flex-1 flex items-center justify-center min-h-[280px] sm:min-h-[380px] overflow-hidden">
-                <img
+                <SmartDishImage
                   src={currentDisplayImage}
                   alt={activePreviewDish.name}
-                  className="w-full h-full object-cover object-center transition-all duration-300 select-none pointer-events-none"
+                  className="w-full h-full object-cover object-center transition-all duration-300 select-none pointer-events-none scale-[1.03]"
                   onContextMenu={(e) => e.preventDefault()}
                 />
                 <WatermarkOverlay size="md" opacity={0.43} />
@@ -738,7 +739,7 @@ export const MenuShowcase: React.FC = () => {
                           : 'border-slate-700 opacity-60 hover:opacity-100 hover:border-slate-400'
                       }`}
                     >
-                      <img src={imgUrl} alt="รูปในอัลบั้ม" className="w-full h-full object-cover" />
+                      <SmartDishImage src={imgUrl} alt="รูปในอัลบั้ม" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>

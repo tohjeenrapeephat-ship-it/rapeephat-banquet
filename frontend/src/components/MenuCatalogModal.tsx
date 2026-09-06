@@ -4,6 +4,7 @@ import { PackageTier } from '../types/quotation.js';
 import { generateA4Pdf } from '../services/pdfService.js';
 import { formatCurrency } from '../utils/currency.js';
 import { getDishImage } from '../utils/dishImageHelper.js';
+import { SmartDishImage } from './SmartDishImage.js';
 import {
   Printer,
   Download,
@@ -443,7 +444,7 @@ export const MenuCatalogModal: React.FC<MenuCatalogModalProps> = ({
                         <div className="flex items-center justify-between gap-1.5">
                           <div className="flex items-center gap-2 min-w-0">
                             <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-300 shrink-0 bg-white shadow-2xs">
-                              <img
+                              <SmartDishImage
                                 src={dishImg}
                                 alt={primaryDishName}
                                 className="w-full h-full object-cover"

@@ -5,6 +5,7 @@ import { formatCurrency } from '../../utils/currency.js';
 import { getDishImage } from '../../utils/dishImageHelper.js';
 import { DishPhotoLibraryModal } from './DishPhotoLibraryModal.js';
 import { WatermarkOverlay } from '../WatermarkOverlay.js';
+import { SmartDishImage } from '../SmartDishImage.js';
 import {
   Utensils,
   Plus,
@@ -552,7 +553,7 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
                           <div className="flex flex-col items-center gap-1.5 shrink-0">
                             {/* Thumbnail with Click to View Large */}
                             <div className="relative group/img w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 border-slate-300 hover:border-amber-400 bg-slate-900 shadow-xs transition-all">
-                              <img
+                              <SmartDishImage
                                 src={dishImg}
                                 alt={dish.name}
                                 className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300 cursor-pointer"
@@ -906,7 +907,7 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
 
             {/* High-Resolution Image Preview Container */}
             <div className="relative bg-slate-950 aspect-[4/3] sm:aspect-[16/10] w-full overflow-hidden flex items-center justify-center">
-              <img
+              <SmartDishImage
                 src={previewLargeImage.url}
                 alt={previewLargeImage.dishName}
                 className="w-full h-full object-cover object-center scale-[1.03] transition-transform duration-200"

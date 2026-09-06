@@ -4,6 +4,7 @@ import { Utensils, CheckCircle2, Circle, Sparkles, Crown, Check, ChefHat, Printe
 import { MenuCatalogModal } from '../MenuCatalogModal.js';
 import { getDishImage } from '../../utils/dishImageHelper.js';
 import { WatermarkOverlay } from '../WatermarkOverlay.js';
+import { SmartDishImage } from '../SmartDishImage.js';
 
 interface CourseSelectorProps {
   selectedPackage: PackageTier;
@@ -102,7 +103,7 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                           onClick={() => setPreviewDish({ name: dishName, image: dishImg, tag: firstOpt.tag })}
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-emerald-300 shrink-0 bg-white shadow-2xs relative group/img cursor-pointer"
                         >
-                          <img
+                          <SmartDishImage
                             src={dishImg}
                             alt={dishName}
                             className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
@@ -165,7 +166,7 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                             isSelected ? 'border-red-500 ring-2 ring-red-200' : 'border-slate-200'
                           }`}
                         >
-                          <img
+                          <SmartDishImage
                             src={dishImg}
                             alt={option.name}
                             className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform duration-300"
@@ -182,7 +183,13 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                             {option.name}
                           </span>
                           {option.tag && (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 shrink-0 border border-amber-300 w-fit">
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 self-start sm:self-auto ${
+                                isSelected
+                                  ? 'bg-red-200/80 text-red-900'
+                                  : 'bg-amber-100 text-amber-900'
+                              }`}
+                            >
                               {option.tag}
                             </span>
                           )}
@@ -215,7 +222,7 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
             </button>
 
             <div className="relative aspect-[4/3] w-full bg-slate-950 overflow-hidden">
-              <img
+              <SmartDishImage
                 src={previewDish.image}
                 alt={previewDish.name}
                 className="w-full h-full object-cover object-center scale-[1.03] select-none pointer-events-none"

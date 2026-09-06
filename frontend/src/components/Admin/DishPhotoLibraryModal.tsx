@@ -14,6 +14,8 @@ import {
   Plus,
   Eye
 } from 'lucide-react';
+import { trimCanvasWhiteMargins } from '../../utils/imageTrimHelper.js';
+import { SmartDishImage } from '../SmartDishImage.js';
 
 export interface PhotoPreset {
   id: string;
@@ -315,129 +317,6 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
 
 const CUSTOM_PHOTOS_KEY = 'rapeephat_custom_uploaded_photos';
 
-// Helper to auto-trim white/blank margins from canvas
-const trimWhiteMargins = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return canvas;
-  const width = canvas.width;
-  const height = canvas.height;
-  if (width < 60 || height < 60) return canvas;
-
-  try {
-    const imgData = ctx.getImageData(0, 0, width, height);
-    const data = imgData.data;
-
-    // Sample corners to detect border color
-    const isBorderColor = (idx: number) => {
-      const a = data[idx + 3];
-      if (a < 30) return true; // Transparent
-      const r = data[idx];
-      const g = data[idx + 1];
-      const b = data[idx + 2];
-      // Near white / solid light background (RGB > 238)
-      if (r > 238 && g > 238 && b > 238) return true;
-      return false;
-    };
-
-    let left = 0;
-    let right = width - 1;
-    let top = 0;
-    let bottom = height - 1;
-
-    // Scan Left edge
-    for (let x = 0; x < width * 0.22; x++) {
-      let nonBorderCount = 0;
-      for (let y = Math.floor(height * 0.1); y < height * 0.9; y += 2) {
-        const idx = (y * width + x) * 4;
-        if (!isBorderColor(idx)) {
-          nonBorderCount++;
-        }
-      }
-      if (nonBorderCount > 4) {
-        left = Math.max(0, x - 1);
-        break;
-      }
-    }
-
-    // Scan Right edge
-    for (let x = width - 1; x > width * 0.78; x--) {
-      let nonBorderCount = 0;
-      for (let y = Math.floor(height * 0.1); y < height * 0.9; y += 2) {
-        const idx = (y * width + x) * 4;
-        if (!isBorderColor(idx)) {
-          nonBorderCount++;
-        }
-      }
-      if (nonBorderCount > 4) {
-        right = Math.min(width - 1, x + 1);
-        break;
-      }
-    }
-
-    // Scan Top edge
-    for (let y = 0; y < height * 0.22; y++) {
-      let nonBorderCount = 0;
-      for (let x = Math.floor(width * 0.1); x < width * 0.9; x += 2) {
-        const idx = (y * width + x) * 4;
-        if (!isBorderColor(idx)) {
-          nonBorderCount++;
-        }
-      }
-      if (nonBorderCount > 4) {
-        top = Math.max(0, y - 1);
-        break;
-      }
-    }
-
-    // Scan Bottom edge
-    for (let y = height - 1; y > height * 0.78; y--) {
-      let nonBorderCount = 0;
-      for (let x = Math.floor(width * 0.1); x < width * 0.9; x += 2) {
-        const idx = (y * width + x) * 4;
-        if (!isBorderColor(idx)) {
-          nonBorderCount++;
-        }
-      }
-      if (nonBorderCount > 4) {
-        bottom = Math.min(height - 1, y + 1);
-        break;
-      }
-    }
-
-    const cropWidth = right - left + 1;
-    const cropHeight = bottom - top + 1;
-
-    // Only crop if meaningful borders were detected (> 4px on any side)
-    if (
-      cropWidth >= 50 &&
-      cropHeight >= 50 &&
-      (left > 3 || right < width - 4 || top > 3 || bottom < height - 4)
-    ) {
-      const trimmedCanvas = document.createElement('canvas');
-      trimmedCanvas.width = cropWidth;
-      trimmedCanvas.height = cropHeight;
-      const trimmedCtx = trimmedCanvas.getContext('2d');
-      if (trimmedCtx) {
-        trimmedCtx.drawImage(
-          canvas,
-          left,
-          top,
-          cropWidth,
-          cropHeight,
-          0,
-          0,
-          cropWidth,
-          cropHeight
-        );
-        return trimmedCanvas;
-      }
-    }
-  } catch (e) {
-    console.warn('Auto-trimming notice:', e);
-  }
-  return canvas;
-};
-
 // Helper to compress and auto-trim images before storing/using
 const compressImageFile = (file: File, maxWidth = 1200, quality = 0.88): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -457,7 +336,7 @@ const compressImageFile = (file: File, maxWidth = 1200, quality = 0.88): Promise
         canvas.width = width;
         canvas.height = height;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) {
           resolve(e.target?.result as string);
           return;
@@ -466,7 +345,7 @@ const compressImageFile = (file: File, maxWidth = 1200, quality = 0.88): Promise
         ctx.drawImage(img, 0, 0, width, height);
 
         // Auto-trim any white/blank letterboxing on all sides
-        const trimmed = trimWhiteMargins(canvas);
+        const trimmed = trimCanvasWhiteMargins(canvas);
         const dataUrl = trimmed.toDataURL('image/jpeg', quality);
         resolve(dataUrl);
       };
@@ -781,7 +660,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                   }`}
                 >
                   <div className="relative aspect-[4/3] w-full bg-slate-900 overflow-hidden">
-                    <img
+                    <SmartDishImage
                       src={preset.url}
                       alt={preset.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -919,12 +798,12 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                 </button>
               </div>
 
-              {/* Image Preview Container */}
-              <div className="bg-slate-950 flex-1 flex items-center justify-center min-h-[300px] max-h-[60vh] p-3 overflow-hidden">
-                <img
+              {/* High-Resolution Image Preview Container */}
+              <div className="relative bg-slate-950 aspect-[4/3] sm:aspect-[16/10] w-full overflow-hidden flex items-center justify-center">
+                <SmartDishImage
                   src={largePreviewPhoto.url}
                   alt={largePreviewPhoto.name}
-                  className="max-h-[55vh] max-w-full object-contain rounded-2xl shadow-2xl"
+                  className="w-full h-full object-cover object-center scale-[1.03] transition-transform duration-200"
                 />
               </div>
 
