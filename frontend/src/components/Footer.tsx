@@ -4,9 +4,10 @@ import { VisitorStatsSection } from './VisitorCounter.js';
 
 interface FooterProps {
   onOpenAdmin?: () => void;
+  onNavigate?: (page: 'home' | 'menu' | 'packages' | 'quotation' | 'portfolio' | 'heritage' | 'contact' | 'admin') => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, onNavigate }) => {
   return (
     <footer className="bg-[#FFFDF9] text-slate-800 border-t-4 border-amber-400/80 pt-10 pb-16 sm:pb-8 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -37,11 +38,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
           {/* Quick Links */}
           <div className="space-y-3 text-sm font-bold text-slate-700">
             <div className="text-base font-black text-slate-900 mb-3 pb-1 border-b border-amber-200">เมนูและบริการ</div>
-            <div><a href="#heritage" className="hover:text-red-700 transition-colors">🏆 ตำนานนครปฐม 35 ปี</a></div>
-            <div><a href="#menu-showcase" className="hover:text-red-700 transition-colors">🍱 เมนูอาหารยอดนิยม</a></div>
-            <div><a href="#packages" className="hover:text-red-700 transition-colors">🏷️ แพ็กเกจราคาเริ่มต้น 1,400.-</a></div>
-            <div><a href="#portfolio" className="hover:text-red-700 transition-colors">📸 ภาพผลงานจริงทั่วไทย</a></div>
-            <div><a href="#fleet-logistics" className="hover:text-red-700 transition-colors">🚚 รถครัวเคลื่อนที่ 77 จังหวัด</a></div>
+            <div><a href="#heritage" onClick={(e) => { e.preventDefault(); onNavigate ? onNavigate('heritage') : window.location.hash = '#heritage'; }} className="hover:text-red-700 transition-colors cursor-pointer">🏆 ตำนานนครปฐม 35 ปี</a></div>
+            <div><a href="#menu" onClick={(e) => { e.preventDefault(); onNavigate ? onNavigate('menu') : window.location.hash = '#menu'; }} className="hover:text-red-700 transition-colors cursor-pointer">🍱 เมนูอาหารยอดนิยม</a></div>
+            <div><a href="#packages" onClick={(e) => { e.preventDefault(); onNavigate ? onNavigate('packages') : window.location.hash = '#packages'; }} className="hover:text-red-700 transition-colors cursor-pointer">🏷️ แพ็กเกจราคาเริ่มต้น 1,400.-</a></div>
+            <div><a href="#portfolio" onClick={(e) => { e.preventDefault(); onNavigate ? onNavigate('portfolio') : window.location.hash = '#portfolio'; }} className="hover:text-red-700 transition-colors cursor-pointer">📸 ภาพผลงานจริงทั่วไทย</a></div>
+            <div><a href="#contact" onClick={(e) => { e.preventDefault(); onNavigate ? onNavigate('contact') : window.location.hash = '#contact'; }} className="hover:text-red-700 transition-colors cursor-pointer">📅 ตารางคิวงาน & ติดต่อเรา</a></div>
           </div>
 
           {/* Contact Details & Locations */}
