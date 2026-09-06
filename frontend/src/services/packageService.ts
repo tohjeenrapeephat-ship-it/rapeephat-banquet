@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PackageTier, CourseCategory, DishItem } from '../types/quotation.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import { imageStore } from './imageStore.js';
+import { normalizeThaiDishName, extractDishBaseName } from '../utils/thaiTextNormalizer.js';
 
 const STORAGE_KEY = 'rapeephat_custom_packages';
 const EVENT_NAME = 'rapeephat_packages_updated';
@@ -329,17 +330,28 @@ class PackageService {
     const clean = dishName.trim().toLowerCase();
     if (!clean) return undefined;
 
-    // 0. Check high-capacity imageStore direct override
+    // 0. Check high-capacity imageStore direct override (has Thai normalization built-in)
     const directStoreImage = imageStore.getOverride(clean);
     if (directStoreImage) return directStoreImage;
 
+    const norm = normalizeThaiDishName(clean);
+    const base = extractDishBaseName(clean);
+
     const pkgs = this.getPackages();
-    // 1. Exact match first
+    // 1. Exact or normalized match first
     for (const pkg of pkgs) {
       for (const course of pkg.courses) {
         for (const opt of course.options) {
-          if (opt.imageUrl && opt.imageUrl.trim() !== '') {
-            if (opt.name.trim().toLowerCase() === clean) {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '' && !opt.imageUrl.startsWith('override:')) {
+            const optClean = opt.name.trim().toLowerCase();
+            const optNorm = normalizeThaiDishName(optClean);
+            const optBase = extractDishBaseName(optClean);
+
+            if (
+              optClean === clean ||
+              optNorm === norm ||
+              (base && (optBase === base || optNorm === base || optClean === base))
+            ) {
               return opt.imageUrl;
             }
           }
@@ -351,9 +363,13 @@ class PackageService {
     for (const pkg of pkgs) {
       for (const course of pkg.courses) {
         for (const opt of course.options) {
-          if (opt.imageUrl && opt.imageUrl.trim() !== '') {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '' && !opt.imageUrl.startsWith('override:')) {
             const optClean = opt.name.trim().toLowerCase();
-            if (optClean.includes(clean) || clean.includes(optClean)) {
+            const optNorm = normalizeThaiDishName(optClean);
+            if (
+              (norm.length > 5 && optNorm.includes(norm)) ||
+              (optNorm.length > 5 && norm.includes(optNorm))
+            ) {
               return opt.imageUrl;
             }
           }

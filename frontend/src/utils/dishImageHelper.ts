@@ -5,10 +5,13 @@
  */
 
 import { packageService } from '../services/packageService.js';
+import { normalizeThaiDishName, isAppetizerDish } from './thaiTextNormalizer.js';
 
 export const getDishImage = (dishName: string = '', courseTitle: string = ''): string => {
-  const d = (dishName || '').toLowerCase().trim();
-  const c = (courseTitle || '').toLowerCase().trim();
+  const dRaw = (dishName || '').toLowerCase().trim();
+  const cRaw = (courseTitle || '').toLowerCase().trim();
+  const d = normalizeThaiDishName(dRaw);
+  const c = normalizeThaiDishName(cRaw);
 
   // --- -1. CUSTOM BACK-OFFICE OVERRIDE (รูปที่ผู้ใช้ตั้งค่า/อัปโหลดจากระบบหลังร้าน) ---
   const customImg = packageService.getCustomDishImage(dishName);
@@ -239,15 +242,17 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['สี่สีไส้มังกร', 'ไส้มังกร', 'สี่สีทอด', 'สี่สี'].some((k) => d.includes(k)) && !d.includes('ขนมจีบ') && !d.includes('หม้อไฟ')) {
     return '/images/dishes/appetizers/see-see-sai-mungkorn-2026.jpg';
   }
-  // จานที่ 2 ของชุด 1,700.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น, สลัดกุ้งทอด, สลัดปลาทิพย์)
+  // จานที่ 2 ของทุกชุด (1,400 - 6,000.-) และออเดิร์ฟ 5 อย่างมาตรฐาน ทุกรูปแบบการสะกดคำ
   if (
-    (d.includes('ขนมจีบ') && (d.includes('สลัดกุ้ง') || d.includes('ปลาทิพย์'))) ||
-    d.includes('สลัดกุ้งทอด, สลัดปลาทิพย์')
+    isAppetizerDish(dishName, courseTitle) ||
+    ['ขนมจีบ', 'ออเดิร์ฟ', 'เป๋าฮื้อแผ่น', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า', '5 อย่าง', 'ห้าอย่าง'].some((k) => d.includes(k) || dRaw.includes(k)) ||
+    c.includes('จานที่ 2') ||
+    c.includes('ออเดิร์ฟ') ||
+    cRaw.includes('จานที่ 2') ||
+    cRaw.includes('ออเดิร์ฟ') ||
+    cRaw.includes('ออร์เดริ์ฟ') ||
+    cRaw.includes('ออร์เดิร์ฟ')
   ) {
-    return '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
-  }
-  // จานที่ 2 ของชุด 1,500.- / 1,400.- / 1,800.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น) และออเดิร์ฟ 5 อย่างมาตรฐาน
-  if (['ขนมจีบ', 'ออเดิร์ฟ', 'เป๋าฮื้อแผ่น', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า'].some((k) => d.includes(k)) || c.includes('จานที่ 2') || c.includes('ออเดิร์ฟ')) {
     return '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
   }
   // กุ้งอบวุ้นเส้น / ปูทะเลอบวุ้นเส้น / ทะเลอบวุ้นเส้น / อบวุ้นเส้น

@@ -28,7 +28,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น', tag: '5 อย่างครบชุด' },
+          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น', tag: '5 อย่างครบชุด', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -134,7 +134,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น', tag: '5 อย่างครบชุด' },
+          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น', tag: '5 อย่างครบชุด', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -251,7 +251,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น, สลัดกุ้งทอด, สลัดปลาทิพย์', tag: 'ครบเครื่อง 5 อย่าง' },
+          { id: 'd2-1', name: 'ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น, สลัดกุ้งทอด, สลัดปลาทิพย์', tag: 'ครบเครื่อง 5 อย่าง', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -491,7 +491,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟ (ไส้กรอกรมควัน, ไข่เยี่ยวม้า, ปลาทิพย์, หมูแผ่น, เกี๊ยวซ่าสลัด)', tag: '5 อย่างพรีเมียม' },
+          { id: 'd2-1', name: 'ออเดิร์ฟ (ไส้กรอกรมควัน, ไข่เยี่ยวม้า, ปลาทิพย์, หมูแผ่น, เกี๊ยวซ่าสลัด)', tag: '5 อย่างพรีเมียม', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -611,9 +611,9 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ (เลือก 1 อย่าง)',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟ 5 อย่าง (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น)', tag: '5 อย่างจักรพรรดิ' },
-          { id: 'd2-2', name: 'ติ่มซำนึ่งร้อน (ขนมจีบกุ้ง/หมู, ซาลาเปา, ฮะเก๋า, เกี๊ยวซ่า)', tag: 'ติ่มซำนึ่ง' },
-          { id: 'd2-3', name: 'ออเดิร์ฟทะเลนึ่งเตาซึ้ง (ก้ามปู, ปูอัด, ลูกชิ้นปลา, เต้าหู้ปลา, กุ้งลวก)', tag: 'ซีฟู้ดนึ่ง' },
+          { id: 'd2-1', name: 'ออเดิร์ฟ 5 อย่าง (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น)', tag: '5 อย่างจักรพรรดิ', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
+          { id: 'd2-2', name: 'ติ่มซำนึ่งร้อน (ขนมจีบกุ้ง/หมู, ซาลาเปา, ฮะเก๋า, เกี๊ยวซ่า)', tag: 'ติ่มซำนึ่ง', imageUrl: '/images/dishes/appetizers/appetizer-dimsum-topdown.jpg' },
+          { id: 'd2-3', name: 'ออเดิร์ฟทะเลนึ่งเตาซึ้ง (ก้ามปู, ปูอัด, ลูกชิ้นปลา, เต้าหู้ปลา, กุ้งลวก)', tag: 'ซีฟู้ดนึ่ง', imageUrl: '/images/dishes/appetizers/appetizer-seafood-steamer.jpg' },
         ],
       },
       {
@@ -744,7 +744,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟ (กระเพาะปลาผัดแห้ง, สี่สีไส้มังกร, หอยจ๊อปูทอด, ขนมจีบ, เป๋าฮื้อทรงเครื่อง, ออเดิร์ฟทะเล)', tag: '5 อย่างพรีเมียม' },
+          { id: 'd2-1', name: 'ออเดิร์ฟ (กระเพาะปลาผัดแห้ง, สี่สีไส้มังกร, หอยจ๊อปูทอด, ขนมจีบ, เป๋าฮื้อทรงเครื่อง, ออเดิร์ฟทะเล)', tag: '5 อย่างพรีเมียม', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -887,7 +887,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ต้มยำ / ออเดิร์ฟ 5 อย่าง / ออเดิร์ฟทะเลนึ่ง', tag: '5 อย่างจักรพรรดิ' },
+          { id: 'd2-1', name: 'ต้มยำ / ออเดิร์ฟ 5 อย่าง / ออเดิร์ฟทะเลนึ่ง', tag: '5 อย่างจักรพรรดิ', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -1021,7 +1021,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ต้มยำ / ออเดิร์ฟ 5 อย่าง / ออเดิร์ฟทะเลนึ่ง', tag: '5 อย่าง VIP' },
+          { id: 'd2-1', name: 'ต้มยำ / ออเดิร์ฟ 5 อย่าง / ออเดิร์ฟทะเลนึ่ง', tag: '5 อย่าง VIP', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -1150,7 +1150,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟ 5 อย่าง', tag: '5 อย่าง VIP' },
+          { id: 'd2-1', name: 'ออเดิร์ฟ 5 อย่าง', tag: '5 อย่าง VIP', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -1269,7 +1269,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟทะเล / ติ่มซำ / ออเดิร์ฟ 5 อย่าง', tag: '5 อย่าง VIP' },
+          { id: 'd2-1', name: 'ออเดิร์ฟทะเล / ติ่มซำ / ออเดิร์ฟ 5 อย่าง', tag: '5 อย่าง VIP', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -1391,7 +1391,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟฮ่องกง (ติ่มซำ) / ออเดิร์ฟ 5 อย่าง', tag: 'ฮ่องกงติ่มซำ' },
+          { id: 'd2-1', name: 'ออเดิร์ฟฮ่องกง (ติ่มซำ) / ออเดิร์ฟ 5 อย่าง', tag: 'ฮ่องกงติ่มซำ', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {
@@ -1511,7 +1511,7 @@ export const BANQUET_PACKAGES: PackageTier[] = [
         title: 'จานที่ 2: ออเดิร์ฟ 5 อย่าง',
         defaultDishId: 'd2-1',
         options: [
-          { id: 'd2-1', name: 'ออเดิร์ฟฮ่องกง (ติ่มซำ) / ออเดิร์ฟ 5 อย่าง', tag: 'ฮ่องกงติ่มซำ' },
+          { id: 'd2-1', name: 'ออเดิร์ฟฮ่องกง (ติ่มซำ) / ออเดิร์ฟ 5 อย่าง', tag: 'ฮ่องกงติ่มซำ', imageUrl: '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg' },
         ],
       },
       {

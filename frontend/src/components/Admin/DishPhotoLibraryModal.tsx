@@ -20,6 +20,7 @@ import {
 import { trimCanvasWhiteMargins } from '../../utils/imageTrimHelper.js';
 import { SmartDishImage } from '../SmartDishImage.js';
 import { imageStore } from '../../services/imageStore.js';
+import { normalizeThaiDishName } from '../../utils/thaiTextNormalizer.js';
 
 export interface PhotoPreset {
   id: string;
@@ -517,11 +518,17 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
 
   const allPresets = [...customUploadedPhotos, ...DISH_PHOTO_PRESETS];
 
+  const normSearch = normalizeThaiDishName(searchTerm);
   const filteredPresets = allPresets.filter((preset) => {
     const matchesCategory = selectedCategory === 'all' || preset.category === selectedCategory;
+    const pNameNorm = normalizeThaiDishName(preset.name);
+    const pTagNorm = preset.tag ? normalizeThaiDishName(preset.tag) : '';
     const matchesSearch =
+      !searchTerm ||
       preset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (preset.tag && preset.tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      pNameNorm.includes(normSearch) ||
+      (preset.tag && preset.tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (pTagNorm && pTagNorm.includes(normSearch));
     return matchesCategory && matchesSearch;
   });
 

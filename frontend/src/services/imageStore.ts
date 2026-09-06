@@ -3,6 +3,8 @@
  * Handles unlimited uploaded photos and dish image mappings without hitting the 5MB LocalStorage limit.
  */
 
+import { normalizeThaiDishName, extractDishBaseName } from '../utils/thaiTextNormalizer.js';
+
 const DB_NAME = 'rapeephat_media_db';
 const DB_VERSION = 1;
 const STORE_PHOTOS = 'uploaded_photos';
@@ -81,12 +83,47 @@ if (typeof window !== 'undefined') {
 
 export const imageStore = {
   /**
-   * Synchronous get for dish image override by dish name or ID
+   * Synchronous get for dish image override by dish name or ID (with Thai normalization)
    */
   getOverride(dishNameOrId: string): string | undefined {
     if (!dishNameOrId) return undefined;
     const key = dishNameOrId.toLowerCase().trim();
-    return inMemoryOverrides.get(key);
+    
+    // 1. Direct match
+    const direct = inMemoryOverrides.get(key);
+    if (direct) return direct;
+
+    // 2. Normalized match (handles 'ออร์เดริ์ฟ', 'ออร์เดิร์ฟ', 'ออเดริฟ', etc.)
+    const norm = normalizeThaiDishName(key);
+    const normMatch = inMemoryOverrides.get(norm);
+    if (normMatch) return normMatch;
+
+    // 3. Base name match (strips parentheses e.g. '(ขนมจีบ, ไข่เยี่ยวม้า...)')
+    const base = extractDishBaseName(key);
+    if (base && base !== norm) {
+      const baseMatch = inMemoryOverrides.get(base);
+      if (baseMatch) return baseMatch;
+    }
+
+    // 4. Fuzzy in-memory scan for substring / base match
+    for (const [k, url] of inMemoryOverrides.entries()) {
+      if (k === 'undefined' || k === 'null' || !k) continue;
+      const kNorm = normalizeThaiDishName(k);
+      const kBase = extractDishBaseName(k);
+
+      if (kNorm === norm || (base && (kBase === base || kNorm === base || kBase === norm))) {
+        return url;
+      }
+      if (
+        (norm.length > 5 && kNorm.includes(norm)) ||
+        (kNorm.length > 5 && norm.includes(kNorm)) ||
+        (base.length > 5 && kNorm.includes(base))
+      ) {
+        return url;
+      }
+    }
+
+    return undefined;
   },
 
   /**
@@ -95,13 +132,22 @@ export const imageStore = {
   async setOverride(dishNameOrId: string, imageUrl: string): Promise<void> {
     if (!dishNameOrId || !imageUrl) return;
     const key = dishNameOrId.toLowerCase().trim();
+    const norm = normalizeThaiDishName(key);
+    const base = extractDishBaseName(key);
+
     inMemoryOverrides.set(key, imageUrl);
+    if (norm && norm !== key) {
+      inMemoryOverrides.set(norm, imageUrl);
+    }
+    if (base && base !== key && base !== norm) {
+      inMemoryOverrides.set(base, imageUrl);
+    }
 
     // Save lightweight backup to LocalStorage
     try {
       if (typeof window !== 'undefined') {
         const obj: Record<string, string> = {};
-        // Only keep recent 20 overrides in localStorage to stay under 1MB
+        // Only keep recent 25 overrides in localStorage to stay under 1MB
         let count = 0;
         inMemoryOverrides.forEach((v, k) => {
           if (count < 25) {
@@ -120,6 +166,12 @@ export const imageStore = {
       const db = await getDB();
       const tx = db.transaction([STORE_OVERRIDES], 'readwrite');
       tx.objectStore(STORE_OVERRIDES).put({ key, url: imageUrl, updatedAt: Date.now() });
+      if (norm && norm !== key) {
+        tx.objectStore(STORE_OVERRIDES).put({ key: norm, url: imageUrl, updatedAt: Date.now() });
+      }
+      if (base && base !== key && base !== norm) {
+        tx.objectStore(STORE_OVERRIDES).put({ key: base, url: imageUrl, updatedAt: Date.now() });
+      }
     } catch (e) {
       console.warn('IndexedDB setOverride error:', e);
     }
