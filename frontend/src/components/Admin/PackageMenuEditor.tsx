@@ -4,6 +4,7 @@ import { packageService, useBanquetPackages } from '../../services/packageServic
 import { formatCurrency } from '../../utils/currency.js';
 import { getDishImage } from '../../utils/dishImageHelper.js';
 import { DishPhotoLibraryModal } from './DishPhotoLibraryModal.js';
+import { WatermarkOverlay } from '../WatermarkOverlay.js';
 import {
   Utensils,
   Plus,
@@ -904,12 +905,13 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
             </div>
 
             {/* High-Resolution Image Preview Container */}
-            <div className="relative bg-slate-950 flex-1 flex items-center justify-center min-h-[300px] max-h-[60vh] p-3 overflow-hidden">
+            <div className="relative bg-slate-950 aspect-[4/3] sm:aspect-[16/10] w-full overflow-hidden flex items-center justify-center">
               <img
                 src={previewLargeImage.url}
                 alt={previewLargeImage.dishName}
-                className="max-h-[56vh] max-w-full object-contain rounded-2xl shadow-2xl transition-transform duration-200"
+                className="w-full h-full object-cover object-center scale-[1.03] transition-transform duration-200"
               />
+              <WatermarkOverlay size="md" opacity={0.4} />
             </div>
 
             {/* Modal Footer / Action Toolbar */}

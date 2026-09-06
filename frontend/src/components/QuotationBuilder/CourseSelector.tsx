@@ -214,11 +214,12 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="relative aspect-[4/3] w-full bg-slate-950">
+            <div className="relative aspect-[4/3] w-full bg-slate-950 overflow-hidden">
               <img
                 src={previewDish.image}
                 alt={previewDish.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center scale-[1.03] select-none pointer-events-none"
+                onContextMenu={(e) => e.preventDefault()}
               />
               <WatermarkOverlay size="md" opacity={0.4} />
             </div>

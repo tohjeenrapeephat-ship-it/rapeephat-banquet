@@ -136,38 +136,62 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
     tag: 'เนื้อนุ่มหอมน้ำปลา',
   },
 
-  // 4. Fish (ปลากะพง, ปลาทับทิม)
+  // 4. Fish (ปลากะพง, ปลาทับทิม จานแดงมงคล 9 ขีด)
   {
-    id: 'fish-seabass-lime',
-    name: 'ปลากะพงนึ่งมะนาวสด 100%',
+    id: 'fish-ruby-lime',
+    name: 'ปลาทับทิมนึ่งมะนาวพริกสด (จานแดง 9 ขีด)',
     category: 'fish',
     categoryLabel: 'ปลากะพง & ปลาทับทิม',
-    url: '/images/dishes/fish/fish-seabass-steamed-lime-chili-pot.jpg',
+    url: '/images/dishes/fish/fish-ruby-steamed-lime-red-oval.jpg',
+    tag: '⭐ ยอดฮิตจานแดง',
+  },
+  {
+    id: 'fish-seabass-lime',
+    name: 'ปลากะพงนึ่งมะนาวสด 100% (จานแดง 9 ขีด)',
+    category: 'fish',
+    categoryLabel: 'ปลากะพง & ปลาทับทิม',
+    url: '/images/dishes/fish/fish-seabass-steamed-lime-red-oval.jpg',
     tag: 'ปลากะพงสดแท้',
   },
   {
-    id: 'fish-seabass-fried-herb',
-    name: 'ปลากะพงทอดน้ำปลา / ปลากะพงทอดสมุนไพร',
+    id: 'fish-ruby-3flavors',
+    name: 'ปลาทับทิมราดพริกสามรส (จานแดง 9 ขีด)',
     category: 'fish',
     categoryLabel: 'ปลากะพง & ปลาทับทิม',
-    url: '/images/dishes/fish/fish-seabass-fried-fishsauce-herbs.jpg',
+    url: '/images/dishes/fish/fish-ruby-three-flavor-red-oval.jpg',
+    tag: 'รสจัดจ้าน 3 รส',
+  },
+  {
+    id: 'fish-ruby-fried-herb',
+    name: 'ปลาทับทิมทอดน้ำปลา & ยำมะม่วงสด (จานแดง 9 ขีด)',
+    category: 'fish',
+    categoryLabel: 'ปลากะพง & ปลาทับทิม',
+    url: '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg',
     tag: 'กรอบนอกนุ่มใน',
   },
   {
     id: 'fish-ruby-steamed-plum',
-    name: 'ปลาทับทิมนึ่งซีอิ๊ว / นึ่งบ๊วยขิงซอย',
+    name: 'ปลาทับทิมนึ่งซีอิ๊ว / นึ่งบ๊วยขิงซอย (จานแดง 9 ขีด)',
     category: 'fish',
     categoryLabel: 'ปลากะพง & ปลาทับทิม',
     url: '/images/dishes/fish/fish-ruby-steamed-plum-red-oval.jpg',
     tag: 'ปลาทับทิมสด',
   },
   {
-    id: 'fish-seabass-3flavors',
-    name: 'ปลากะพงราดพริกสามรส / ปลากะพงราดยำมะม่วง',
+    id: 'fish-seabass-fried-herbal',
+    name: 'ปลากะพงทอดสมุนไพรสูตรโบราณ',
     category: 'fish',
     categoryLabel: 'ปลากะพง & ปลาทับทิม',
-    url: '/images/dishes/fish/fish-seabass-fried-sweet-sour-chili.jpg',
-    tag: 'รสจัดจ้าน',
+    url: '/images/dishes/fish/fish-seabass-fried-herbal-2026.jpg',
+    tag: 'สมุนไพรกรอบ',
+  },
+  {
+    id: 'fish-ruby-miang',
+    name: 'เมี่ยงปลาทับทิมสมุนไพรเครื่องแน่น',
+    category: 'fish',
+    categoryLabel: 'ปลากะพง & ปลาทับทิม',
+    url: '/images/dishes/fish/fish-ruby-miang-pla-herb-2026.jpg',
+    tag: 'เครื่องสมุนไพรสด',
   },
 
   // 5. Hotpots & Soups
@@ -291,8 +315,131 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
 
 const CUSTOM_PHOTOS_KEY = 'rapeephat_custom_uploaded_photos';
 
-// Helper to compress images before storing/using
-const compressImageFile = (file: File, maxWidth = 1200, quality = 0.85): Promise<string> => {
+// Helper to auto-trim white/blank margins from canvas
+const trimWhiteMargins = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
+  const width = canvas.width;
+  const height = canvas.height;
+  if (width < 60 || height < 60) return canvas;
+
+  try {
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    // Sample corners to detect border color
+    const isBorderColor = (idx: number) => {
+      const a = data[idx + 3];
+      if (a < 30) return true; // Transparent
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      // Near white / solid light background (RGB > 238)
+      if (r > 238 && g > 238 && b > 238) return true;
+      return false;
+    };
+
+    let left = 0;
+    let right = width - 1;
+    let top = 0;
+    let bottom = height - 1;
+
+    // Scan Left edge
+    for (let x = 0; x < width * 0.22; x++) {
+      let nonBorderCount = 0;
+      for (let y = Math.floor(height * 0.1); y < height * 0.9; y += 2) {
+        const idx = (y * width + x) * 4;
+        if (!isBorderColor(idx)) {
+          nonBorderCount++;
+        }
+      }
+      if (nonBorderCount > 4) {
+        left = Math.max(0, x - 1);
+        break;
+      }
+    }
+
+    // Scan Right edge
+    for (let x = width - 1; x > width * 0.78; x--) {
+      let nonBorderCount = 0;
+      for (let y = Math.floor(height * 0.1); y < height * 0.9; y += 2) {
+        const idx = (y * width + x) * 4;
+        if (!isBorderColor(idx)) {
+          nonBorderCount++;
+        }
+      }
+      if (nonBorderCount > 4) {
+        right = Math.min(width - 1, x + 1);
+        break;
+      }
+    }
+
+    // Scan Top edge
+    for (let y = 0; y < height * 0.22; y++) {
+      let nonBorderCount = 0;
+      for (let x = Math.floor(width * 0.1); x < width * 0.9; x += 2) {
+        const idx = (y * width + x) * 4;
+        if (!isBorderColor(idx)) {
+          nonBorderCount++;
+        }
+      }
+      if (nonBorderCount > 4) {
+        top = Math.max(0, y - 1);
+        break;
+      }
+    }
+
+    // Scan Bottom edge
+    for (let y = height - 1; y > height * 0.78; y--) {
+      let nonBorderCount = 0;
+      for (let x = Math.floor(width * 0.1); x < width * 0.9; x += 2) {
+        const idx = (y * width + x) * 4;
+        if (!isBorderColor(idx)) {
+          nonBorderCount++;
+        }
+      }
+      if (nonBorderCount > 4) {
+        bottom = Math.min(height - 1, y + 1);
+        break;
+      }
+    }
+
+    const cropWidth = right - left + 1;
+    const cropHeight = bottom - top + 1;
+
+    // Only crop if meaningful borders were detected (> 4px on any side)
+    if (
+      cropWidth >= 50 &&
+      cropHeight >= 50 &&
+      (left > 3 || right < width - 4 || top > 3 || bottom < height - 4)
+    ) {
+      const trimmedCanvas = document.createElement('canvas');
+      trimmedCanvas.width = cropWidth;
+      trimmedCanvas.height = cropHeight;
+      const trimmedCtx = trimmedCanvas.getContext('2d');
+      if (trimmedCtx) {
+        trimmedCtx.drawImage(
+          canvas,
+          left,
+          top,
+          cropWidth,
+          cropHeight,
+          0,
+          0,
+          cropWidth,
+          cropHeight
+        );
+        return trimmedCanvas;
+      }
+    }
+  } catch (e) {
+    console.warn('Auto-trimming notice:', e);
+  }
+  return canvas;
+};
+
+// Helper to compress and auto-trim images before storing/using
+const compressImageFile = (file: File, maxWidth = 1200, quality = 0.88): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -317,7 +464,10 @@ const compressImageFile = (file: File, maxWidth = 1200, quality = 0.85): Promise
         }
 
         ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+        // Auto-trim any white/blank letterboxing on all sides
+        const trimmed = trimWhiteMargins(canvas);
+        const dataUrl = trimmed.toDataURL('image/jpeg', quality);
         resolve(dataUrl);
       };
       img.onerror = () => reject(new Error('ไม่สามารถประมวลผลไฟล์รูปภาพได้'));
