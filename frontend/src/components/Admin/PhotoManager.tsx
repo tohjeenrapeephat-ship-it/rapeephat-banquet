@@ -1386,7 +1386,7 @@ export const PhotoManager: React.FC = () => {
         const alreadyBoundPkgIds = Array.from(alreadyBoundPkgIdsSet);
 
         // Helper to unbind photo from a single dish
-        const handleUnbindSingleDish = (
+        const handleUnbindSingleDish = async (
           pkgId: string,
           courseIdx: number,
           optIdentifier: string,
@@ -1430,6 +1430,15 @@ export const PhotoManager: React.FC = () => {
             };
           });
 
+          // Check if photo is still used anywhere
+          const stillUsed = newPkgs.some((p) =>
+            p.courses.some((c) => c.options.some((o) => o.imageUrl === assigningPhoto.url))
+          );
+          if (!stillUsed) {
+            await imageStore.removeOverridesByUrl(assigningPhoto.url);
+            await imageStore.removeOverride(assigningPhoto.name);
+          }
+
           packageService.savePackages(newPkgs);
           setPackages(newPkgs);
           showNotification(
@@ -1438,7 +1447,7 @@ export const PhotoManager: React.FC = () => {
         };
 
         // Helper to unbind photo from all packages at once
-        const handleUnbindAllDishes = () => {
+        const handleUnbindAllDishes = async () => {
           if (!assigningPhoto || alreadyBoundDishes.length === 0) return;
           if (
             !window.confirm(
@@ -1468,6 +1477,9 @@ export const PhotoManager: React.FC = () => {
               }),
             })),
           }));
+
+          await imageStore.removeOverridesByUrl(targetUrl);
+          await imageStore.removeOverride(assigningPhoto.name);
 
           packageService.savePackages(newPkgs);
           setPackages(newPkgs);
@@ -2125,8 +2137,10 @@ export const PhotoManager: React.FC = () => {
                 <div className="text-xs text-slate-600 flex items-center gap-2">
                   <span className="font-bold text-slate-800">สรุปการเลือก:</span>
                   <span className="text-red-600 font-black">{selectedPkgIds.length} แพ็กเกจ</span>
-                  {selectedPkgIds.length > 0 && (
-                    <span className="text-emerald-700 font-black">({selectedDishesCount} เมนูที่จะเปลี่ยนรูปภาพ)</span>
+                  {selectedPkgIds.length > 0 ? (
+                    <span className="text-emerald-700 font-black">({selectedDishesCount} เมนูที่จะผูกรูปภาพ)</span>
+                  ) : (
+                    <span className="text-slate-500 font-medium">(ไม่ได้เลือกแพ็กเกจเพิ่ม)</span>
                   )}
                 </div>
 
@@ -2136,19 +2150,33 @@ export const PhotoManager: React.FC = () => {
                     onClick={() => setAssigningPhoto(null)}
                     className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
                   >
-                    ยกเลิก
+                    ปิดหน้าต่าง
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleAssignToCourse}
-                    disabled={selectedPkgIds.length === 0 || selectedDishesCount === 0}
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:from-red-700 active:to-amber-700 disabled:opacity-50 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform active:scale-95"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>
-                      ยืนยันการผูกรูปภาพ ({selectedPkgIds.length} ราคา • {selectedDishesCount} เมนู)
-                    </span>
-                  </button>
+
+                  {selectedPkgIds.length > 0 && selectedDishesCount > 0 ? (
+                    <button
+                      type="button"
+                      onClick={handleAssignToCourse}
+                      className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:from-red-700 active:to-amber-700 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform active:scale-95"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>
+                        บันทึกการผูกรูปภาพ ({selectedPkgIds.length} ราคา • {selectedDishesCount} เมนู)
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        showNotification('✓ บันทึกข้อมูลเรียบร้อยแล้วค่ะ');
+                        setAssigningPhoto(null);
+                      }}
+                      className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer transform active:scale-95"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>✓ บันทึก / เสร็จสิ้น</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
