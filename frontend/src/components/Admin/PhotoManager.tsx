@@ -564,44 +564,20 @@ export const PhotoManager: React.FC = () => {
     showNotification(`✓ บันทึกรูป "${photo.name}" ลงเครื่องเรียบร้อยแล้วค่ะ`);
   };
 
-  // Open Assign Modal with smart multi-package detection
+  // Open Assign Modal with multi-package selection
   const openAssignModal = (photo: PhotoPreset) => {
     setAssigningPhoto(photo);
     const currentPkgs = packageService.getPackages();
     setPackages(currentPkgs);
 
-    // Find which packages contain this dish
-    const matched = currentPkgs.filter((pkg) =>
-      pkg.courses.some((course) =>
-        course.options.some((opt) =>
-          checkDishMatch(photo.name, opt.name, course.title, opt.tag)
-        )
-      )
-    );
-
-    const initialPkgIds = matched.length > 0 ? matched.map((p) => p.id) : currentPkgs.map((p) => p.id);
-    setSelectedPkgIds(initialPkgIds);
+    // Start with NO packages pre-selected as requested by user
+    setSelectedPkgIds([]);
+    setSelectedDishKeys([]);
 
     setAssignCourseMode('match_name');
     const detectedCourse = detectCourseNumberFromDish(photo.name, photo.category);
     setTargetCourseNumber(detectedCourse);
     setSelectedDishOptionName('all');
-
-    // Pre-populate selectedDishKeys with matched items
-    const initialKeys: string[] = [];
-    currentPkgs.forEach((pkg) => {
-      if (initialPkgIds.includes(pkg.id)) {
-        pkg.courses.forEach((course, cIdx) => {
-          const cNum = course.courseIndex || cIdx + 1;
-          course.options.forEach((opt) => {
-            if (checkDishMatch(photo.name, opt.name, course.title, opt.tag)) {
-              initialKeys.push(`${pkg.id}__${cNum}__${opt.id || opt.name}`);
-            }
-          });
-        });
-      }
-    });
-    setSelectedDishKeys(initialKeys);
   };
 
   // Assign photo to multiple packages at once
@@ -1177,6 +1153,27 @@ export const PhotoManager: React.FC = () => {
         );
         const matchedPkgIds = matchedPkgs.map((p) => p.id);
 
+        // Find which packages currently have this photo attached
+        const alreadyBoundDishes: { pkgId: string; pkgPrice: number; optName: string; courseTitle: string }[] = [];
+        const alreadyBoundPkgIdsSet = new Set<string>();
+
+        packages.forEach((pkg) => {
+          pkg.courses.forEach((course) => {
+            course.options.forEach((opt) => {
+              if (opt.imageUrl === assigningPhoto.url) {
+                alreadyBoundDishes.push({
+                  pkgId: pkg.id,
+                  pkgPrice: pkg.price,
+                  optName: opt.name,
+                  courseTitle: course.title,
+                });
+                alreadyBoundPkgIdsSet.add(pkg.id);
+              }
+            });
+          });
+        });
+        const alreadyBoundPkgIds = Array.from(alreadyBoundPkgIdsSet);
+
         // Calculate available dish options in the selected target course across all packages
         const courseDishOptionCounts = new Map<string, number>();
         packages.forEach((pkg) => {
@@ -1194,7 +1191,7 @@ export const PhotoManager: React.FC = () => {
           count,
         }));
 
-        // Candidate dishes based on current filters
+        // Candidate dishes based STRICTLY on user-selected packages
         const candidateDishes: {
           key: string;
           pkgId: string;
@@ -1302,6 +1299,13 @@ export const PhotoManager: React.FC = () => {
           syncKeysForPackages(targetIds, assignCourseMode, targetCourseNumber, selectedDishOptionName);
         };
 
+        const selectAlreadyBoundOnly = () => {
+          if (alreadyBoundPkgIds.length > 0) {
+            setSelectedPkgIds(alreadyBoundPkgIds);
+            syncKeysForPackages(alreadyBoundPkgIds, assignCourseMode, targetCourseNumber, selectedDishOptionName);
+          }
+        };
+
         const clearSelectedPackages = () => {
           setSelectedPkgIds([]);
           setSelectedDishKeys([]);
@@ -1362,7 +1366,7 @@ export const PhotoManager: React.FC = () => {
                       ผูกรูปภาพเข้ากับเมนูอาหาร (หลายแพ็กเกจ)
                     </h3>
                     <p className="text-xs text-slate-500">
-                      เลือกหลายราคาพร้อมกันเพื่อนำรูปนี้ไปแสดงผลในทุกแพ็กเกจในคลิกเดียว
+                      คลิกเลือกแพ็กเกจราคาที่ต้องการเพื่อนำรูปนี้ไปแสดงผลในเมนูอาหาร
                     </p>
                   </div>
                 </div>
@@ -1377,31 +1381,56 @@ export const PhotoManager: React.FC = () => {
 
               {/* Modal Scrollable Body */}
               <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
-                {/* Photo preview banner */}
-                <div className="p-3 sm:p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border-2 border-amber-400 shadow-xs">
-                      <SmartDishImage src={assigningPhoto.url} alt={assigningPhoto.name} className="w-full h-full object-cover" />
+                {/* Photo preview banner & current usage */}
+                <div className="p-3 sm:p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border-2 border-amber-400 shadow-xs">
+                        <SmartDishImage src={assigningPhoto.url} alt={assigningPhoto.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-black text-amber-950 truncate">
+                          {assigningPhoto.name}
+                        </div>
+                        <div className="text-[11px] text-amber-800">
+                          {assigningPhoto.categoryLabel}
+                        </div>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-black text-amber-950 truncate">
-                        {assigningPhoto.name}
-                      </div>
-                      <div className="text-[11px] text-amber-800">
-                        {assigningPhoto.categoryLabel}
-                      </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {alreadyBoundDishes.length > 0 ? (
+                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] border border-emerald-300 shrink-0 flex items-center gap-1">
+                          <Check className="w-3.5 h-3.5" />
+                          <span>ผูกใช้งานอยู่แล้ว {alreadyBoundDishes.length} เมนู ({alreadyBoundPkgIds.length} ราคา)</span>
+                        </span>
+                      ) : matchedPkgIds.length > 0 ? (
+                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-[11px] border border-blue-300 shrink-0 flex items-center gap-1">
+                          <span>พบชื่อตรงกันใน {matchedPkgIds.length} แพ็กเกจ</span>
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-300 shrink-0">
+                          ยังไม่ได้ผูกกับแพ็กเกจ
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {matchedPkgIds.length > 0 ? (
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] border border-emerald-300 shrink-0 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" />
-                      <span>พบเมนูนี้ใน {matchedPkgIds.length} แพ็กเกจ</span>
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[11px] border border-amber-300 shrink-0">
-                      พร้อมผูกเข้าแพ็กเกจ
-                    </span>
+                  {/* If already bound, show quick preview list of where it's used */}
+                  {alreadyBoundDishes.length > 0 && (
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-emerald-200 text-[11px] space-y-1">
+                      <div className="font-bold text-emerald-900 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>รายการที่ผูกรูปนี้ไว้ในปัจจุบัน:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {alreadyBoundDishes.map((b, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px]">
+                            <strong>{b.pkgPrice.toLocaleString()}.-</strong> ({b.optName})
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -1411,7 +1440,7 @@ export const PhotoManager: React.FC = () => {
                     <label className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
                       <span className="w-5 h-5 rounded-full bg-red-600 text-white inline-flex items-center justify-center text-[10px] font-bold">1</span>
                       <span>เลือกแพ็กเกจราคาที่ต้องการผูกรูปนี้</span>
-                      <span className="text-red-600 font-black">
+                      <span className={`font-black ${selectedPkgIds.length > 0 ? 'text-red-600' : 'text-slate-500'}`}>
                         ({selectedPkgIds.length} / {packages.length} แพ็กเกจ)
                       </span>
                     </label>
@@ -1425,22 +1454,33 @@ export const PhotoManager: React.FC = () => {
                       >
                         เลือกทุกราคา ({packages.length})
                       </button>
+                      {alreadyBoundPkgIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={selectAlreadyBoundOnly}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-black border border-emerald-200 cursor-pointer transition-colors"
+                        >
+                          ที่ผูกรูปนี้อยู่ ({alreadyBoundPkgIds.length})
+                        </button>
+                      )}
                       {matchedPkgIds.length > 0 && (
                         <button
                           type="button"
                           onClick={selectMatchedOnly}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-black border border-emerald-200 cursor-pointer transition-colors"
+                          className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 text-[11px] font-black border border-blue-200 cursor-pointer transition-colors"
                         >
-                          เฉพาะที่ตรงกัน ({matchedPkgIds.length})
+                          เฉพาะชื่อตรงกัน ({matchedPkgIds.length})
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={clearSelectedPackages}
-                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold cursor-pointer transition-colors"
-                      >
-                        ล้าง
-                      </button>
+                      {selectedPkgIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={clearSelectedPackages}
+                          className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold cursor-pointer transition-colors"
+                        >
+                          ล้าง
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -1449,6 +1489,7 @@ export const PhotoManager: React.FC = () => {
                     {packages.map((pkg) => {
                       const isChecked = selectedPkgIds.includes(pkg.id);
                       const isMatched = matchedPkgIds.includes(pkg.id);
+                      const isAlreadyBound = alreadyBoundPkgIds.includes(pkg.id);
 
                       return (
                         <button
@@ -1478,11 +1519,15 @@ export const PhotoManager: React.FC = () => {
 
                           <div className="flex items-center justify-between text-[10px] text-slate-500 w-full">
                             <span className="truncate">{pkg.name.replace('โต๊ะจีนราคา ', '')}</span>
-                            {isMatched && (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-200 text-amber-900 font-bold">
+                            {isAlreadyBound ? (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold">
+                                ✓ ผูกรูปนี้อยู่
+                              </span>
+                            ) : isMatched ? (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 text-amber-900 font-bold">
                                 มีเมนูนี้
                               </span>
-                            )}
+                            ) : null}
                           </div>
                         </button>
                       );
@@ -1602,13 +1647,15 @@ export const PhotoManager: React.FC = () => {
                       <label className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
                         <span className="w-5 h-5 rounded-full bg-red-600 text-white inline-flex items-center justify-center text-[10px] font-bold">3</span>
                         <span>รายการเมนูอาหารที่จะเปลี่ยนรูปภาพ:</span>
-                        <span className={`font-black ${selectedDishesCount > 0 ? 'text-emerald-700' : 'text-red-600'}`}>
-                          (เลือกแล้ว {selectedDishesCount} / {candidateDishes.length} รายการ)
-                        </span>
+                        {selectedPkgIds.length > 0 && (
+                          <span className={`font-black ${selectedDishesCount > 0 ? 'text-emerald-700' : 'text-red-600'}`}>
+                            (เลือกแล้ว {selectedDishesCount} / {candidateDishes.length} รายการ)
+                          </span>
+                        )}
                       </label>
 
                       {/* Quick Dish Selection Buttons */}
-                      {candidateDishes.length > 0 && (
+                      {selectedPkgIds.length > 0 && candidateDishes.length > 0 && (
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <button
                             type="button"
@@ -1637,7 +1684,19 @@ export const PhotoManager: React.FC = () => {
                       )}
                     </div>
 
-                    {candidateDishes.length > 0 ? (
+                    {selectedPkgIds.length === 0 ? (
+                      <div className="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl text-center py-6 space-y-2 animate-fadeIn">
+                        <div className="w-10 h-10 rounded-full bg-slate-200 text-slate-500 mx-auto flex items-center justify-center">
+                          <Utensils className="w-5 h-5" />
+                        </div>
+                        <div className="text-xs font-bold text-slate-700">
+                          ยังไม่ได้เลือกแพ็กเกจราคา
+                        </div>
+                        <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                          กรุณาคลิกเลือกแพ็กเกจราคาในข้อ 1 ด้านบน เพื่อดูและเลือกเฉพาะรายการเมนูอาหารที่ต้องการเปลี่ยนรูปภาพค่ะ
+                        </p>
+                      </div>
+                    ) : candidateDishes.length > 0 ? (
                       <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
                         <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
                           {candidateDishes.map((item) => {
@@ -1708,7 +1767,9 @@ export const PhotoManager: React.FC = () => {
                 <div className="text-xs text-slate-600 flex items-center gap-2">
                   <span className="font-bold text-slate-800">สรุปการเลือก:</span>
                   <span className="text-red-600 font-black">{selectedPkgIds.length} แพ็กเกจ</span>
-                  <span className="text-emerald-700 font-black">({selectedDishesCount} เมนูที่จะเปลี่ยนรูปภาพ)</span>
+                  {selectedPkgIds.length > 0 && (
+                    <span className="text-emerald-700 font-black">({selectedDishesCount} เมนูที่จะเปลี่ยนรูปภาพ)</span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
