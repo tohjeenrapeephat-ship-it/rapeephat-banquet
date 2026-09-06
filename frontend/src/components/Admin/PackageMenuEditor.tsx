@@ -319,6 +319,24 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
 
           <button
             type="button"
+            onClick={() => {
+              setPhotoPickerTarget({
+                pkgId: currentPkg.id,
+                courseId: currentPkg.courses[0]?.id || 'c1',
+                dishId: currentPkg.courses[0]?.options[0]?.id || '',
+                dishName: currentPkg.courses[0]?.options[0]?.name || '',
+                currentUrl: currentPkg.courses[0]?.options[0]?.imageUrl || '',
+              });
+            }}
+            title="เปิดคลังรูปภาพและจัดการรูปที่อัปโหลด"
+            className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-950 text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer border border-emerald-300 shadow-2xs"
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-emerald-700" />
+            <span>🖼️ คลังรูปภาพ & รูปอัปโหลด</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowResetConfirm(true)}
             className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-amber-300"
           >

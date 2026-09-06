@@ -9,6 +9,7 @@ import { CateringContractModal } from './CateringContractModal.js';
 import { CateringReceiptModal, ReceiptType } from './CateringReceiptModal.js';
 import { EditQuotationModal } from './EditQuotationModal.js';
 import { PackageMenuEditor } from './Admin/PackageMenuEditor.js';
+import { PhotoManager } from './Admin/PhotoManager.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
 import {
   LayoutDashboard,
@@ -23,6 +24,7 @@ import {
   CloudUpload,
   Phone,
   RefreshCw,
+  Image as ImageIcon,
   Edit3,
   Save,
   Settings,
@@ -62,9 +64,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
   const [receiptQuote, setReceiptQuote] = useState<QuotationDoc | null>(null);
   const [receiptType, setReceiptType] = useState<ReceiptType>('deposit_30');
   const [editingQuote, setEditingQuote] = useState<QuotationDoc | null>(null);
-  const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'settings'>(() => {
+  const [activeTab, setActiveTab] = useState<'quotations' | 'queue_manager' | 'chat_leads' | 'packages' | 'photo_manager' | 'settings'>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.toLowerCase();
+      if (hash.includes('photo') || hash.includes('image') || hash.includes('upload')) return 'photo_manager';
       if (hash.includes('package') || hash.includes('menu') || hash.includes('dish')) return 'packages';
       if (hash.includes('queue')) return 'queue_manager';
       if (hash.includes('chat') || hash.includes('lead')) return 'chat_leads';
@@ -665,6 +668,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
                 <span>จัดการเมนูอาหาร & แพ็กเกจ</span>
                 <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-950 font-black">
                   แก้ไขเมนู
+                </span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('photo_manager')}
+                className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeTab === 'photo_manager'
+                    ? 'bg-red-600 text-white shadow-sm ring-2 ring-emerald-300'
+                    : 'text-emerald-950 hover:text-emerald-800 bg-emerald-50 font-black border border-emerald-300 shadow-2xs'
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5 text-emerald-700" />
+                <span>คลังรูปภาพ & แก้ไขรูป</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-200 text-emerald-950 font-black">
+                  รูปอาหาร
                 </span>
               </button>
 
@@ -2126,6 +2144,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToSite }) => {
         {/* TAB: Packages & Dynamic Menus Management */}
         {activeTab === 'packages' && (
           <PackageMenuEditor onPreviewSite={onBackToSite} />
+        )}
+
+        {/* TAB: Photo & Media Management */}
+        {activeTab === 'photo_manager' && (
+          <PhotoManager />
         )}
 
         {/* TAB 3: Google Drive & GAS Settings */}
