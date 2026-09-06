@@ -139,21 +139,36 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage,
                       <span>รายการอาหารในเซ็ต ({pkg.courses.length} จาน):</span>
                     </div>
 
-                    <div className="space-y-1.5 text-xs text-slate-800">
+                    <div className="space-y-2 text-xs text-slate-800">
                       {(isExpanded ? pkg.courses : pkg.courses.slice(0, 5)).map((course, idx) => {
-                        const dishName = course.options[0]?.name || course.title;
+                        const hasMultiple = course.options.length > 1;
                         return (
-                          <div key={idx} className="flex items-start gap-2 leading-relaxed">
-                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                            <span className="font-bold text-slate-800 text-xs">
-                              <span className="text-amber-800 font-black mr-1">{idx + 1}.</span>
-                              {dishName}
-                              {course.options.length > 1 && (
-                                <span className="text-slate-500 font-semibold text-[11px] ml-1">
-                                  (เลือกได้ {course.options.length} เมนู)
-                                </span>
-                              )}
-                            </span>
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-start gap-2 leading-relaxed">
+                              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                              <span className="font-bold text-slate-800 text-xs">
+                                <span className="text-amber-800 font-black mr-1">{idx + 1}.</span>
+                                {hasMultiple
+                                  ? (course.title.replace(/^จานที่\s*\d+:?\s*/i, '') || course.options[0]?.name)
+                                  : (course.options[0]?.name || course.title)}
+                                {hasMultiple && (
+                                  <span className="text-red-700 font-bold text-[10.5px] ml-1.5 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">
+                                    เลือก 1 อย่าง ({course.options.length} เมนู)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                            {hasMultiple && (
+                              <div className="pl-6 space-y-0.5 text-[11px] text-slate-600">
+                                {course.options.map((opt, optIdx) => (
+                                  <div key={opt.id || optIdx} className="flex items-center gap-1.5">
+                                    <span className="text-amber-500 font-bold">•</span>
+                                    <span>{opt.name}</span>
+                                    {opt.tag && <span className="text-[9.5px] text-amber-800 font-bold">({opt.tag})</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}

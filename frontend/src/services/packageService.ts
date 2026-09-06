@@ -29,19 +29,37 @@ class PackageService {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((pkg: PackageTier) => ({
-            ...pkg,
-            courses: pkg.courses.map((c) => ({
-              ...c,
-              options: c.options.map((opt) => {
-                const override = imageStore.getOverride(opt.name) || imageStore.getOverride(opt.id);
+          return parsed.map((pkg: PackageTier) => {
+            const defaultPkg = BANQUET_PACKAGES.find((p) => p.id === pkg.id);
+            return {
+              ...pkg,
+              courses: pkg.courses.map((c) => {
+                // Auto-upgrade legacy c2 if it still has old single merged string
+                let options = c.options;
+                if (
+                  c.id === 'c2' &&
+                  options.length === 1 &&
+                  options[0].name.includes('ติ่มซำ / ออเดิร์ฟ')
+                ) {
+                  const defaultCourse = defaultPkg?.courses.find((dc) => dc.id === 'c2');
+                  if (defaultCourse && defaultCourse.options.length > 1) {
+                    options = defaultCourse.options;
+                  }
+                }
+
                 return {
-                  ...opt,
-                  imageUrl: override || (opt.imageUrl?.startsWith('override:') ? '' : opt.imageUrl)
+                  ...c,
+                  options: options.map((opt) => {
+                    const override = imageStore.getOverride(opt.name) || imageStore.getOverride(opt.id);
+                    return {
+                      ...opt,
+                      imageUrl: override || (opt.imageUrl?.startsWith('override:') ? '' : opt.imageUrl)
+                    };
+                  })
                 };
               })
-            }))
-          }));
+            };
+          });
         }
       }
     } catch (e) {
