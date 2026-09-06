@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PackageTier, CourseCategory, DishItem } from '../types/quotation.js';
 import { BANQUET_PACKAGES } from '../data/packages.js';
+import { imageStore } from './imageStore.js';
 
 const STORAGE_KEY = 'rapeephat_custom_packages';
 const EVENT_NAME = 'rapeephat_packages_updated';
@@ -11,11 +12,6 @@ class PackageService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      window.addEventListener(EVENT_NAME, () => {
-        this.cache = this.loadFromStorage();
-        this.notifyListeners();
-      });
-
       // Handle multi-tab cross sync
       window.addEventListener('storage', (e) => {
         if (e.key === STORAGE_KEY) {
@@ -33,7 +29,19 @@ class PackageService {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return parsed.map((pkg: PackageTier) => ({
+            ...pkg,
+            courses: pkg.courses.map((c) => ({
+              ...c,
+              options: c.options.map((opt) => {
+                const override = imageStore.getOverride(opt.name) || imageStore.getOverride(opt.id);
+                return {
+                  ...opt,
+                  imageUrl: override || (opt.imageUrl?.startsWith('override:') ? '' : opt.imageUrl)
+                };
+              })
+            }))
+          }));
         }
       }
     } catch (e) {
@@ -77,17 +85,51 @@ class PackageService {
   }
 
   /**
-   * Save complete list of packages
+   * Save complete list of packages with reliable quota management and imageStore sync
    */
   public savePackages(packages: PackageTier[]): void {
     this.cache = packages;
+
+    // 1. Sync all custom image overrides to high-capacity imageStore
+    packages.forEach((pkg) => {
+      pkg.courses.forEach((course) => {
+        course.options.forEach((opt) => {
+          if (opt.imageUrl && opt.imageUrl.trim() !== '' && !opt.imageUrl.startsWith('override:')) {
+            imageStore.setOverride(opt.name, opt.imageUrl);
+            if (opt.id) {
+              imageStore.setOverride(opt.id, opt.imageUrl);
+            }
+          }
+        });
+      });
+    });
+
+    // 2. Persist packages safely to localStorage
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(packages));
       }
     } catch (e) {
-      console.error('Failed to save packages to localStorage:', e);
+      console.warn('LocalStorage payload notice, using slim storage fallback:', e);
+      try {
+        const slimPackages = packages.map((pkg) => ({
+          ...pkg,
+          courses: pkg.courses.map((c) => ({
+            ...c,
+            options: c.options.map((opt) => ({
+              ...opt,
+              imageUrl: opt.imageUrl?.startsWith('data:') && opt.imageUrl.length > 30000
+                ? `override:${opt.name}`
+                : opt.imageUrl
+            }))
+          }))
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slimPackages));
+      } catch (err) {
+        console.warn('Slim storage fallback error:', err);
+      }
     }
+
     this.broadcast();
     this.notifyListeners();
   }
@@ -264,6 +306,10 @@ class PackageService {
     if (!dishName) return undefined;
     const clean = dishName.trim().toLowerCase();
     if (!clean) return undefined;
+
+    // 0. Check high-capacity imageStore direct override
+    const directStoreImage = imageStore.getOverride(clean);
+    if (directStoreImage) return directStoreImage;
 
     const pkgs = this.getPackages();
     // 1. Exact match first

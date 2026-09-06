@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PackageTier, CourseCategory, DishItem } from '../../types/quotation.js';
 import { packageService, useBanquetPackages } from '../../services/packageService.js';
+import { imageStore } from '../../services/imageStore.js';
 import { formatCurrency } from '../../utils/currency.js';
 import { getDishImage } from '../../utils/dishImageHelper.js';
 import { DishPhotoLibraryModal } from './DishPhotoLibraryModal.js';
@@ -766,6 +767,12 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
           dishNameHint={photoPickerTarget.dishName}
           currentPhotoUrl={photoPickerTarget.currentUrl}
           onSelectPhoto={(photoUrl) => {
+            if (photoPickerTarget.dishName) {
+              imageStore.setOverride(photoPickerTarget.dishName, photoUrl);
+            }
+            if (photoPickerTarget.dishId) {
+              imageStore.setOverride(photoPickerTarget.dishId, photoUrl);
+            }
             handleUpdateDishField(
               photoPickerTarget.courseId,
               photoPickerTarget.dishId,

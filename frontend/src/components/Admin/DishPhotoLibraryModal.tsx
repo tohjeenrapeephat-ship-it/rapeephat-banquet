@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { trimCanvasWhiteMargins } from '../../utils/imageTrimHelper.js';
 import { SmartDishImage } from '../SmartDishImage.js';
+import { imageStore } from '../../services/imageStore.js';
 
 export interface PhotoPreset {
   id: string;
@@ -391,22 +392,56 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load custom photos from localStorage
+  // Load custom photos from imageStore (IndexedDB) & localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(CUSTOM_PHOTOS_KEY);
-      if (saved) {
-        setCustomUploadedPhotos(JSON.parse(saved));
+    let isMounted = true;
+    const loadPhotos = async () => {
+      try {
+        const dbPhotos = await imageStore.getAllCustomPhotos();
+        let localPhotos: PhotoPreset[] = [];
+        const saved = localStorage.getItem(CUSTOM_PHOTOS_KEY);
+        if (saved) {
+          try {
+            localPhotos = JSON.parse(saved);
+          } catch (e) {}
+        }
+
+        // Merge and deduplicate by id/url
+        const combinedMap = new Map<string, PhotoPreset>();
+        localPhotos.forEach((p) => {
+          if (p && (p.id || p.url)) combinedMap.set(p.id || p.url, p);
+        });
+        dbPhotos.forEach((p) => {
+          if (p && (p.id || p.url)) combinedMap.set(p.id || p.url, p);
+        });
+
+        const merged = Array.from(combinedMap.values()).sort(
+          (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+        );
+
+        if (isMounted) {
+          setCustomUploadedPhotos(merged);
+        }
+      } catch (e) {
+        console.warn('Failed to load custom uploaded photos', e);
       }
-    } catch (e) {
-      console.warn('Failed to load custom uploaded photos', e);
-    }
+    };
+    loadPhotos();
+    return () => {
+      isMounted = false;
+    };
   }, [isOpen]);
 
   const saveCustomPhotos = (newPhotos: PhotoPreset[]) => {
     setCustomUploadedPhotos(newPhotos);
+    // Persist all photos to imageStore (IndexedDB)
+    newPhotos.forEach((photo) => {
+      imageStore.saveCustomPhoto(photo);
+    });
+
+    // Try keeping a lightweight backup in localStorage
     try {
-      localStorage.setItem(CUSTOM_PHOTOS_KEY, JSON.stringify(newPhotos));
+      localStorage.setItem(CUSTOM_PHOTOS_KEY, JSON.stringify(newPhotos.slice(0, 15)));
     } catch (e) {
       console.warn('Failed to persist custom photos to localStorage', e);
     }
@@ -418,10 +453,17 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
     setEditingPhotoName(photo.name);
   };
 
-  const handleSaveRename = (photoId: string, e?: React.MouseEvent) => {
+  const handleSaveRename = async (photoId: string, customName?: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const newName = editingPhotoName.trim();
+    const newName = (customName !== undefined ? customName : editingPhotoName).trim();
     if (!newName) return;
+
+    const targetPhoto = customUploadedPhotos.find((p) => p.id === photoId);
+    if (targetPhoto) {
+      const updatedPhoto = { ...targetPhoto, name: newName };
+      await imageStore.saveCustomPhoto(updatedPhoto);
+      await imageStore.setOverride(newName, targetPhoto.url);
+    }
 
     const updated = customUploadedPhotos.map((p) => {
       if (p.id === photoId) {
@@ -494,7 +536,10 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
         timestamp: Date.now(),
       };
 
-      const updated = [newPhoto, ...customUploadedPhotos];
+      await imageStore.saveCustomPhoto(newPhoto);
+      await imageStore.setOverride(cleanDishName, compressedDataUrl);
+
+      const updated = [newPhoto, ...customUploadedPhotos.filter((p) => p.id !== newPhoto.id)];
       saveCustomPhotos(updated);
 
       setUploadSuccessMsg(`✓ บันทึกรูป "${cleanDishName}" สำเร็จแล้ว!`);
@@ -513,7 +558,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
     }
   };
 
-  const handleApplyCustomUrl = () => {
+  const handleApplyCustomUrl = async () => {
     const url = customUrl.trim();
     if (!url) return;
 
@@ -530,6 +575,9 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
       timestamp: Date.now(),
     };
 
+    await imageStore.saveCustomPhoto(newPhoto);
+    await imageStore.setOverride(cleanDishName, url);
+
     const updated = [newPhoto, ...customUploadedPhotos.filter((p) => p.url !== url)];
     saveCustomPhotos(updated);
 
@@ -537,9 +585,10 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
     onClose();
   };
 
-  const handleDeleteCustomPhoto = (photoId: string, e: React.MouseEvent) => {
+  const handleDeleteCustomPhoto = async (photoId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm('คุณต้องการลบรูปภาพนี้ออกจากรายการที่บันทึกไว้ใช่หรือไม่?')) {
+      await imageStore.deleteCustomPhoto(photoId);
       const updated = customUploadedPhotos.filter((p) => p.id !== photoId);
       saveCustomPhotos(updated);
     }
@@ -760,7 +809,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
-                            onClick={(e) => handleSaveRename(preset.id, e)}
+                            onClick={(e) => handleSaveRename(preset.id, undefined, e)}
                             className="flex-1 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                           >
                             <Check className="w-3 h-3" />
@@ -881,7 +930,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                         className="flex-1 px-2.5 py-1 bg-white text-slate-900 border-2 border-amber-400 rounded-lg text-xs font-black focus:outline-none"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            handleSaveRename(largePreviewPhoto.id);
+                            handleSaveRename(largePreviewPhoto.id, largeTitleText);
                             setIsEditingLargeTitle(false);
                           }
                           if (e.key === 'Escape') setIsEditingLargeTitle(false);
@@ -890,7 +939,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                       <button
                         type="button"
                         onClick={() => {
-                          handleSaveRename(largePreviewPhoto.id);
+                          handleSaveRename(largePreviewPhoto.id, largeTitleText);
                           setIsEditingLargeTitle(false);
                         }}
                         className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black flex items-center gap-1 cursor-pointer shrink-0"
