@@ -227,5 +227,77 @@ export const imageStore = {
     } catch (e) {
       console.warn('IndexedDB deleteCustomPhoto error:', e);
     }
+  },
+
+  /**
+   * Remove dish image override
+   */
+  async removeOverride(dishNameOrId: string): Promise<void> {
+    if (!dishNameOrId) return;
+    const key = dishNameOrId.toLowerCase().trim();
+    const norm = normalizeThaiDishName(key);
+    const base = extractDishBaseName(key);
+
+    inMemoryOverrides.delete(key);
+    if (norm) inMemoryOverrides.delete(norm);
+    if (base) inMemoryOverrides.delete(base);
+
+    // Also remove from localStorage backup
+    try {
+      if (typeof window !== 'undefined') {
+        const rawOverrides = localStorage.getItem('rapeephat_dish_overrides_v1');
+        if (rawOverrides) {
+          const parsed = JSON.parse(rawOverrides);
+          delete parsed[key];
+          if (norm) delete parsed[norm];
+          if (base) delete parsed[base];
+          localStorage.setItem('rapeephat_dish_overrides_v1', JSON.stringify(parsed));
+        }
+      }
+    } catch (e) {}
+
+    // Delete from IndexedDB
+    try {
+      const db = await getDB();
+      const tx = db.transaction([STORE_OVERRIDES], 'readwrite');
+      const store = tx.objectStore(STORE_OVERRIDES);
+      store.delete(key);
+      if (norm) store.delete(norm);
+      if (base) store.delete(base);
+    } catch (e) {
+      console.warn('IndexedDB removeOverride error:', e);
+    }
+  },
+
+  /**
+   * Remove any overrides pointing to a specific image URL
+   */
+  async removeOverridesByUrl(imageUrl: string): Promise<void> {
+    if (!imageUrl) return;
+    const keysToDelete: string[] = [];
+    inMemoryOverrides.forEach((url, k) => {
+      if (url === imageUrl) keysToDelete.push(k);
+    });
+    keysToDelete.forEach((k) => inMemoryOverrides.delete(k));
+
+    try {
+      if (typeof window !== 'undefined') {
+        const rawOverrides = localStorage.getItem('rapeephat_dish_overrides_v1');
+        if (rawOverrides) {
+          const parsed = JSON.parse(rawOverrides);
+          keysToDelete.forEach((k) => delete parsed[k]);
+          localStorage.setItem('rapeephat_dish_overrides_v1', JSON.stringify(parsed));
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const db = await getDB();
+      const tx = db.transaction([STORE_OVERRIDES], 'readwrite');
+      const store = tx.objectStore(STORE_OVERRIDES);
+      keysToDelete.forEach((k) => store.delete(k));
+    } catch (e) {
+      console.warn('IndexedDB removeOverridesByUrl error:', e);
+    }
   }
 };

@@ -505,16 +505,134 @@ export const PhotoManager: React.FC = () => {
     setEditingPhotoId(null);
   };
 
-  // Delete Photo
+  // Helper to compute binding status & matching prices for any photo
+  const getPhotoBindingInfo = (photo: PhotoPreset) => {
+    const boundDishes: {
+      pkgId: string;
+      pkgPrice: number;
+      optName: string;
+      courseTitle: string;
+      courseIndex: number;
+    }[] = [];
+    const boundPricesSet = new Set<number>();
+    const matchedPricesSet = new Set<number>();
+
+    packages.forEach((pkg) => {
+      let pkgHasMatch = false;
+      pkg.courses.forEach((course, cIdx) => {
+        const cNum = course.courseIndex || cIdx + 1;
+        course.options.forEach((opt) => {
+          if (opt.imageUrl === photo.url) {
+            boundDishes.push({
+              pkgId: pkg.id,
+              pkgPrice: pkg.price,
+              optName: opt.name,
+              courseTitle: course.title,
+              courseIndex: cNum,
+            });
+            boundPricesSet.add(pkg.price);
+          }
+          if (checkDishMatch(photo.name, opt.name, course.title, opt.tag)) {
+            pkgHasMatch = true;
+            matchedPricesSet.add(pkg.price);
+          }
+        });
+      });
+    });
+
+    const boundPrices = Array.from(boundPricesSet).sort((a, b) => a - b);
+    const matchedPrices = Array.from(matchedPricesSet).sort((a, b) => a - b);
+
+    return {
+      boundDishes,
+      boundPrices,
+      isBound: boundDishes.length > 0,
+      matchedPrices,
+      hasMatches: matchedPrices.length > 0,
+    };
+  };
+
+  // Direct Unbind Photo from all packages
+  const handleUnbindPhotoDirectly = async (photo: PhotoPreset) => {
+    if (
+      !window.confirm(
+        `คุณต้องการยกเลิกการผูกรูปภาพ "${photo.name}" ออกจากทุกแพ็กเกจราคาใช่หรือไม่?`
+      )
+    ) {
+      return;
+    }
+
+    const currentPkgs = packageService.getPackages();
+    let unbindCount = 0;
+    const newPkgs = currentPkgs.map((pkg) => ({
+      ...pkg,
+      courses: pkg.courses.map((course) => ({
+        ...course,
+        options: course.options.map((opt) => {
+          if (opt.imageUrl === photo.url) {
+            unbindCount++;
+            return {
+              ...opt,
+              imageUrl: undefined,
+            };
+          }
+          return opt;
+        }),
+      })),
+    }));
+
+    await imageStore.removeOverridesByUrl(photo.url);
+    await imageStore.removeOverride(photo.name);
+
+    packageService.savePackages(newPkgs);
+    setPackages(newPkgs);
+    showNotification(
+      `✓ ปลดการผูกรูปภาพ "${photo.name}" ออกจากทุกแพ็กเกจ (${unbindCount} เมนู) เรียบร้อยแล้วค่ะ`
+    );
+  };
+
+  // Delete Custom Photo and unbind from all packages
   const handleDeletePhoto = async (photoId: string) => {
     const target = customPhotos.find((p) => p.id === photoId);
     if (!target) return;
 
-    if (window.confirm(`คุณต้องการลบรูปภาพ "${target.name}" ออกจากระบบใช่หรือไม่?`)) {
+    if (
+      window.confirm(
+        `คุณต้องการลบรูปภาพ "${target.name}" ออกจากระบบใช่หรือไม่?\n\n(รูปภาพนี้จะถูกลบออกจากคลังและปลดออกจากทุกแพ็กเกจที่ผูกไว้)`
+      )
+    ) {
       await imageStore.deleteCustomPhoto(photoId);
+      await imageStore.removeOverridesByUrl(target.url);
+      await imageStore.removeOverride(target.name);
+
+      // Also unbind from packages if currently used
+      const currentPkgs = packageService.getPackages();
+      let unbindCount = 0;
+      const newPkgs = currentPkgs.map((pkg) => ({
+        ...pkg,
+        courses: pkg.courses.map((course) => ({
+          ...course,
+          options: course.options.map((opt) => {
+            if (opt.imageUrl === target.url) {
+              unbindCount++;
+              return {
+                ...opt,
+                imageUrl: undefined,
+              };
+            }
+            return opt;
+          }),
+        })),
+      }));
+
+      if (unbindCount > 0) {
+        packageService.savePackages(newPkgs);
+        setPackages(newPkgs);
+      }
+
       const updated = customPhotos.filter((p) => p.id !== photoId);
       savePhotosState(updated);
-      showNotification(`✓ ลบรูปภาพ "${target.name}" เรียบร้อยแล้วค่ะ`);
+      showNotification(`✓ ลบรูปภาพ "${target.name}" และปลดออกจากทุกแพ็กเกจเรียบร้อยแล้วค่ะ`);
     }
   };
 
@@ -926,7 +1044,7 @@ export const PhotoManager: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex items-start justify-between gap-1.5">
                         <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug line-clamp-2">
                           {photo.name}
@@ -943,6 +1061,89 @@ export const PhotoManager: React.FC = () => {
                       <p className="text-[10px] text-slate-500 font-medium">
                         หมวดหมู่: {photo.categoryLabel}
                       </p>
+
+                      {/* Binding Status Badge & Price List */}
+                      {(() => {
+                        const binding = getPhotoBindingInfo(photo);
+
+                        if (binding.isBound) {
+                          return (
+                            <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] space-y-1 shadow-2xs">
+                              <div className="flex items-center justify-between gap-1">
+                                <div className="flex items-center gap-1 font-black text-emerald-900 text-xs">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                  <span>ผูกใน {binding.boundPrices.length} ราคา ({binding.boundDishes.length} เมนู):</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUnbindPhotoDirectly(photo);
+                                  }}
+                                  className="px-1.5 py-0.5 rounded-md bg-red-100 hover:bg-red-200 active:bg-red-300 text-red-700 text-[10px] font-bold border border-red-200 flex items-center gap-0.5 cursor-pointer transition-colors"
+                                  title="คลิกเพื่อยกเลิกการผูกรูปนี้ออกจากทุกแพ็กเกจ"
+                                >
+                                  <Trash2 className="w-2.5 h-2.5" />
+                                  <span>ปลดรูป</span>
+                                </button>
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {binding.boundPrices.map((price) => (
+                                  <span
+                                    key={price}
+                                    className="px-1.5 py-0.2 rounded-md bg-white border border-emerald-300 text-[10px] font-black text-emerald-800 shadow-2xs"
+                                  >
+                                    {price.toLocaleString()}.-
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (binding.hasMatches) {
+                          return (
+                            <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-[11px] space-y-1 shadow-2xs">
+                              <div className="flex items-center justify-between gap-1">
+                                <div className="flex items-center gap-1 font-bold text-blue-900 text-[11px]">
+                                  <Sparkles className="w-3 h-3 text-blue-600 shrink-0" />
+                                  <span>พบใน {binding.matchedPrices.length} ราคา:</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => openAssignModal(photo)}
+                                  className="px-1.5 py-0.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer transition-colors shadow-2xs"
+                                >
+                                  ผูกรูป
+                                </button>
+                              </div>
+                              <div className="flex flex-wrap gap-1">
+                                {binding.matchedPrices.map((price) => (
+                                  <span
+                                    key={price}
+                                    className="px-1.5 py-0.2 rounded-md bg-white border border-blue-200 text-[10px] font-bold text-blue-700"
+                                  >
+                                    {price.toLocaleString()}.-
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div className="p-1.5 px-2 rounded-xl bg-slate-100/70 border border-slate-200 text-[10.5px] text-slate-500 flex items-center justify-between">
+                            <span>⚪ ยังไม่ได้ผูกกับเมนูใด</span>
+                            <button
+                              type="button"
+                              onClick={() => openAssignModal(photo)}
+                              className="text-[10px] font-bold text-red-600 hover:text-red-700 hover:underline cursor-pointer"
+                            >
+                              + ผูกเมนู
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
 
@@ -1507,7 +1708,8 @@ export const PhotoManager: React.FC = () => {
                         </span>
                       ) : matchedPkgIds.length > 0 ? (
                         <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-[11px] border border-blue-300 shrink-0 flex items-center gap-1">
-                          <span>พบชื่อตรงกันใน {matchedPkgIds.length} แพ็กเกจ</span>
+                          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                          <span>พบชื่อตรงกันใน {matchedPkgIds.length} แพ็กเกจราคา</span>
                         </span>
                       ) : (
                         <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-300 shrink-0">
@@ -1518,7 +1720,7 @@ export const PhotoManager: React.FC = () => {
                   </div>
 
                   {/* If already bound, show quick preview list of where it's used with cancel/unbind capability */}
-                  {alreadyBoundDishes.length > 0 && (
+                  {alreadyBoundDishes.length > 0 ? (
                     <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 text-[11px] space-y-2.5 shadow-2xs">
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="font-black text-emerald-950 flex items-center gap-1.5 text-xs">
@@ -1567,7 +1769,27 @@ export const PhotoManager: React.FC = () => {
                         💡 <b>คำแนะนำ:</b> สามารถคลิกปุ่ม <b>✕</b> ท้ายแต่ละรายการ หรือกดปุ่ม <b>"ยกเลิกการผูกทั้งหมด"</b> เพื่อปลดรูปภาพออกได้ทันทีค่ะ
                       </p>
                     </div>
-                  )}
+                  ) : matchedPkgs.length > 0 ? (
+                    <div className="p-3 rounded-2xl bg-blue-50/90 border border-blue-200 text-[11px] space-y-2 shadow-2xs">
+                      <div className="font-bold text-blue-950 flex items-center gap-1.5 text-xs">
+                        <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                        <span>พบชื่อเมนูตรงกันใน {matchedPkgs.length} แพ็กเกจราคา:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {matchedPkgs.map((p) => (
+                          <span
+                            key={p.id}
+                            className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white border border-blue-300 text-blue-900 font-black text-xs shadow-2xs"
+                          >
+                            {p.price.toLocaleString()}.-
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-blue-800 font-medium">
+                        💡 <b>คำแนะนำ:</b> คลิกเลือกราคาด้านล่างในข้อ 1 เพื่อนำรูปไปผูกกับเมนูอาหารได้ทันทีค่ะ
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* Step 1: Multi-package Selection */}
