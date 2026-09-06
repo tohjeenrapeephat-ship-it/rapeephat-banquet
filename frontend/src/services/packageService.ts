@@ -47,13 +47,17 @@ class PackageService {
                   }
                 }
 
+                const defaultCourse = defaultPkg?.courses.find((dc) => dc.id === c.id);
                 return {
                   ...c,
                   options: options.map((opt) => {
+                    const defaultOption = defaultCourse?.options.find(
+                      (dopt) => dopt.id === opt.id || dopt.name.trim().toLowerCase() === opt.name.trim().toLowerCase()
+                    );
                     const override = imageStore.getOverride(opt.name) || imageStore.getOverride(opt.id);
                     return {
                       ...opt,
-                      imageUrl: override || (opt.imageUrl?.startsWith('override:') ? '' : opt.imageUrl)
+                      imageUrl: override || (opt.imageUrl?.startsWith('override:') ? '' : (opt.imageUrl || defaultOption?.imageUrl || ''))
                     };
                   })
                 };

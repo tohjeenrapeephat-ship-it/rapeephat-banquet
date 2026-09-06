@@ -228,6 +228,10 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   if (['ไก่ผัดเม็ดมะม่วง', 'ผัดเม็ดมะม่วง'].some((k) => d.includes(k))) {
     return '/images/dishes/appetizers/chicken-cashew-stirfry.jpg';
   }
+  // ติ่มซำ / ซาลาเปา / ฮะเก๋า
+  if (['ติ่มซำ', 'ซาลาเปา', 'ฮะเก๋า'].some((k) => d.includes(k))) {
+    return '/images/dishes/appetizers/appetizer-dimsum-topdown.jpg';
+  }
   if (['ออเดิร์ฟทะเล', 'ทะเลนึ่ง', 'เตาซึ้ง'].some((k) => d.includes(k))) {
     return '/images/dishes/appetizers/appetizer-seafood-steamer.jpg';
   }
@@ -242,9 +246,9 @@ export const getDishImage = (dishName: string = '', courseTitle: string = ''): s
   ) {
     return '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
   }
-  // จานที่ 2 ของชุด 1,500.- / 1,400.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น) และออเดิร์ฟ 5 อย่างมาตรฐาน
-  if (['ขนมจีบ', 'ติ่มซำ', 'ออเดิร์ฟ', 'เป๋าฮื้อแผ่น', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า'].some((k) => d.includes(k)) || c.includes('จานที่ 2') || c.includes('ออเดิร์ฟ')) {
-    return '/images/dishes/appetizers/appetizer-5-platter-marble.jpg';
+  // จานที่ 2 ของชุด 1,500.- / 1,400.- / 1,800.- (ขนมจีบ, ไข่เยี่ยวม้า, ไส้กรอก, แฮม, หมูแผ่น) และออเดิร์ฟ 5 อย่างมาตรฐาน
+  if (['ขนมจีบ', 'ออเดิร์ฟ', 'เป๋าฮื้อแผ่น', 'เกี๊ยวซ่า', 'หมูแผ่น', 'ไข่เยี่ยวม้า'].some((k) => d.includes(k)) || c.includes('จานที่ 2') || c.includes('ออเดิร์ฟ')) {
+    return '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
   }
   // กุ้งอบวุ้นเส้น / ปูทะเลอบวุ้นเส้น / ทะเลอบวุ้นเส้น / อบวุ้นเส้น
   if (['อบวุ้นเส้น', 'กุ้งอบวุ้นเส้น', 'ปูทะเลอบวุ้นเส้น', 'ทะเลอบวุ้นเส้น'].some((k) => d.includes(k))) {
@@ -334,6 +338,8 @@ export const getPackageHeroImage = (packageId: string): string => {
       return '/images/dishes/pork/pork-knuckle-braised-spoon-lift.jpg';
     case 'pkg-1700':
       return '/images/dishes/ducks/ped-sap-yang-orchid-2026.jpg';
+    case 'pkg-1800':
+      return '/images/dishes/fish/fish-ruby-fried-fishsauce-red-oval.jpg';
     case 'pkg-2000':
       return '/images/dishes/fish/fish-seabass-steamed-lime-red-oval.jpg';
     case 'pkg-2500':

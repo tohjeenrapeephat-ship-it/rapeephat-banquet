@@ -50,6 +50,22 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
     tag: '5 อย่างพรีเมียม',
   },
   {
+    id: 'app-dimsum',
+    name: 'ติ่มซำนึ่งร้อน (ขนมจีบกุ้ง/หมู, ซาลาเปา, ฮะเก๋า, เกี๊ยวซ่า)',
+    category: 'appetizers',
+    categoryLabel: 'ของทานเล่น & ออเดิร์ฟ',
+    url: '/images/dishes/appetizers/appetizer-dimsum-topdown.jpg',
+    tag: '🥟 ติ่มซำนึ่งร้อน',
+  },
+  {
+    id: 'app-seafood-steamer',
+    name: 'ออเดิร์ฟทะเลนึ่งเตาซึ้ง (ก้ามปู, ปูอัด, ลูกชิ้นปลา, เต้าหู้ปลา, กุ้งลวก)',
+    category: 'appetizers',
+    categoryLabel: 'ของทานเล่น & ออเดิร์ฟ',
+    url: '/images/dishes/appetizers/appetizer-seafood-steamer.jpg',
+    tag: '🦀 ซีฟู้ดนึ่งเตาซึ้ง',
+  },
+  {
     id: 'app-see-see',
     name: 'สี่สีไส้มังกร & หอยจ๊อปูทองคำ',
     category: 'appetizers',
