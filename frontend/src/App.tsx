@@ -27,10 +27,11 @@ import { VisitorFloatingBadge } from './components/VisitorCounter.js';
 import { AdminPortal } from './components/AdminPortal.js';
 import { MobileBottomNav } from './components/MobileBottomNav.js';
 import { LiveChatWidget } from './components/LiveChatWidget.js';
+import { ReviewPage } from './components/ReviewPage.js';
 import { Phone, MessageCircle, ArrowUp, Sparkles, ChevronRight } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Navigation & View State: 'home' | 'menu' | 'packages' | 'quotation' | 'portfolio' | 'heritage' | 'contact' | 'admin'
+  // Navigation & View State: 'home' | 'menu' | 'packages' | 'quotation' | 'portfolio' | 'heritage' | 'contact' | 'review' | 'admin'
   const [currentView, setCurrentView] = useState<PageView>(() => {
     if (typeof window === 'undefined') return 'home';
     const hash = window.location.hash.toLowerCase();
@@ -47,6 +48,9 @@ export const App: React.FC = () => {
       search.includes('admin')
     ) {
       return 'admin';
+    }
+    if (hash.includes('review') || path.includes('/review') || search.includes('review')) {
+      return 'review';
     }
     if (hash.includes('quotation') || hash.includes('calculate') || path.includes('/quotation')) {
       return 'quotation';
@@ -84,22 +88,6 @@ export const App: React.FC = () => {
       const path = window.location.pathname.toLowerCase();
       const search = window.location.search.toLowerCase();
 
-      // Instant redirect to Google Maps Review
-      if (
-        path === '/review' ||
-        path.startsWith('/review') ||
-        path === '/google-review' ||
-        path.startsWith('/google-review') ||
-        hash === '#review' ||
-        hash.includes('#review') ||
-        search.includes('review')
-      ) {
-        window.location.replace(
-          'https://www.google.com/search?q=%E0%B9%82%E0%B8%95%E0%B9%8A%E0%B8%B0%E0%B8%88%E0%B8%B5%E0%B8%99+%E0%B8%A3%E0%B8%9E%E0%B8%B5%E0%B8%9E%E0%B8%B1%E0%B8%92%E0%B8%99%E0%B9%8C'
-        );
-        return;
-      }
-
       if (
         hash.includes('admin') ||
         hash.includes('backend') ||
@@ -110,6 +98,8 @@ export const App: React.FC = () => {
         search.includes('admin')
       ) {
         setCurrentView('admin');
+      } else if (hash.includes('review') || path.includes('/review') || search.includes('review')) {
+        setCurrentView('review');
       } else if (hash.includes('quotation') || hash.includes('calculate') || path.includes('/quotation')) {
         setCurrentView('quotation');
       } else if (hash.includes('menu') || hash.includes('dishes') || path.includes('/menu')) {
@@ -196,6 +186,11 @@ export const App: React.FC = () => {
   // 1. If in Full Admin Portal View
   if (currentView === 'admin') {
     return <AdminPortal onBackToSite={() => handleNavigate('home')} />;
+  }
+
+  // 2. If in 5-Star Review Landing Page View (Scanned QR Code)
+  if (currentView === 'review') {
+    return <ReviewPage onNavigateHome={() => handleNavigate('home')} />;
   }
 
   // 2. If in Dedicated Quotation Builder Page View
