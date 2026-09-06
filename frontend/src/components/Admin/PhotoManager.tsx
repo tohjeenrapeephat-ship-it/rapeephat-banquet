@@ -580,7 +580,7 @@ export const PhotoManager: React.FC = () => {
                 className="bg-white rounded-2xl border-2 border-slate-200 hover:border-amber-400 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
               >
                 {/* Thumbnail Image Container */}
-                <div className="relative aspect-[4/3] w-full bg-slate-950 overflow-hidden">
+                <div className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
                   <SmartDishImage
                     src={photo.url}
                     alt={photo.name}

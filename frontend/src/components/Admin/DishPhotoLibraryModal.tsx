@@ -139,7 +139,7 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
     name: 'ขาหมูน้ำแดงหมั่นโถว / ขาหมูเยอรมัน',
     category: 'mains',
     categoryLabel: 'ขาหมู & เป็ดย่าง & ไก่',
-    url: '/images/dishes/mains/main-pork-knuckle-braised-sauce.jpg',
+    url: '/images/dishes/pork/pork-knuckle-braised-peanut-platter.jpg',
     tag: 'นุ่มละมุน',
   },
   {
@@ -147,8 +147,24 @@ export const DISH_PHOTO_PRESETS: PhotoPreset[] = [
     name: 'เป็ดสับย่างสูตรฮ่องกง / เป็ดพะโล้ / เป็ดยอดผัก',
     category: 'mains',
     categoryLabel: 'ขาหมู & เป็ดย่าง & ไก่',
-    url: '/images/dishes/mains/main-duck-roast-hongkong-chopped.jpg',
+    url: '/images/dishes/ducks/ped-sap-yang-orchid-2026.jpg',
     tag: '⭐ ซิกเนเจอร์สูตรฮ่องกง',
+  },
+  {
+    id: 'main-pork-shiitake',
+    name: 'ขาหมูน้ำแดงเห็ดหอมยอดผัก',
+    category: 'mains',
+    categoryLabel: 'ขาหมู & เป็ดย่าง & ไก่',
+    url: '/images/dishes/pork/pork-knuckle-braised-shiitake-platter.jpg',
+    tag: 'ขาหมูตุ๋นยาจีน',
+  },
+  {
+    id: 'main-duck-palo',
+    name: 'เป็ดพะโล้ตุ๋นยาจีนยอดผักน้ำแดง',
+    category: 'mains',
+    categoryLabel: 'ขาหมู & เป็ดย่าง & ไก่',
+    url: '/images/dishes/ducks/ped-palo-braised-2026.jpg',
+    tag: 'เป็ดพะโล้สูตรโบราณ',
   },
   {
     id: 'main-chicken-steamed',
@@ -775,7 +791,7 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                     isSelected ? 'border-red-600 ring-2 ring-red-300' : 'border-slate-200 hover:border-amber-400'
                   }`}
                 >
-                  <div className="relative aspect-[4/3] w-full bg-slate-900 overflow-hidden">
+                  <div className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
                     <SmartDishImage
                       src={preset.url}
                       alt={preset.name}

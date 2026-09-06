@@ -40,14 +40,16 @@ export const SmartDishImage: React.FC<SmartDishImageProps> = ({
     };
   }, [src]);
 
+  const defaultFallback = fallbackSrc || '/images/dishes/appetizers/appetizer-5-platter-banquet-tower.jpg';
+
   return (
     <img
-      src={cleanSrc}
+      src={cleanSrc || defaultFallback}
       alt={alt}
       className={className}
       onError={(e) => {
-        if (fallbackSrc && cleanSrc !== fallbackSrc) {
-          setCleanSrc(fallbackSrc);
+        if (cleanSrc !== defaultFallback) {
+          setCleanSrc(defaultFallback);
         }
         if (rest.onError) {
           rest.onError(e);
