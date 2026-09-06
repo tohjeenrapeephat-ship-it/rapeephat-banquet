@@ -33,6 +33,7 @@ import { DISH_PHOTO_PRESETS, PhotoPreset } from './DishPhotoLibraryModal.js';
 import { PackageTier } from '../../types/quotation.js';
 
 const CUSTOM_PHOTOS_KEY = 'rapeephat_custom_uploaded_photos_v1';
+export const PRESET_NAMES_OVERRIDE_KEY = 'rapeephat_preset_names_override_v1';
 
 // Client-side image compression & white-margin auto-trimming
 const processImageFile = (file: File, autoTrim: boolean = true): Promise<string> => {
@@ -94,6 +95,15 @@ const processImageFile = (file: File, autoTrim: boolean = true): Promise<string>
 
 export const PhotoManager: React.FC = () => {
   const [customPhotos, setCustomPhotos] = useState<PhotoPreset[]>([]);
+  const [presetOverrides, setPresetOverrides] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem(PRESET_NAMES_OVERRIDE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
   const [activeTab, setActiveTab] = useState<'my_uploads' | 'presets'>('my_uploads');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -269,6 +279,16 @@ export const PhotoManager: React.FC = () => {
     }
   };
 
+  const currentPresets: PhotoPreset[] = DISH_PHOTO_PRESETS.map((p) => {
+    if (presetOverrides[p.id]) {
+      return {
+        ...p,
+        name: presetOverrides[p.id],
+      };
+    }
+    return p;
+  });
+
   // Start Inline Rename
   const handleStartRename = (photo: PhotoPreset) => {
     setEditingPhotoId(photo.id);
@@ -280,16 +300,29 @@ export const PhotoManager: React.FC = () => {
     const newName = (customName !== undefined ? customName : editingPhotoName).trim();
     if (!newName) return;
 
-    const targetPhoto = customPhotos.find((p) => p.id === photoId);
+    const isCustomPhoto = customPhotos.some((p) => p.id === photoId);
+    const targetCustom = customPhotos.find((p) => p.id === photoId);
+    const targetPreset = currentPresets.find((p) => p.id === photoId);
+    const targetPhoto = targetCustom || targetPreset;
+
     if (targetPhoto) {
-      const oldName = targetPhoto.name;
-      const updatedPhoto = { ...targetPhoto, name: newName };
+      if (isCustomPhoto && targetCustom) {
+        const updatedPhoto = { ...targetCustom, name: newName };
+        await imageStore.saveCustomPhoto(updatedPhoto);
+        await imageStore.setOverride(newName, targetCustom.url);
 
-      await imageStore.saveCustomPhoto(updatedPhoto);
-      await imageStore.setOverride(newName, targetPhoto.url);
+        const updated = customPhotos.map((p) => (p.id === photoId ? updatedPhoto : p));
+        savePhotosState(updated);
+      } else if (targetPreset) {
+        // Standard preset rename
+        const newOverrides = { ...presetOverrides, [photoId]: newName };
+        setPresetOverrides(newOverrides);
+        try {
+          localStorage.setItem(PRESET_NAMES_OVERRIDE_KEY, JSON.stringify(newOverrides));
+        } catch (e) {}
 
-      const updated = customPhotos.map((p) => (p.id === photoId ? updatedPhoto : p));
-      savePhotosState(updated);
+        await imageStore.setOverride(newName, targetPreset.url);
+      }
 
       if (largePreviewPhoto && largePreviewPhoto.id === photoId) {
         setLargePreviewPhoto({ ...largePreviewPhoto, name: newName });
@@ -483,7 +516,7 @@ export const PhotoManager: React.FC = () => {
 
   // Filter photos
   const normSearch = normalizeThaiDishName(searchTerm);
-  const currentList = activeTab === 'my_uploads' ? customPhotos : DISH_PHOTO_PRESETS;
+  const currentList = activeTab === 'my_uploads' ? customPhotos : currentPresets;
 
   const filteredPhotos = currentList.filter((photo) => {
     const matchesCategory = selectedCategory === 'all' || photo.category === selectedCategory;
@@ -714,7 +747,7 @@ export const PhotoManager: React.FC = () => {
                 <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between bg-slate-50/50">
                   
                   {/* Dish Name Header / Inline Editor */}
-                  {isCustom && editingPhotoId === photo.id ? (
+                  {editingPhotoId === photo.id ? (
                     <div className="space-y-1.5" onClick={(e) => e.stopPropagation()}>
                       <label className="text-[10px] font-bold text-slate-500">พิมพ์ชื่อเมนูอาหาร:</label>
                       <input
@@ -753,16 +786,14 @@ export const PhotoManager: React.FC = () => {
                         <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug line-clamp-2">
                           {photo.name}
                         </h4>
-                        {isCustom && (
-                          <button
-                            type="button"
-                            onClick={() => handleStartRename(photo)}
-                            className="p-1 rounded-lg bg-white hover:bg-amber-100 text-slate-600 hover:text-amber-900 border border-slate-200 transition-colors shrink-0 cursor-pointer"
-                            title="✏️ คลิกเพื่อแก้ไขชื่อเมนูอาหาร"
-                          >
-                            <Edit3 className="w-3 h-3 text-amber-700" />
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleStartRename(photo)}
+                          className="p-1 rounded-lg bg-white hover:bg-amber-100 text-slate-600 hover:text-amber-900 border border-slate-200 transition-colors shrink-0 cursor-pointer"
+                          title="✏️ คลิกเพื่อแก้ไขชื่อเมนูอาหาร"
+                        >
+                          <Edit3 className="w-3 h-3 text-amber-700" />
+                        </button>
                       </div>
                       <p className="text-[10px] text-slate-500 font-medium">
                         หมวดหมู่: {photo.categoryLabel}
@@ -878,9 +909,25 @@ export const PhotoManager: React.FC = () => {
                   <Eye className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm sm:text-base font-black text-amber-300 truncate">
-                    {largePreviewPhoto.name}
-                  </h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-black text-amber-300 truncate">
+                      {largePreviewPhoto.name}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newName = prompt('แก้ไขชื่อเมนูอาหาร:', largePreviewPhoto.name);
+                        if (newName && newName.trim()) {
+                          handleSaveRename(largePreviewPhoto.id, newName.trim());
+                        }
+                      }}
+                      className="px-2 py-0.5 rounded-lg bg-amber-400/20 hover:bg-amber-400 hover:text-slate-950 text-amber-300 text-[10px] font-black flex items-center gap-1 transition-colors cursor-pointer border border-amber-400/40 shrink-0"
+                      title="✏️ คลิกเพื่อแก้ไขชื่อเมนูอาหาร"
+                    >
+                      <Edit3 className="w-2.5 h-2.5" />
+                      <span>เปลี่ยนชื่อ</span>
+                    </button>
+                  </div>
                   <p className="text-[11px] text-slate-300">
                     หมวดหมู่: {largePreviewPhoto.categoryLabel}
                   </p>
