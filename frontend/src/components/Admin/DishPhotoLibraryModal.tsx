@@ -12,7 +12,8 @@ import {
   Trash2,
   HelpCircle,
   Plus,
-  Eye
+  Eye,
+  Download
 } from 'lucide-react';
 import { trimCanvasWhiteMargins } from '../../utils/imageTrimHelper.js';
 import { SmartDishImage } from '../SmartDishImage.js';
@@ -815,6 +816,23 @@ export const DishPhotoLibraryModal: React.FC<DishPhotoLibraryModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = largePreviewPhoto.url;
+                      link.download = `${largePreviewPhoto.name || 'rapeephat_photo'}.jpg`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                    title="บันทึกรูปนี้เก็บไว้ในเครื่องคอมพิวเตอร์"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>บันทึกลงเครื่อง</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setLargePreviewPhoto(null)}
