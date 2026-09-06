@@ -20,8 +20,10 @@ import {
   ArrowRight,
   ExternalLink,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportMenuToExcelFile } from '../../utils/excelMenuExporter.js';
 import { SmartDishImage } from '../SmartDishImage.js';
 import { imageStore } from '../../services/imageStore.js';
 import { packageService } from '../../services/packageService.js';
@@ -553,6 +555,16 @@ export const PhotoManager: React.FC = () => {
             >
               <Upload className="w-4 h-4" />
               <span>{isUploading ? 'กำลังอัปโหลด...' : '📤 อัปโหลดรูปอาหารใหม่'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => exportMenuToExcelFile('รายการเมนูอาหาร_โต๊ะจีนรพีพัฒน์_ครบทุกแพ็กเกจ.xlsx')}
+              className="px-4 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 transition-all transform hover:scale-102 cursor-pointer shadow-md"
+              title="ดาวน์โหลดรายการเมนูอาหารทั้งหมดและรายการซ้ำเป็นไฟล์ Excel (.xlsx)"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-slate-950" />
+              <span>📊 ส่งออก Excel (.xlsx)</span>
             </button>
 
             <button

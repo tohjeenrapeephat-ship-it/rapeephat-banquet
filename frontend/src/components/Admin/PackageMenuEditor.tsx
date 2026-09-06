@@ -26,8 +26,10 @@ import {
   AlertTriangle,
   X,
   Layers,
-  FileJson
+  FileJson,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportMenuToExcelFile } from '../../utils/excelMenuExporter.js';
 
 interface PackageMenuEditorProps {
   onPreviewSite?: () => void;
@@ -333,6 +335,16 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
           >
             <ImageIcon className="w-3.5 h-3.5 text-emerald-700" />
             <span>🖼️ คลังรูปภาพ & รูปอัปโหลด</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => exportMenuToExcelFile('รายการเมนูอาหาร_โต๊ะจีนรพีพัฒน์_ครบทุกแพ็กเกจ.xlsx')}
+            title="ดาวน์โหลดรายการเมนูอาหารทั้งหมดและรายการซ้ำเป็นไฟล์ Excel (.xlsx)"
+            className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-950 text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer border border-teal-300 shadow-2xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-teal-700" />
+            <span>📊 ส่งออก Excel (.xlsx)</span>
           </button>
 
           <button
