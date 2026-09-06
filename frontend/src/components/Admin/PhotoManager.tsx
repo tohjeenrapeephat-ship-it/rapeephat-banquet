@@ -112,9 +112,9 @@ export const PhotoManager: React.FC = () => {
   // Assign to Menu modal state
   const [assigningPhoto, setAssigningPhoto] = useState<PhotoPreset | null>(null);
   const [packages, setPackages] = useState<PackageTier[]>(() => packageService.getPackages());
-  const [selectedPkgId, setSelectedPkgId] = useState<string>('pkg-1800');
-  const [selectedCourseId, setSelectedCourseId] = useState<string>('c2');
-  const [selectedDishId, setSelectedDishId] = useState<string>('');
+  const [selectedPkgIds, setSelectedPkgIds] = useState<string[]>([]);
+  const [assignCourseMode, setAssignCourseMode] = useState<'match_name' | 'specific_course'>('match_name');
+  const [targetCourseNumber, setTargetCourseNumber] = useState<number>(1);
 
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
@@ -357,48 +357,126 @@ export const PhotoManager: React.FC = () => {
     showNotification(`✓ บันทึกรูป "${photo.name}" ลงเครื่องเรียบร้อยแล้วค่ะ`);
   };
 
-  // Assign photo to a specific package course option
+  // Open Assign Modal with smart multi-package detection
+  const openAssignModal = (photo: PhotoPreset) => {
+    setAssigningPhoto(photo);
+    const currentPkgs = packageService.getPackages();
+    setPackages(currentPkgs);
+
+    const photoNorm = normalizeThaiDishName(photo.name);
+    const photoBase = extractDishBaseName(photo.name);
+
+    // Find which packages contain this dish
+    const matched = currentPkgs.filter((pkg) =>
+      pkg.courses.some((course) =>
+        course.options.some((opt) => {
+          const optNorm = normalizeThaiDishName(opt.name);
+          const optBase = extractDishBaseName(opt.name);
+          return (
+            optNorm === photoNorm ||
+            optNorm.includes(photoNorm) ||
+            photoNorm.includes(optNorm) ||
+            (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)))
+          );
+        })
+      )
+    );
+
+    if (matched.length > 0) {
+      setSelectedPkgIds(matched.map((p) => p.id));
+    } else {
+      setSelectedPkgIds(currentPkgs.map((p) => p.id));
+    }
+
+    setAssignCourseMode('match_name');
+    setTargetCourseNumber(1);
+  };
+
+  // Assign photo to multiple packages at once
   const handleAssignToCourse = () => {
     if (!assigningPhoto) return;
+    if (selectedPkgIds.length === 0) {
+      showNotification('กรุณาเลือกอย่างน้อย 1 แพ็กเกจราคาที่ต้องการผูกรูปภาพ', true);
+      return;
+    }
 
     const currentPkgs = packageService.getPackages();
-    let assigned = false;
+    let updatedDishesCount = 0;
+    let updatedPackagesCount = 0;
+
+    const photoNorm = normalizeThaiDishName(assigningPhoto.name);
+    const photoBase = extractDishBaseName(assigningPhoto.name);
 
     const newPkgs = currentPkgs.map((pkg) => {
-      if (pkg.id === selectedPkgId) {
-        return {
-          ...pkg,
-          courses: pkg.courses.map((course) => {
-            if (course.id === selectedCourseId) {
+      if (!selectedPkgIds.includes(pkg.id)) return pkg;
+
+      let pkgChanged = false;
+      const newCourses = pkg.courses.map((course, cIdx) => {
+        const isTargetCourse =
+          assignCourseMode === 'specific_course' &&
+          (course.courseIndex === targetCourseNumber || cIdx + 1 === targetCourseNumber);
+
+        const newOptions = course.options.map((opt) => {
+          const optNorm = normalizeThaiDishName(opt.name);
+          const optBase = extractDishBaseName(opt.name);
+
+          const isMatch =
+            optNorm === photoNorm ||
+            optNorm.includes(photoNorm) ||
+            photoNorm.includes(optNorm) ||
+            (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)));
+
+          if (assignCourseMode === 'match_name') {
+            if (isMatch) {
+              pkgChanged = true;
+              updatedDishesCount++;
               return {
-                ...course,
-                options: course.options.map((opt) => {
-                  if (!selectedDishId || opt.id === selectedDishId) {
-                    assigned = true;
-                    return {
-                      ...opt,
-                      name: assigningPhoto.name || opt.name,
-                      imageUrl: assigningPhoto.url,
-                    };
-                  }
-                  return opt;
-                }),
+                ...opt,
+                imageUrl: assigningPhoto.url,
               };
             }
-            return course;
-          }),
+          } else if (assignCourseMode === 'specific_course') {
+            if (isTargetCourse || isMatch) {
+              pkgChanged = true;
+              updatedDishesCount++;
+              return {
+                ...opt,
+                imageUrl: assigningPhoto.url,
+              };
+            }
+          }
+          return opt;
+        });
+
+        return {
+          ...course,
+          options: newOptions,
+        };
+      });
+
+      if (pkgChanged) {
+        updatedPackagesCount++;
+        return {
+          ...pkg,
+          courses: newCourses,
         };
       }
       return pkg;
     });
 
-    if (assigned) {
-      packageService.savePackages(newPkgs);
-      imageStore.setOverride(assigningPhoto.name, assigningPhoto.url);
-      setPackages(newPkgs);
-      showNotification(`✓ ผูกรูป "${assigningPhoto.name}" เข้ากับแพ็กเกจเรียบร้อยแล้วค่ะ!`);
-      setAssigningPhoto(null);
+    // Also register image override globally
+    imageStore.setOverride(assigningPhoto.name, assigningPhoto.url);
+    if (photoBase) {
+      imageStore.setOverride(photoBase, assigningPhoto.url);
     }
+
+    packageService.savePackages(newPkgs);
+    setPackages(newPkgs);
+
+    showNotification(
+      `✓ ผูกรูป "${assigningPhoto.name}" เข้ากับ ${selectedPkgIds.length} แพ็กเกจราคาเรียบร้อยแล้วค่ะ!`
+    );
+    setAssigningPhoto(null);
   };
 
   // Filter photos
@@ -725,12 +803,9 @@ export const PhotoManager: React.FC = () => {
 
                       <button
                         type="button"
-                        onClick={() => {
-                          setAssigningPhoto(photo);
-                          setSelectedPkgId('pkg-1800');
-                        }}
+                        onClick={() => openAssignModal(photo)}
                         className="py-1.5 px-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-[10.5px] flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-xs"
-                        title="นำรูปนี้ไปผูกกับเมนูในแพ็กเกจทันที"
+                        title="นำรูปนี้ไปผูกกับเมนูในหลายแพ็กเกจพร้อมกัน"
                       >
                         <Sparkles className="w-3 h-3 text-amber-300" />
                         <span>ผูกเข้าเมนู</span>
@@ -773,11 +848,11 @@ export const PhotoManager: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 🖼️ LARGE PREVIEW MODAL */}
+      {/* 🔍 HIGH-RES LARGE PREVIEW MODAL */}
       {/* ========================================================================= */}
       {largePreviewPhoto && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
           onClick={() => setLargePreviewPhoto(null)}
         >
           <div
@@ -785,9 +860,9 @@ export const PhotoManager: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b-2 border-amber-400">
-              <div className="flex items-center gap-2.5 min-w-0 pr-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+            <div className="p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 text-white flex items-center justify-between border-b-2 border-amber-400">
+              <div className="flex items-center gap-2.5 flex-1 min-w-0 pr-3">
+                <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0">
                   <Eye className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
@@ -847,12 +922,12 @@ export const PhotoManager: React.FC = () => {
                   onClick={() => {
                     const target = largePreviewPhoto;
                     setLargePreviewPhoto(null);
-                    setAssigningPhoto(target);
+                    openAssignModal(target);
                   }}
                   className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>นำรูปนี้ไปผูกกับเมนู</span>
+                  <span>นำรูปนี้ไปผูกกับเมนูหลายแพ็กเกจ</span>
                 </button>
               </div>
             </div>
@@ -861,147 +936,313 @@ export const PhotoManager: React.FC = () => {
       )}
 
       {/* ========================================================================= */}
-      {/* 🔗 ASSIGN PHOTO TO MENU MODAL */}
+      {/* 🔗 MULTI-PACKAGE ASSIGN PHOTO TO MENU MODAL */}
       {/* ========================================================================= */}
-      {assigningPhoto && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setAssigningPhoto(null)}
-        >
+      {assigningPhoto && (() => {
+        const photoNorm = normalizeThaiDishName(assigningPhoto.name);
+        const photoBase = extractDishBaseName(assigningPhoto.name);
+
+        // Auto-detected matched packages
+        const matchedPkgs = packages.filter((pkg) =>
+          pkg.courses.some((course) =>
+            course.options.some((opt) => {
+              const optNorm = normalizeThaiDishName(opt.name);
+              const optBase = extractDishBaseName(opt.name);
+              return (
+                optNorm === photoNorm ||
+                optNorm.includes(photoNorm) ||
+                photoNorm.includes(optNorm) ||
+                (photoBase && (optNorm.includes(photoBase) || optBase.includes(photoBase)))
+              );
+            })
+          )
+        );
+        const matchedPkgIds = matchedPkgs.map((p) => p.id);
+
+        const togglePackage = (pkgId: string) => {
+          setSelectedPkgIds((prev) =>
+            prev.includes(pkgId) ? prev.filter((id) => id !== pkgId) : [...prev, pkgId]
+          );
+        };
+
+        const selectAllPackages = () => {
+          setSelectedPkgIds(packages.map((p) => p.id));
+        };
+
+        const selectMatchedOnly = () => {
+          if (matchedPkgIds.length > 0) {
+            setSelectedPkgIds(matchedPkgIds);
+          } else {
+            setSelectedPkgIds(packages.map((p) => p.id));
+          }
+        };
+
+        const clearSelectedPackages = () => {
+          setSelectedPkgIds([]);
+        };
+
+        return (
           <div
-            className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border-2 border-red-500 animate-scaleUp p-6 space-y-5"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn"
+            onClick={() => setAssigningPhoto(null)}
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">
-                    ผูกรูปภาพเข้ากับเมนูอาหาร
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    เลือกแพ็กเกจและจานที่ต้องการนำรูปนี้ไปแสดงผล
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setAssigningPhoto(null)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Photo preview pill */}
-            <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-amber-300">
-                <SmartDishImage src={assigningPhoto.url} alt={assigningPhoto.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-black text-amber-950 truncate">
-                  {assigningPhoto.name}
-                </div>
-                <div className="text-[11px] text-amber-800">
-                  {assigningPhoto.categoryLabel}
-                </div>
-              </div>
-            </div>
-
-            {/* Package selector */}
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">1. เลือกแพ็กเกจราคา:</label>
-                <select
-                  value={selectedPkgId}
-                  onChange={(e) => {
-                    setSelectedPkgId(e.target.value);
-                    const p = packages.find((x) => x.id === e.target.value);
-                    if (p && p.courses[0]) {
-                      setSelectedCourseId(p.courses[0].id);
-                      setSelectedDishId(p.courses[0].options[0]?.id || '');
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-red-600"
-                >
-                  {packages.map((pkg) => (
-                    <option key={pkg.id} value={pkg.id}>
-                      {pkg.name} ({pkg.price.toLocaleString()} บาท)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Course Selector */}
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">2. เลือกจานลำดับที่:</label>
-                <select
-                  value={selectedCourseId}
-                  onChange={(e) => {
-                    setSelectedCourseId(e.target.value);
-                    const p = packages.find((x) => x.id === selectedPkgId);
-                    const c = p?.courses.find((x) => x.id === e.target.value);
-                    if (c && c.options[0]) {
-                      setSelectedDishId(c.options[0].id);
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-red-600"
-                >
-                  {packages.find((p) => p.id === selectedPkgId)?.courses.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Dish Option Selector (if multiple) */}
-              {(() => {
-                const p = packages.find((x) => x.id === selectedPkgId);
-                const c = p?.courses.find((x) => x.id === selectedCourseId);
-                if (!c || c.options.length <= 1) return null;
-                return (
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">3. เลือกเมนูในจานนี้:</label>
-                    <select
-                      value={selectedDishId}
-                      onChange={(e) => setSelectedDishId(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-red-600"
-                    >
-                      {c.options.map((opt) => (
-                        <option key={opt.id} value={opt.id}>
-                          {opt.name} {opt.tag ? `(${opt.tag})` : ''}
-                        </option>
-                      ))}
-                    </select>
+            <div
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden shadow-2xl border-2 border-red-500 animate-scaleUp flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-red-50 via-white to-amber-50 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-amber-600 text-white flex items-center justify-center shadow-md">
+                    <Sparkles className="w-5 h-5 text-amber-200" />
                   </div>
-                );
-              })()}
-            </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900">
+                      ผูกรูปภาพเข้ากับเมนูอาหาร (หลายแพ็กเกจ)
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      เลือกหลายราคาพร้อมกันเพื่อนำรูปนี้ไปแสดงผลในทุกแพ็กเกจในคลิกเดียว
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAssigningPhoto(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setAssigningPhoto(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="button"
-                onClick={handleAssignToCourse}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer"
-              >
-                <Check className="w-4 h-4" />
-                <span>ยืนยันการผูกรูปภาพ</span>
-              </button>
+              {/* Modal Scrollable Body */}
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+                {/* Photo preview banner */}
+                <div className="p-3 sm:p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border-2 border-amber-400 shadow-xs">
+                      <SmartDishImage src={assigningPhoto.url} alt={assigningPhoto.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-black text-amber-950 truncate">
+                        {assigningPhoto.name}
+                      </div>
+                      <div className="text-[11px] text-amber-800">
+                        {assigningPhoto.categoryLabel}
+                      </div>
+                    </div>
+                  </div>
+
+                  {matchedPkgIds.length > 0 ? (
+                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] border border-emerald-300 shrink-0 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>พบเมนูนี้ใน {matchedPkgIds.length} แพ็กเกจ</span>
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[11px] border border-amber-300 shrink-0">
+                      พร้อมผูกเข้าแพ็กเกจ
+                    </span>
+                  )}
+                </div>
+
+                {/* Step 1: Multi-package Selection */}
+                <div className="space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <label className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-red-600 text-white inline-flex items-center justify-center text-[10px] font-bold">1</span>
+                      <span>เลือกแพ็กเกจราคาที่ต้องการผูกรูปนี้</span>
+                      <span className="text-red-600 font-black">
+                        ({selectedPkgIds.length} / {packages.length} แพ็กเกจ)
+                      </span>
+                    </label>
+
+                    {/* Quick Select Buttons */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={selectAllPackages}
+                        className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-black border border-red-200 cursor-pointer transition-colors"
+                      >
+                        เลือกทุกราคา ({packages.length})
+                      </button>
+                      {matchedPkgIds.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={selectMatchedOnly}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-black border border-emerald-200 cursor-pointer transition-colors"
+                        >
+                          เฉพาะที่ตรงกัน ({matchedPkgIds.length})
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={clearSelectedPackages}
+                        className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold cursor-pointer transition-colors"
+                      >
+                        ล้าง
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Checkbox Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                    {packages.map((pkg) => {
+                      const isChecked = selectedPkgIds.includes(pkg.id);
+                      const isMatched = matchedPkgIds.includes(pkg.id);
+
+                      return (
+                        <button
+                          key={pkg.id}
+                          type="button"
+                          onClick={() => togglePackage(pkg.id)}
+                          className={`p-2.5 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between gap-1 relative ${
+                            isChecked
+                              ? 'bg-gradient-to-br from-red-50 to-amber-50 border-red-600 shadow-sm ring-1 ring-red-400'
+                              : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1 w-full">
+                            <div className="font-black text-xs text-slate-900">
+                              {pkg.price.toLocaleString()}.-
+                            </div>
+                            <div
+                              className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] font-black transition-colors ${
+                                isChecked
+                                  ? 'bg-red-600 text-white shadow-xs'
+                                  : 'border-2 border-slate-300 bg-white'
+                              }`}
+                            >
+                              {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] text-slate-500 w-full">
+                            <span className="truncate">{pkg.name.replace('โต๊ะจีนราคา ', '')}</span>
+                            {isMatched && (
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-200 text-amber-900 font-bold">
+                                มีเมนูนี้
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Step 2: Assign Mode */}
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <label className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-red-600 text-white inline-flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span>เลือกวิธีการผูกรูปภาพ:</span>
+                  </label>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Option A: Match by Name */}
+                    <div
+                      onClick={() => setAssignCourseMode('match_name')}
+                      className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        assignCourseMode === 'match_name'
+                          ? 'bg-amber-50 border-red-600 shadow-xs ring-1 ring-red-400'
+                          : 'bg-white border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 font-black text-xs text-slate-900 mb-1">
+                        <input
+                          type="radio"
+                          name="assignMode"
+                          checked={assignCourseMode === 'match_name'}
+                          onChange={() => setAssignCourseMode('match_name')}
+                          className="accent-red-600"
+                        />
+                        <span>⚡ ผูกตามชื่อเมนูอัตโนมัติ (แนะนำ)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 pl-5 leading-relaxed">
+                        ค้นหาจานที่มีชื่อตรงกับ <span className="font-bold text-red-700">"{assigningPhoto.name}"</span> ในทุกแพ็กเกจที่เลือก แล้วอัปเดตรูปให้ทันที
+                      </p>
+                    </div>
+
+                    {/* Option B: Match by Specific Course Index */}
+                    <div
+                      onClick={() => setAssignCourseMode('specific_course')}
+                      className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        assignCourseMode === 'specific_course'
+                          ? 'bg-amber-50 border-red-600 shadow-xs ring-1 ring-red-400'
+                          : 'bg-white border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 font-black text-xs text-slate-900 mb-1">
+                        <input
+                          type="radio"
+                          name="assignMode"
+                          checked={assignCourseMode === 'specific_course'}
+                          onChange={() => setAssignCourseMode('specific_course')}
+                          className="accent-red-600"
+                        />
+                        <span>🎯 กำหนดใส่จานลำดับที่ระบุ</span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 pl-5 leading-relaxed">
+                        ใส่รูปนี้ลงในจานลำดับที่เลือกของทุกแพ็กเกจราคา เช่น จานที่ 1 (ข้าวเกรียบ) หรือ จานที่ 2 (ออเดิร์ฟ)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Course index dropdown when Option B is active */}
+                  {assignCourseMode === 'specific_course' && (
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 animate-fadeIn">
+                      <label className="font-bold text-slate-700 block text-xs">
+                        เลือกจานลำดับที่ต้องการผูกในทุกแพ็กเกจที่เลือก:
+                      </label>
+                      <select
+                        value={targetCourseNumber}
+                        onChange={(e) => setTargetCourseNumber(Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-white border-2 border-slate-300 rounded-xl font-black text-slate-900 text-xs focus:outline-none focus:border-red-600"
+                      >
+                        <option value={1}>จานที่ 1: ข้าวเกรียบ & ถั่วอบเนย / เม็ดมะม่วง (ของทานเล่น)</option>
+                        <option value={2}>จานที่ 2: ออเดิร์ฟ 5 อย่าง / ติ่มซำ / ซีฟู้ดนึ่งเตาซึ้ง</option>
+                        <option value={3}>จานที่ 3: กระเพาะปลาน้ำแดง / ซุปเยื่อไผ่ / หูฉลาม</option>
+                        <option value={4}>จานที่ 4: ยำสามกรอบ / สลัดกุ้ง / ขาหมูน้ำแดง / เป็ดย่าง</option>
+                        <option value={5}>จานที่ 5: เมนูปลา (ปลากะพง / ปลาทับทิม) หรือ ขาหมู</option>
+                        <option value={6}>จานที่ 6: เมนูปลา / ต้มยำกุ้ง / แกงส้ม / หม้อไฟ</option>
+                        <option value={7}>จานที่ 7: ต้มยำหม้อไฟ / แกงจืด / ข้าวผัดปู</option>
+                        <option value={8}>จานที่ 8: ข้าวผัดปูก้อน / ผัดหมี่ฮ่องกง / ของหวาน</option>
+                        <option value={9}>จานที่ 9: ของหวานมงคล (โอวนี้ / แปะก๊วย / เต้าทึง / ลอยแก้ว)</option>
+                        <option value={10}>จานที่ 10: ผลไม้รวม / ของหวานลอยแก้ว</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer Toolbar */}
+              <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+                <div className="text-xs text-slate-600">
+                  <span className="font-bold text-slate-800">จำนวนที่เลือก: </span>
+                  <span className="text-red-600 font-black">{selectedPkgIds.length} แพ็กเกจราคา</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAssigningPhoto(null)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAssignToCourse}
+                    disabled={selectedPkgIds.length === 0}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 disabled:opacity-50 text-white text-xs font-black flex items-center gap-2 shadow-md transition-all cursor-pointer transform hover:scale-102"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>ยืนยันการผูกรูปภาพ ({selectedPkgIds.length} ราคา)</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );
