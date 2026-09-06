@@ -949,7 +949,7 @@ export const PackageMenuEditor: React.FC<PackageMenuEditorProps> = ({ onPreviewS
                 alt={previewLargeImage.dishName}
                 className="w-full h-full object-cover object-center scale-[1.03] transition-transform duration-200"
               />
-              <WatermarkOverlay size="md" opacity={0.4} />
+              <WatermarkOverlay size="md" opacity={0.45} />
             </div>
 
             {/* Modal Footer / Action Toolbar */}

@@ -546,7 +546,7 @@ export const MenuShowcase: React.FC = () => {
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 select-none pointer-events-none"
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  <WatermarkOverlay size="md" opacity={0.43} />
+                  <WatermarkOverlay size="md" opacity={0.48} />
 
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-black/20 to-transparent pointer-events-none" />
                   
@@ -709,7 +709,7 @@ export const MenuShowcase: React.FC = () => {
                   className="w-full h-full object-cover object-center transition-all duration-300 select-none pointer-events-none scale-[1.03]"
                   onContextMenu={(e) => e.preventDefault()}
                 />
-                <WatermarkOverlay size="md" opacity={0.43} />
+                <WatermarkOverlay size="md" opacity={0.48} />
                 
                 <div className="absolute top-4 left-4 z-20">
                   <span className="px-3.5 py-1.5 rounded-xl bg-slate-950/85 backdrop-blur-md text-amber-300 text-xs font-black border border-amber-300/40 shadow-lg">

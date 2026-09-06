@@ -7,7 +7,7 @@ interface WatermarkOverlayProps {
 
 export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
   size = 'md',
-  opacity = 0.43,
+  opacity = 0.48,
 }) => {
   return (
     <div
@@ -15,7 +15,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
       style={{ opacity }}
     >
       <div className="text-center transform -rotate-12 space-y-0.5 select-none">
-        {/* Main Title Text - 15% Richer & Clearer */}
+        {/* Main Title Text - Darker & Clearer Anti-Copy Watermark */}
         <div
           className={`font-black tracking-wider text-white ${
             size === 'sm'
@@ -25,7 +25,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
               : 'text-base sm:text-xl md:text-2xl'
           }`}
           style={{
-            textShadow: '0 2px 6px rgba(0,0,0,0.75), 0 0 10px rgba(0,0,0,0.5)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.85), 0 0 12px rgba(0,0,0,0.65)',
             fontFamily: "'Prompt', 'Noto Sans Thai', sans-serif",
           }}
         >
@@ -42,7 +42,7 @@ export const WatermarkOverlay: React.FC<WatermarkOverlayProps> = ({
               : 'text-[8.5px] sm:text-[10px]'
           }`}
           style={{
-            textShadow: '0 1px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)',
+            textShadow: '0 1px 5px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.7)',
             letterSpacing: '0.18em',
           }}
         >

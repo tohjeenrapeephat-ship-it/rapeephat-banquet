@@ -324,7 +324,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenBuilder }) => {
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-all duration-700 animate-fadeIn select-none pointer-events-none"
                   onContextMenu={(e) => e.preventDefault()}
                 />
-                <WatermarkOverlay size="lg" opacity={0.42} />
+                <WatermarkOverlay size="lg" opacity={0.47} />
 
                 {/* Dark Vignette & Gradient Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/30 pointer-events-none" />
@@ -509,7 +509,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenBuilder }) => {
                 className="w-full h-full object-cover object-center select-none pointer-events-none"
                 onContextMenu={(e) => e.preventDefault()}
               />
-              <WatermarkOverlay size="lg" opacity={0.42} />
+              <WatermarkOverlay size="lg" opacity={0.47} />
 
               {/* Navigation Arrows */}
               <button

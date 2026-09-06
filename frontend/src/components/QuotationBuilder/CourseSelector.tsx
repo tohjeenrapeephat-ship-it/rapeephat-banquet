@@ -228,7 +228,7 @@ export const CourseSelector: React.FC<CourseSelectorProps> = ({
                 className="w-full h-full object-cover object-center scale-[1.03] select-none pointer-events-none"
                 onContextMenu={(e) => e.preventDefault()}
               />
-              <WatermarkOverlay size="md" opacity={0.4} />
+              <WatermarkOverlay size="md" opacity={0.45} />
             </div>
 
             <div className="p-4 bg-gradient-to-b from-white to-amber-50/30 space-y-1 text-center">

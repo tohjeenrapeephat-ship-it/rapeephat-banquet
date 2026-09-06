@@ -150,7 +150,7 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
                 />
 
                 {/* Protective Center Watermark */}
-                <WatermarkOverlay size="md" opacity={0.4} />
+                <WatermarkOverlay size="md" opacity={0.45} />
 
                 {/* Top Badge */}
                 <div className="absolute top-4 left-4 z-10">
@@ -335,7 +335,7 @@ export const NakhonPathomHeritageSection: React.FC<{ onOpenBuilder?: () => void 
                 alt={selectedImage.title}
                 className="max-w-full max-h-[65vh] object-contain rounded-2xl border border-amber-400/40"
               />
-              <WatermarkOverlay size="lg" opacity={0.45} />
+              <WatermarkOverlay size="lg" opacity={0.50} />
             </div>
 
             {/* Modal Footer */}

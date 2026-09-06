@@ -128,7 +128,7 @@ export const ContactSection: React.FC = () => {
                         alt="บรรยากาศครัวโต๊ะจีนเมื่อ 35 ปีก่อน"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <WatermarkOverlay size="sm" opacity={0.4} />
+                      <WatermarkOverlay size="sm" opacity={0.45} />
                       <div className="absolute bottom-2 left-2 right-2 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs border border-amber-400/40 text-[11px] font-black text-amber-300 flex items-center gap-1.5">
                         <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>ครัวเตาถ่านไฟแรง ผัดกระทะเหล็กสูตรโบราณ</span>
@@ -181,7 +181,7 @@ export const ContactSection: React.FC = () => {
                         alt="ศักยภาพจัดเลี้ยง 750 โต๊ะต่อวัน โต๊ะจีนรพีพัฒน์"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <WatermarkOverlay size="sm" opacity={0.42} />
+                      <WatermarkOverlay size="sm" opacity={0.47} />
                       <div className="absolute bottom-2 left-2 right-2 px-3 py-1 rounded-xl bg-slate-950/85 backdrop-blur-xs border border-amber-400/60 text-[11px] font-black text-amber-300 flex items-center gap-1.5">
                         <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>จัดเลี้ยงสเกลใหญ่ถึง 750 โต๊ะ/วัน (ภาพโดรน 4K)</span>

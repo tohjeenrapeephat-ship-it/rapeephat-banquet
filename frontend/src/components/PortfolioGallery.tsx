@@ -1801,7 +1801,7 @@ export const PortfolioGallery: React.FC = () => {
                         isActive ? 'scale-108' : 'group-hover/thumb:scale-105 opacity-90'
                       }`}
                     />
-                    <WatermarkOverlay size="sm" opacity={0.4} />
+                    <WatermarkOverlay size="sm" opacity={0.45} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
                     
                     {/* Badge Count on Thumbnail */}
@@ -1946,7 +1946,7 @@ export const PortfolioGallery: React.FC = () => {
                   alt={currentItem.title}
                   className="w-full h-full object-cover object-center animate-fadeIn duration-500 transform group-hover:scale-105 transition-transform"
                 />
-                <WatermarkOverlay size="lg" opacity={0.43} />
+                <WatermarkOverlay size="lg" opacity={0.48} />
 
                 {/* Gradient Scrim */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
@@ -2112,7 +2112,7 @@ export const PortfolioGallery: React.FC = () => {
                     alt={item.title}
                     className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
                   />
-                  <WatermarkOverlay size="md" opacity={0.42} />
+                  <WatermarkOverlay size="md" opacity={0.47} />
 
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
@@ -2218,7 +2218,7 @@ export const PortfolioGallery: React.FC = () => {
                   alt={filteredItems[lightboxIndex]?.title}
                   className="w-full h-full object-cover object-center"
                 />
-                <WatermarkOverlay size="lg" opacity={0.45} />
+                <WatermarkOverlay size="lg" opacity={0.50} />
 
                 {/* Subtle Luxury Gradient Overlay at Top & Bottom */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />

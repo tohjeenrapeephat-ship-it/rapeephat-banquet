@@ -194,7 +194,7 @@ export const DroneAerialShowcase: React.FC<{ onOpenBuilder?: () => void }> = ({ 
             />
 
             {/* Protective Center Watermark */}
-            <WatermarkOverlay size="lg" opacity={0.45} />
+            <WatermarkOverlay size="lg" opacity={0.50} />
 
             {/* Top Vignette Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/60 pointer-events-none" />
