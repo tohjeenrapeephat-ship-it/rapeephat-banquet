@@ -518,7 +518,6 @@ export const PhotoManager: React.FC = () => {
     const matchedPricesSet = new Set<number>();
 
     packages.forEach((pkg) => {
-      let pkgHasMatch = false;
       pkg.courses.forEach((course, cIdx) => {
         const cNum = course.courseIndex || cIdx + 1;
         course.options.forEach((opt) => {
@@ -533,7 +532,6 @@ export const PhotoManager: React.FC = () => {
             boundPricesSet.add(pkg.price);
           }
           if (checkDishMatch(photo.name, opt.name, course.title, opt.tag)) {
-            pkgHasMatch = true;
             matchedPricesSet.add(pkg.price);
           }
         });
@@ -542,13 +540,16 @@ export const PhotoManager: React.FC = () => {
 
     const boundPrices = Array.from(boundPricesSet).sort((a, b) => a - b);
     const matchedPrices = Array.from(matchedPricesSet).sort((a, b) => a - b);
+    const unboundMatchedPrices = matchedPrices.filter((p) => !boundPrices.includes(p));
 
     return {
       boundDishes,
       boundPrices,
       isBound: boundDishes.length > 0,
       matchedPrices,
+      unboundMatchedPrices,
       hasMatches: matchedPrices.length > 0,
+      hasUnboundMatches: unboundMatchedPrices.length > 0,
     };
   };
 
@@ -1062,85 +1063,115 @@ export const PhotoManager: React.FC = () => {
                         หมวดหมู่: {photo.categoryLabel}
                       </p>
 
-                      {/* Binding Status Badge & Price List */}
+                      {/* Binding Status Badge & Price List (Separates user-bound from system-matched) */}
                       {(() => {
                         const binding = getPhotoBindingInfo(photo);
 
-                        if (binding.isBound) {
-                          return (
-                            <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] space-y-1 shadow-2xs">
-                              <div className="flex items-center justify-between gap-1">
-                                <div className="flex items-center gap-1 font-black text-emerald-900 text-xs">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                                  <span>ผูกใน {binding.boundPrices.length} ราคา ({binding.boundDishes.length} เมนู):</span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleUnbindPhotoDirectly(photo);
-                                  }}
-                                  className="px-1.5 py-0.5 rounded-md bg-red-100 hover:bg-red-200 active:bg-red-300 text-red-700 text-[10px] font-bold border border-red-200 flex items-center gap-0.5 cursor-pointer transition-colors"
-                                  title="คลิกเพื่อยกเลิกการผูกรูปนี้ออกจากทุกแพ็กเกจ"
-                                >
-                                  <Trash2 className="w-2.5 h-2.5" />
-                                  <span>ปลดรูป</span>
-                                </button>
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {binding.boundPrices.map((price) => (
-                                  <span
-                                    key={price}
-                                    className="px-1.5 py-0.2 rounded-md bg-white border border-emerald-300 text-[10px] font-black text-emerald-800 shadow-2xs"
+                        return (
+                          <div className="space-y-1.5 pt-1">
+                            {/* 1. รายการที่คุณเลือกผูกไว้แล้ว (สีเขียว) */}
+                            {binding.isBound ? (
+                              <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] space-y-1 shadow-2xs">
+                                <div className="flex items-center justify-between gap-1">
+                                  <div className="flex items-center gap-1 font-black text-emerald-900 text-xs">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                    <span>✅ ผูกใช้งานแล้ว ({binding.boundPrices.length} ราคา):</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUnbindPhotoDirectly(photo);
+                                    }}
+                                    className="px-1.5 py-0.5 rounded-md bg-red-100 hover:bg-red-200 active:bg-red-300 text-red-700 text-[10px] font-bold border border-red-200 flex items-center gap-0.5 cursor-pointer transition-colors"
+                                    title="คลิกเพื่อยกเลิกการผูกรูปนี้ออกจากทุกแพ็กเกจ"
                                   >
-                                    {price.toLocaleString()}.-
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        if (binding.hasMatches) {
-                          return (
-                            <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-[11px] space-y-1 shadow-2xs">
-                              <div className="flex items-center justify-between gap-1">
-                                <div className="flex items-center gap-1 font-bold text-blue-900 text-[11px]">
-                                  <Sparkles className="w-3 h-3 text-blue-600 shrink-0" />
-                                  <span>พบใน {binding.matchedPrices.length} ราคา:</span>
+                                    <Trash2 className="w-2.5 h-2.5" />
+                                    <span>ปลดรูป</span>
+                                  </button>
                                 </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {binding.boundPrices.map((price) => (
+                                    <span
+                                      key={price}
+                                      className="px-1.5 py-0.2 rounded-md bg-white border border-emerald-400 text-[10px] font-black text-emerald-800 shadow-2xs"
+                                    >
+                                      {price.toLocaleString()}.-
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : null}
+
+                            {/* 2. รายการที่ระบบตรวจพบชื่อตรงกันเพิ่มเติม (สีฟ้า) */}
+                            {binding.isBound && binding.hasUnboundMatches ? (
+                              <div className="p-1.5 rounded-xl bg-blue-50/70 border border-dashed border-blue-300 text-[10.5px] space-y-1">
+                                <div className="flex items-center justify-between gap-1">
+                                  <div className="flex items-center gap-1 font-bold text-blue-900 text-[10px]">
+                                    <Sparkles className="w-3 h-3 text-blue-600 shrink-0" />
+                                    <span>🔍 ระบบพบอีก {binding.unboundMatchedPrices.length} ราคา (ยังไม่ผูก):</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => openAssignModal(photo)}
+                                    className="px-1.5 py-0.2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-black cursor-pointer transition-colors shadow-2xs"
+                                  >
+                                    + ผูกเพิ่ม
+                                  </button>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {binding.unboundMatchedPrices.map((price) => (
+                                    <span
+                                      key={price}
+                                      className="px-1.5 py-0.2 rounded-md bg-white/80 border border-blue-200 text-[9.5px] font-bold text-blue-700"
+                                    >
+                                      {price.toLocaleString()}.-
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : !binding.isBound && binding.hasMatches ? (
+                              <div className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-[11px] space-y-1.5">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="text-[10px] text-slate-500 font-bold">⚪ ยังไม่ได้เลือกผูกใช้งาน</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => openAssignModal(photo)}
+                                    className="px-2 py-0.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer transition-colors shadow-2xs flex items-center gap-1"
+                                  >
+                                    <Sparkles className="w-2.5 h-2.5" />
+                                    <span>ผูกรูปเข้าเมนู</span>
+                                  </button>
+                                </div>
+                                <div className="p-1.5 rounded-lg bg-blue-50/80 border border-blue-200 space-y-1">
+                                  <div className="flex items-center gap-1 text-[10px] font-bold text-blue-900">
+                                    <Sparkles className="w-3 h-3 text-blue-600 shrink-0" />
+                                    <span>🔍 ระบบตรวจพบชื่อตรงกัน ({binding.matchedPrices.length} ราคา):</span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {binding.matchedPrices.map((price) => (
+                                      <span
+                                        key={price}
+                                        className="px-1.5 py-0.2 rounded-md bg-white border border-blue-200 text-[9.5px] font-bold text-blue-700"
+                                      >
+                                        {price.toLocaleString()}.-
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : !binding.isBound ? (
+                              <div className="p-1.5 px-2.5 rounded-xl bg-slate-100/70 border border-slate-200 text-[10.5px] text-slate-500 flex items-center justify-between">
+                                <span>⚪ ยังไม่ได้ผูกกับเมนูใด</span>
                                 <button
                                   type="button"
                                   onClick={() => openAssignModal(photo)}
-                                  className="px-1.5 py-0.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer transition-colors shadow-2xs"
+                                  className="text-[10px] font-bold text-red-600 hover:text-red-700 hover:underline cursor-pointer"
                                 >
-                                  ผูกรูป
+                                  + ผูกเมนู
                                 </button>
                               </div>
-                              <div className="flex flex-wrap gap-1">
-                                {binding.matchedPrices.map((price) => (
-                                  <span
-                                    key={price}
-                                    className="px-1.5 py-0.2 rounded-md bg-white border border-blue-200 text-[10px] font-bold text-blue-700"
-                                  >
-                                    {price.toLocaleString()}.-
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="p-1.5 px-2 rounded-xl bg-slate-100/70 border border-slate-200 text-[10.5px] text-slate-500 flex items-center justify-between">
-                            <span>⚪ ยังไม่ได้ผูกกับเมนูใด</span>
-                            <button
-                              type="button"
-                              onClick={() => openAssignModal(photo)}
-                              className="text-[10px] font-bold text-red-600 hover:text-red-700 hover:underline cursor-pointer"
-                            >
-                              + ผูกเมนู
-                            </button>
+                            ) : null}
                           </div>
                         );
                       })()}
@@ -1715,29 +1746,24 @@ export const PhotoManager: React.FC = () => {
                     <div className="flex items-center gap-2 flex-wrap">
                       {alreadyBoundDishes.length > 0 ? (
                         <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] border border-emerald-300 shrink-0 flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5" />
-                          <span>ผูกใช้งานอยู่แล้ว {alreadyBoundDishes.length} เมนู ({alreadyBoundPkgIds.length} ราคา)</span>
-                        </span>
-                      ) : matchedPkgIds.length > 0 ? (
-                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-[11px] border border-blue-300 shrink-0 flex items-center gap-1">
-                          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                          <span>พบชื่อตรงกันใน {matchedPkgIds.length} แพ็กเกจราคา</span>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>✅ ผูกใช้งานแล้ว {alreadyBoundDishes.length} เมนู ({alreadyBoundPkgIds.length} ราคา)</span>
                         </span>
                       ) : (
                         <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-300 shrink-0">
-                          ยังไม่ได้ผูกกับแพ็กเกจ
+                          ⚪ ยังไม่ได้เลือกผูกใช้งาน
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* If already bound, show quick preview list of where it's used with cancel/unbind capability */}
-                  {alreadyBoundDishes.length > 0 ? (
+                  {/* 1. If already bound, show what the user has bound */}
+                  {alreadyBoundDishes.length > 0 && (
                     <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 text-[11px] space-y-2.5 shadow-2xs">
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="font-black text-emerald-950 flex items-center gap-1.5 text-xs">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>รายการที่ผูกรูปนี้ไว้ในปัจจุบัน ({alreadyBoundDishes.length} เมนู):</span>
+                          <span>✅ รายการที่คุณเลือกผูกไว้แล้ว ({alreadyBoundDishes.length} เมนู):</span>
                         </div>
                         <button
                           type="button"
@@ -1781,27 +1807,63 @@ export const PhotoManager: React.FC = () => {
                         💡 <b>คำแนะนำ:</b> สามารถคลิกปุ่ม <b>✕</b> ท้ายแต่ละรายการ หรือกดปุ่ม <b>"ยกเลิกการผูกทั้งหมด"</b> เพื่อปลดรูปภาพออกได้ทันทีค่ะ
                       </p>
                     </div>
-                  ) : matchedPkgs.length > 0 ? (
-                    <div className="p-3 rounded-2xl bg-blue-50/90 border border-blue-200 text-[11px] space-y-2 shadow-2xs">
-                      <div className="font-bold text-blue-950 flex items-center gap-1.5 text-xs">
-                        <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-                        <span>พบชื่อเมนูตรงกันใน {matchedPkgs.length} แพ็กเกจราคา:</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {matchedPkgs.map((p) => (
-                          <span
-                            key={p.id}
-                            className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white border border-blue-300 text-blue-900 font-black text-xs shadow-2xs"
-                          >
-                            {p.price.toLocaleString()}.-
-                          </span>
-                        ))}
-                      </div>
-                      <p className="text-[10px] text-blue-800 font-medium">
-                        💡 <b>คำแนะนำ:</b> คลิกเลือกราคาด้านล่างในข้อ 1 เพื่อนำรูปไปผูกกับเมนูอาหารได้ทันทีค่ะ
-                      </p>
-                    </div>
-                  ) : null}
+                  )}
+
+                  {/* 2. System detected matching packages (unbound) */}
+                  {(() => {
+                    const unboundMatchedPkgs = matchedPkgs.filter((p) => !alreadyBoundPkgIds.includes(p.id));
+                    if (unboundMatchedPkgs.length === 0 && alreadyBoundDishes.length > 0) return null;
+
+                    if (alreadyBoundDishes.length > 0 && unboundMatchedPkgs.length > 0) {
+                      return (
+                        <div className="p-2.5 rounded-2xl bg-blue-50/70 border border-dashed border-blue-300 text-[11px] space-y-1.5 shadow-2xs">
+                          <div className="font-bold text-blue-950 flex items-center gap-1.5 text-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            <span>🔍 ระบบตรวจพบชื่อเมนูตรงกันเพิ่มเติม (ยังไม่ได้ผูกอีก {unboundMatchedPkgs.length} ราคา):</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 pt-0.5">
+                            {unboundMatchedPkgs.map((p) => (
+                              <span
+                                key={p.id}
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-white border border-blue-200 text-blue-800 font-bold text-xs shadow-2xs"
+                              >
+                                {p.price.toLocaleString()}.-
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-blue-800 font-medium">
+                            💡 <b>คำแนะนำ:</b> คลิกเลือกราคาด้านล่างในข้อ 1 เพื่อผูกรูปภาพเพิ่มเติมได้ค่ะ
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    if (alreadyBoundDishes.length === 0 && matchedPkgs.length > 0) {
+                      return (
+                        <div className="p-3 rounded-2xl bg-blue-50/90 border border-blue-200 text-[11px] space-y-2 shadow-2xs">
+                          <div className="font-bold text-blue-950 flex items-center gap-1.5 text-xs">
+                            <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                            <span>🔍 ระบบตรวจพบชื่อเมนูตรงกัน (แนะนำ {matchedPkgs.length} แพ็กเกจราคา — ยังไม่ได้ผูก):</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 pt-0.5">
+                            {matchedPkgs.map((p) => (
+                              <span
+                                key={p.id}
+                                className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white border border-blue-300 text-blue-900 font-black text-xs shadow-2xs"
+                              >
+                                {p.price.toLocaleString()}.-
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-blue-800 font-medium">
+                            💡 <b>สถานะ:</b> รูปนี้ยังไม่ได้ผูกกับเมนูใด — คุณสามารถคลิกเลือกราคาด้านล่างในข้อ 1 เพื่อผูกรูปภาพได้ทันทีค่ะ
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return null;
+                  })()}
                 </div>
 
                 {/* Step 1: Multi-package Selection */}
@@ -1891,11 +1953,11 @@ export const PhotoManager: React.FC = () => {
                             <span className="truncate">{pkg.name.replace('โต๊ะจีนราคา ', '')}</span>
                             {isAlreadyBound ? (
                               <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold">
-                                ✓ ผูกรูปนี้อยู่
+                                ✓ ผูกรูปนี้แล้ว
                               </span>
                             ) : isMatched ? (
-                              <span className="text-[9px] px-1 py-0.2 rounded bg-amber-100 text-amber-900 font-bold">
-                                มีเมนูนี้
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-blue-100 text-blue-800 font-bold">
+                                🔍 ระบบพบชื่อตรง
                               </span>
                             ) : null}
                           </div>
