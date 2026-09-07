@@ -55,9 +55,11 @@ export const PageHeroBanner: React.FC<PageHeroBannerProps> = ({
 
             {/* Page Title */}
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-              {title}{' '}
+              <span>{title}</span>
               {highlightText && (
-                <span className="text-gradient-red-gold">{highlightText}</span>
+                <span className="block mt-1 sm:mt-1.5 text-gradient-red-gold">
+                  {highlightText}
+                </span>
               )}
             </h1>
 
