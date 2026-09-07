@@ -12,6 +12,7 @@ import { QuotationApi } from '../../services/api.js';
 import { sendOrderToLine } from '../../utils/lineOrderHelper.js';
 import { Calculator, Sparkles, Utensils, CheckCircle, ChevronRight, Flame, Crown, Check } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency.js';
+import { trackQuotationGenerated } from '../../utils/googleAnalytics.js';
 
 interface QuotationBuilderProps {
   initialPackage?: PackageTier;
@@ -206,6 +207,17 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
     }
 
     const quoteDoc = buildQuoteDoc();
+
+    // Track Google Ads / GA4 Conversion Event
+    trackQuotationGenerated({
+      packageId: quoteDoc.package.id,
+      packageName: quoteDoc.package.name,
+      pricePerTable: quoteDoc.package.price,
+      tableCount: quoteDoc.tableCount,
+      totalAmount: quoteDoc.grandTotal,
+      customerName: quoteDoc.customer.name,
+      location: quoteDoc.customer.eventLocation,
+    });
 
     // Save to Database (or localStorage fallback)
     try {

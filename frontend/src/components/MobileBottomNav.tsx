@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, UtensilsCrossed, Sparkles, Award, Phone, Calendar } from 'lucide-react';
 import { PageView } from './Navbar.js';
+import { trackPageView } from '../utils/googleAnalytics.js';
 
 interface MobileBottomNavProps {
   currentView: PageView;
@@ -11,13 +12,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   currentView,
   onNavigate,
 }) => {
+  const handleNav = (page: PageView) => {
+    trackPageView(page);
+    onNavigate(page);
+  };
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t-2 border-amber-300 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] px-2 py-1 flex items-center justify-around safe-area-bottom select-none">
       
       {/* 1. Home / หน้าแรก */}
       <button
         type="button"
-        onClick={() => onNavigate('home')}
+        onClick={() => handleNav('home')}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
           currentView === 'home'
             ? 'text-red-700 font-black'
@@ -33,7 +38,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {/* 2. Menu Packages / แพ็กเกจราคา */}
       <button
         type="button"
-        onClick={() => onNavigate('packages')}
+        onClick={() => handleNav('packages')}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
           currentView === 'packages' || currentView === 'menu'
             ? 'text-red-700 font-black'
@@ -49,7 +54,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {/* 3. CENTER HERO ACTION: Smart Quotation Builder / คำนวณราคา */}
       <button
         type="button"
-        onClick={() => onNavigate('quotation')}
+        onClick={() => handleNav('quotation')}
         className="flex flex-col items-center justify-center -mt-5 group cursor-pointer"
       >
         <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-red-700 via-red-600 to-amber-500 text-white shadow-lg shadow-red-900/30 ring-4 ring-white flex items-center justify-center transform active:scale-95 transition-all animate-pulse">
@@ -63,7 +68,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {/* 4. Portfolio / ผลงานจัดเลี้ยง */}
       <button
         type="button"
-        onClick={() => onNavigate('portfolio')}
+        onClick={() => handleNav('portfolio')}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
           currentView === 'portfolio'
             ? 'text-red-700 font-black'
@@ -79,7 +84,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {/* 5. Queue & Contact / คิวงาน & ติดต่อ */}
       <button
         type="button"
-        onClick={() => onNavigate('contact')}
+        onClick={() => handleNav('contact')}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
           currentView === 'contact'
             ? 'text-red-700 font-black'

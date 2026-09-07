@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, MessageCircle, FileText, Menu as MenuIcon, X, Sparkles, Crown, ChevronRight, Home, Utensils, Award, Calendar, MapPin, Layers } from 'lucide-react';
+import { trackClickToCall, trackPageView } from '../utils/googleAnalytics.js';
 
 export type PageView =
   | 'home'
@@ -9,6 +10,7 @@ export type PageView =
   | 'portfolio'
   | 'heritage'
   | 'contact'
+  | 'review'
   | 'admin';
 
 interface NavbarProps {
@@ -47,6 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   const handlePageClick = (pageId: PageView) => {
+    trackPageView(pageId);
     setMobileMenuOpen(false);
     onNavigate(pageId);
   };
@@ -141,6 +144,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Direct Phone Call Button */}
           <a
             href="tel:0813311646"
+            onClick={() => trackClickToCall('navbar_desktop')}
             className="p-1.5 xl:px-2.5 xl:py-1.5 rounded-xl bg-slate-900 hover:bg-black text-amber-300 font-bold text-xs flex items-center gap-1 border border-amber-500/40 shadow-xs transition-all whitespace-nowrap"
             title="โทรด่วน โต๊ะจีน รพีพัฒน์: 081-331-1646"
           >
