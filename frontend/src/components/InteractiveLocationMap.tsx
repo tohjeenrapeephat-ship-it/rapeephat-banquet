@@ -278,31 +278,62 @@ export const InteractiveLocationMap: React.FC = () => {
                 </ul>
               </div>
 
-              {/* Phone & Working Hours */}
-              <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <img
-                    src="/images/brand/khun-pang.jpg"
-                    alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
-                    className="w-9 h-9 rounded-full object-cover ring-2 ring-amber-400 shrink-0 shadow-xs"
-                  />
-                  <div>
-                    <div className="text-[10px] text-amber-300 font-black">สายด่วนคุณแป้ง (24 ชม.)</div>
-                    <a
-                      href={`tel:${activeLoc.phone.replace(/[^0-9]/g, '')}`}
-                      className="font-mono text-white text-xs sm:text-sm font-black hover:text-amber-300 transition-colors flex items-center gap-1"
-                    >
-                      <Phone className="w-3 h-3 text-amber-400" />
-                      <span>{activeLoc.phone}</span>
-                    </a>
+              {/* 📞 Premium Hotline & Instant Call Card */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-slate-900 to-red-950/40 border border-amber-400/40 shadow-md space-y-2.5">
+                
+                {/* Header: Avatar + Officer Details + Status */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="relative shrink-0">
+                      <img
+                        src="/images/brand/khun-pang.jpg"
+                        alt="คุณแป้ง โต๊ะจีนรพีพัฒน์"
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-amber-400 shadow-md"
+                      />
+                      <span
+                        className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900 shadow-xs"
+                        title="ออนไลน์พร้อมรับสาย"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs text-amber-300 font-black tracking-wide truncate">
+                        สายด่วนคุณแป้ง (24 ชม.)
+                      </div>
+                      <div className="text-[10px] text-slate-300 font-medium truncate">
+                        ปรึกษาจัดเลี้ยง & เช็คคิวงานทันที
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-[10.5px] text-slate-400 font-medium text-right shrink-0">
-                  <div className="flex items-center gap-1 text-emerald-400 font-bold">
+
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/50 text-[10px] text-emerald-300 font-bold shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>พร้อมรับสาย</span>
                   </div>
-                  <div>{activeLoc.hours}</div>
+                </div>
+
+                {/* Single-Line Guaranteed Gold Call Button */}
+                <a
+                  href={`tel:${activeLoc.phone.replace(/[^0-9]/g, '')}`}
+                  className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black flex items-center justify-center gap-2 shadow-md hover:shadow-amber-400/20 transform hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap"
+                >
+                  <Phone className="w-4 h-4 text-slate-950 fill-current animate-bounce shrink-0" />
+                  <span className="font-mono tracking-wider text-slate-950 font-black text-sm sm:text-base whitespace-nowrap">
+                    {activeLoc.phone}
+                  </span>
+                  <span className="text-[11px] bg-slate-950/15 px-2 py-0.5 rounded-md font-sans font-black text-slate-900 shrink-0">
+                    โทรออกทันที
+                  </span>
+                </a>
+
+                {/* Operating Hours Note */}
+                <div className="flex items-center justify-between text-[10.5px] text-slate-300 pt-0.5 px-0.5">
+                  <span className="text-amber-300/90 font-bold flex items-center gap-1 shrink-0">
+                    <Clock className="w-3 h-3 text-amber-400" />
+                    <span>เวลาทำการ:</span>
+                  </span>
+                  <span className="text-slate-300 font-medium text-right text-[10px] sm:text-[10.5px] truncate pl-1">
+                    {activeLoc.hours}
+                  </span>
                 </div>
               </div>
 
