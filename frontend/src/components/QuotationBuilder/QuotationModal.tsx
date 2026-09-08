@@ -27,7 +27,8 @@ import {
   Check,
   Maximize2,
   Monitor,
-  Smartphone
+  Smartphone,
+  Loader2,
 } from 'lucide-react';
 
 interface QuotationModalProps {
@@ -245,11 +246,19 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({ quotation, onClo
               type="button"
               onClick={handleDownloadPdf}
               disabled={isGeneratingPdf}
-              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all border border-red-500 cursor-pointer"
+              className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all border cursor-pointer ${
+                isGeneratingPdf
+                  ? 'bg-red-800 border-red-700 opacity-90 cursor-wait'
+                  : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 border-red-500 hover:scale-102 active:scale-95'
+              }`}
               title="ดาวน์โหลดไฟล์ PDF คุณภาพสูง A4"
             >
-              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>{isGeneratingPdf ? 'กำลังสร้าง...' : 'ดาวน์โหลด PDF'}</span>
+              {isGeneratingPdf ? (
+                <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-amber-300" />
+              ) : (
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              )}
+              <span>{isGeneratingPdf ? 'กำลังสร้าง PDF...' : 'ดาวน์โหลด PDF'}</span>
             </button>
 
             {/* Upload Google Drive */}
