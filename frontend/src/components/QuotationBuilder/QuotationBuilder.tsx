@@ -13,6 +13,7 @@ import { sendOrderToLine } from '../../utils/lineOrderHelper.js';
 import { Calculator, Sparkles, Utensils, CheckCircle, ChevronRight, Flame, Crown, Check } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency.js';
 import { trackQuotationGenerated } from '../../utils/googleAnalytics.js';
+import { sendLeadPushNotification } from '../../services/chatService.js';
 
 interface QuotationBuilderProps {
   initialPackage?: PackageTier;
@@ -218,6 +219,13 @@ export const QuotationBuilder: React.FC<QuotationBuilderProps> = ({
       customerName: quoteDoc.customer.name,
       location: quoteDoc.customer.eventLocation,
     });
+
+    // Instant Mobile Push Notification for Owner
+    sendLeadPushNotification(
+      `📋 มีลูกค้าสร้างใบเสนอราคาใหม่!`,
+      `คุณ ${quoteDoc.customer.name} (โทร: ${quoteDoc.customer.phone || '-'}) สนใจ ${quoteDoc.tableCount} โต๊ะ ยอด ${(quoteDoc.grandTotal || 0).toLocaleString()} ฿ ที่ ${quoteDoc.customer.eventLocation || '-'}`,
+      'scroll,moneybag'
+    );
 
     // Save to Database (or localStorage fallback)
     try {

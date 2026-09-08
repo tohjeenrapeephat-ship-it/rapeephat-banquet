@@ -475,11 +475,18 @@ class ChatSyncEngine {
       } catch {}
     }
 
-    // 1. Instant Sub-50ms Real-Time Push to All Connected Browsers
+    // 1. Instant Sub-50ms Real-Time Push to All Connected Browsers & Mobile App
     try {
+      const isCust = msg.sender === 'customer';
       fetch(SSE_POST_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Title: isCust ? `ลูกค้าทักแชท: ${msg.senderName || 'ลูกค้าจากหน้าเว็บ'}` : `ตอบกลับลูกค้า`,
+          Priority: isCust ? 'high' : 'default',
+          Tags: isCust ? 'speech_balloon,phone' : 'envelope',
+          Click: 'https://www.rapeephat-catering.com/#admin',
+        },
         body: JSON.stringify({ type: 'LIVE_MSG', msg }),
       }).catch(() => {});
     } catch {}
@@ -518,3 +525,29 @@ class ChatSyncEngine {
 }
 
 export const chatSync = new ChatSyncEngine();
+
+/**
+ * Send Instant Mobile Push Notification for new Leads, Quotations, and Inquiries
+ * Delivered to mobile phone via ntfy app (topic: rapeephat_live_stream_v4)
+ */
+export async function sendLeadPushNotification(
+  title: string,
+  message: string,
+  tags = 'bell,phone',
+  clickUrl = 'https://www.rapeephat-catering.com/#admin'
+) {
+  try {
+    await fetch(SSE_POST_URL, {
+      method: 'POST',
+      headers: {
+        Title: title,
+        Priority: 'urgent',
+        Tags: tags,
+        Click: clickUrl,
+      },
+      body: message,
+    });
+  } catch (err) {
+    console.warn('Lead push notification dispatch error:', err);
+  }
+}
