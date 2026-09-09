@@ -19,7 +19,7 @@ interface GoogleReviewModalProps {
 }
 
 export const EXACT_GOOGLE_MAPS_REVIEW_URL =
-  'https://www.google.com/search?q=%E0%B9%82%E0%B8%95%E0%B9%8A%E0%B8%B0%E0%B8%88%E0%B8%B5%E0%B8%99+%E0%B8%A3%E0%B8%9E%E0%B8%B5%E0%B8%9E%E0%B8%B1%E0%B8%92%E0%B8%99%E0%B9%8C#lrd=0x30e2e560007bdda1:0xa22e275fdbe6507f,3,,,,';
+  'https://search.google.com/local/writereview?placeid=ChIJod17AGDl4jB_UObbXycuog';
 
 export const DEFAULT_GOOGLE_REVIEW_URL = EXACT_GOOGLE_MAPS_REVIEW_URL;
 export const GOOGLE_MAPS_DIRECT_URL = EXACT_GOOGLE_MAPS_REVIEW_URL;
