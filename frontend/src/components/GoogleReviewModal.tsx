@@ -133,7 +133,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 📱 INTERACTIVE QR CODE STAND CARD (READY TO SCAN & PRINT) */}
+        {/* 📱 INTERACTIVE REVIEW & QR CODE STAND CARD */}
         {/* ========================================================================= */}
         <div className="p-5 sm:p-7 space-y-5 bg-gradient-to-b from-amber-50/40 via-white to-amber-50/20">
           
@@ -159,7 +159,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
                 สแกนเพื่อเขียนรีวิว & ให้คะแนน 5 ดาว
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 font-medium">
-                ร่วมแบ่งปันความประทับใจในรสชาติอาหารและบริการจัดเลี้ยงบน Google Maps ค่ะ
+                ร่วมแบ่งปันความประทับใจในรสชาติอาหารและบริการจัดเลี้ยง โต๊ะจีน รพีพัฒน์ ค่ะ
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
                 <span>เปิดกล้องมือถือแล้วส่องที่ QR Code เพื่อรีวิวได้ทันที</span>
               </div>
               <div className="text-[11px] text-slate-500 font-medium">
-                ครัวรพีพัฒน์ (โต๊ะจีน รพีพัฒน์) • บริการจัดเลี้ยงทั่วประเทศไทย • โทร: 081-331-1646
+                ครัวรพีพัฒน์ (โต๊ะจีน รพีพัฒน์) • 72 หมู่ 1 ต.นครปฐม อ.เมืองนครปฐม • โทร: 081-331-1646
               </div>
             </div>
 
@@ -199,15 +199,16 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
           {/* ========================================================================= */}
           <div className="space-y-2.5">
             
-            {/* Primary Button: Open Google Maps Direct */}
+            {/* Primary Button: Open Review Page Direct */}
             <a
-              href={GOOGLE_MAPS_DIRECT_URL}
+              href={reviewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer border border-amber-300"
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all transform hover:scale-102 cursor-pointer border border-amber-300"
             >
-              <ExternalLink className="w-4 h-4 text-amber-300" />
-              <span>เปิดหน้าเขียนรีวิว Google Maps ทันที</span>
+              <Star className="w-4 h-4 text-amber-200 fill-amber-200" />
+              <span>เปิดหน้ารีวิวและให้คะแนน 5 ดาวทันที</span>
+              <ExternalLink className="w-4 h-4 text-amber-200" />
             </a>
 
             {/* Grid of Secondary Utility Buttons */}
