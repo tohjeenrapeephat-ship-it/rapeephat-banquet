@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, UtensilsCrossed, Sparkles, Award, Phone, Calendar } from 'lucide-react';
+import { Home, UtensilsCrossed, Sparkles, MessageCircle, Phone } from 'lucide-react';
 import { PageView } from './Navbar.js';
 import { trackPageView } from '../utils/googleAnalytics.js';
 
@@ -17,7 +17,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     onNavigate(page);
   };
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t-2 border-amber-300 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] px-2 py-1 flex items-center justify-around safe-area-bottom select-none">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t-2 border-amber-300 shadow-[0_-4px_25px_rgba(0,0,0,0.15)] px-2 py-1 flex items-center justify-around safe-area-bottom select-none">
       
       {/* 1. Home / หน้าแรก */}
       <button
@@ -65,37 +65,29 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         </span>
       </button>
 
-      {/* 4. Portfolio / ผลงานจัดเลี้ยง */}
-      <button
-        type="button"
-        onClick={() => handleNav('portfolio')}
-        className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
-          currentView === 'portfolio'
-            ? 'text-red-700 font-black'
-            : 'text-slate-600 hover:text-red-700 font-bold'
-        }`}
+      {/* 4. Direct LINE Chat / ทัก LINE */}
+      <a
+        href="https://line.me/ti/p/~pang_baichaa"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer text-[#06C755] font-black group"
       >
-        <div className={`p-1 rounded-xl ${currentView === 'portfolio' ? 'bg-red-50 text-red-700 shadow-xs' : ''}`}>
-          <Award className="w-4.5 h-4.5 text-red-600" />
+        <div className="p-1 rounded-xl bg-emerald-50 text-[#06C755] group-hover:scale-110 transition-transform shadow-xs">
+          <MessageCircle className="w-4.5 h-4.5" />
         </div>
-        <span className="text-[10px] leading-tight mt-0.5">ผลงาน</span>
-      </button>
+        <span className="text-[10px] leading-tight mt-0.5 text-emerald-800 font-bold">ทัก LINE</span>
+      </a>
 
-      {/* 5. Queue & Contact / คิวงาน & ติดต่อ */}
-      <button
-        type="button"
-        onClick={() => handleNav('contact')}
-        className={`flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer ${
-          currentView === 'contact'
-            ? 'text-red-700 font-black'
-            : 'text-slate-600 hover:text-red-700 font-bold'
-        }`}
+      {/* 5. Direct Phone Call / โทรทันที */}
+      <a
+        href="tel:0813311646"
+        className="flex flex-col items-center justify-center py-1 px-2 rounded-2xl transition-all cursor-pointer text-red-600 font-black group"
       >
-        <div className={`p-1 rounded-xl ${currentView === 'contact' ? 'bg-amber-100 text-amber-900 shadow-xs' : ''}`}>
-          <Calendar className="w-4.5 h-4.5 text-amber-700" />
+        <div className="p-1 rounded-xl bg-red-100 text-red-600 animate-bounce group-hover:scale-110 transition-transform shadow-xs">
+          <Phone className="w-4.5 h-4.5" />
         </div>
-        <span className="text-[10px] leading-tight mt-0.5">คิวงาน</span>
-      </button>
+        <span className="text-[10px] leading-tight mt-0.5 text-red-700 font-bold">โทรเลย</span>
+      </a>
 
     </div>
   );

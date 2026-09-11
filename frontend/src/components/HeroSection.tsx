@@ -264,22 +264,43 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenBuilder }) => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
               <button
                 onClick={onOpenBuilder}
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-base shadow-red-glow border border-amber-300/80 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black text-sm sm:text-base shadow-red-glow border border-amber-300/80 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <Sparkles className="w-5 h-5 text-amber-300" />
-                <span>คำนวณราคา & ออกใบเสนอราคา</span>
+                <span>⚡ จัดเมนู & คำนวณราคา</span>
                 <ArrowRight className="w-5 h-5 text-amber-300" />
               </button>
 
               <a
                 href="#packages"
-                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-amber-50/60 text-slate-900 font-black text-sm border-2 border-amber-400 shadow-md transition-all flex items-center justify-center gap-2.5 group"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-white hover:bg-amber-50 text-slate-900 font-black text-sm border-2 border-amber-400 shadow-md transition-all flex items-center justify-center gap-2 group cursor-pointer"
               >
                 <Utensils className="w-4 h-4 text-red-600 group-hover:scale-110 transition-transform" />
-                <span className="text-slate-900 group-hover:text-red-700 transition-colors">ดูแพ็กเกจ & เมนูอาหาร</span>
+                <span className="text-slate-900 group-hover:text-red-700 transition-colors">ดูแพ็กเกจ (1,400.-)</span>
+              </a>
+            </div>
+
+            {/* Quick 1-Click Call & LINE Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 pt-1">
+              <a
+                href="tel:0813311646"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transform hover:scale-103 active:scale-95 transition-all border border-amber-300 cursor-pointer animate-pulse"
+              >
+                <Phone className="w-4 h-4 animate-bounce" />
+                <span>📞 โทรปรึกษาด่วน 081-331-1646 (คุณแป้ง)</span>
+              </a>
+
+              <a
+                href="https://line.me/ti/p/~pang_baichaa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transform hover:scale-103 active:scale-95 transition-all border border-white/40 cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>💬 ทัก LINE: pang_baichaa</span>
               </a>
             </div>
 

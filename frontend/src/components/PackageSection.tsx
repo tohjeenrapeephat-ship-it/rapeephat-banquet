@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useBanquetPackages } from '../services/packageService.js';
 import { PackageTier } from '../types/quotation.js';
-import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText } from 'lucide-react';
+import { Sparkles, Check, ChevronDown, ChevronUp, Crown, Flame, ArrowRight, Printer, FileText, Phone, MessageCircle } from 'lucide-react';
 import { formatCurrency } from '../utils/currency.js';
 import { MenuCatalogModal } from './MenuCatalogModal.js';
 
@@ -214,6 +214,28 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage,
                       <span>🔍 ดูเมนูแบบ Pop-up & พิมพ์ PDF (A4)</span>
                     </button>
 
+                    {/* Quick 1-Click Call / LINE for this Package */}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <a
+                        href="tel:0813311646"
+                        className="py-2 px-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-black text-[11px] flex items-center justify-center gap-1 border border-red-200 transition-colors cursor-pointer"
+                        title="โทรสอบถามเซ็ตนี้"
+                      >
+                        <Phone className="w-3 h-3 text-red-600 animate-bounce" />
+                        <span>โทรจองเซ็ตนี้</span>
+                      </a>
+                      <a
+                        href="https://line.me/ti/p/~pang_baichaa"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#06C755] font-black text-[11px] flex items-center justify-center gap-1 border border-emerald-200 transition-colors cursor-pointer"
+                        title="ทัก LINE สอบถามเซ็ตนี้"
+                      >
+                        <MessageCircle className="w-3 h-3" />
+                        <span>ทัก LINE</span>
+                      </a>
+                    </div>
+
                   </div>
 
                 </div>
@@ -222,8 +244,8 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage,
           })}
         </div>
 
-        {/* Bottom Guarantee Banner */}
-        <div className="mt-12 p-6 rounded-3xl bg-gradient-to-r from-slate-950 via-red-950 to-slate-950 text-white border-2 border-amber-400 text-center space-y-3 shadow-xl">
+        {/* Bottom Guarantee Banner with Direct Contact Actions */}
+        <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-950 via-red-950 to-slate-950 text-white border-2 border-amber-400 text-center space-y-4 shadow-xl">
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm font-bold text-amber-200">
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
@@ -241,8 +263,27 @@ export const PackageSection: React.FC<PackageSectionProps> = ({ onSelectPackage,
             </span>
           </div>
           <p className="text-xs text-slate-300 max-w-2xl mx-auto">
-            หากต้องการเซ็ตเมนูพิเศษสำหรับงานมงคลสมรส งานพิธีการ หรืองานองค์กรขนาดใหญ่ สามารถติดต่อทีมงานเพื่อจัดเซ็ตเมนูตามงบประมาณได้ทันที
+            หากต้องการเซ็ตเมนูพิเศษสำหรับงานมงคลสมรส งานพิธีการ หรืองานองค์กรขนาดใหญ่ สามารถโทรปรึกษาคุณแป้ง หรือทัก LINE เพื่อจัดเซ็ตเมนูตามงบประมาณได้ทันที
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a
+              href="tel:0813311646"
+              className="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs sm:text-sm shadow-red-glow border border-amber-300 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            >
+              <Phone className="w-4 h-4 animate-bounce" />
+              <span>📞 โทรสายด่วน 081-331-1646</span>
+            </a>
+            <a
+              href="https://line.me/ti/p/~pang_baichaa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs sm:text-sm shadow-md flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all border border-white/40 cursor-pointer"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>💬 แอด LINE: pang_baichaa</span>
+            </a>
+          </div>
         </div>
 
       </div>
