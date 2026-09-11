@@ -144,24 +144,42 @@ export const GoogleReviewModal: React.FC<GoogleReviewModalProps> = ({
             className="p-6 rounded-3xl bg-white border-2 border-amber-300 shadow-xl text-center space-y-4 relative overflow-hidden"
           >
             {/* Top Google & Rating Badges */}
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-950 text-xs font-black shadow-2xs">
-                <Crown className="w-3.5 h-3.5 text-amber-600" />
-                <span>โต๊ะจีนรพีพัฒน์ พรีเมียม 35+ ปี (นครปฐม)</span>
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 border border-red-200 text-red-900 text-xs font-black shadow-2xs">
+                <Crown className="w-3.5 h-3.5 text-red-600" />
+                <span>👑 โต๊ะจีน รพีพัฒน์ (นครปฐม)</span>
               </div>
 
-              <div className="flex items-center justify-center gap-1 pt-1">
+              {/* Iconic Keyword: รีวิว 5 ดาว */}
+              <div className="pt-1">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none">
+                  รีวิว
+                </div>
+                <div className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mt-1 flex items-center justify-center gap-1">
+                  <span className="text-[#EA4335]">5</span>
+                  <span className="text-[#4285F4]">ด</span>
+                  <span className="text-[#34A853]">า</span>
+                  <span className="text-[#FBBC05]">ว</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-1 pt-0.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-6 h-6 text-amber-400 fill-amber-400 drop-shadow-xs" />
+                  <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400 drop-shadow-xs" />
                 ))}
               </div>
 
-              <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                สแกนเพื่อเขียนรีวิว & ให้คะแนน 5 ดาว
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium">
-                ร่วมแบ่งปันความประทับใจในรสชาติอาหารและบริการจัดเลี้ยง โต๊ะจีน รพีพัฒน์ ค่ะ
-              </p>
+              {/* Google Maps Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold shadow-2xs">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 50 50">
+                  <path d="M 25 5 C 15.6 5 8 12.6 8 22 C 8 26.5 9.8 30.5 12.8 33.5 L 25 47 L 37.2 33.5 C 40.2 30.5 42 26.5 42 22 C 42 12.6 34.4 5 25 5 Z" fill="#EA4335"/>
+                  <path d="M 8 22 C 8 27.5 10.8 32.3 15 35.2 L 25 47 L 25 22 Z" fill="#FBBC05"/>
+                  <path d="M 25 22 L 25 47 L 35 35.2 C 39.2 32.3 42 27.5 42 22 Z" fill="#34A853"/>
+                  <path d="M 25 5 C 34.4 5 42 12.6 42 22 L 25 22 Z" fill="#4285F4"/>
+                  <circle cx="25" cy="20" r="7.5" fill="#FFFFFF"/>
+                </svg>
+                <span className="font-sans font-bold text-slate-700">Google Maps</span>
+              </div>
             </div>
 
             {/* QR Code Frame with Gold Corner Accents (100% Unobstructed Crisp PNG) */}
