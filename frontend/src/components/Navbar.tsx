@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, MessageCircle, FileText, Menu as MenuIcon, X, Sparkles, Crown, ChevronRight, Home, Utensils, Award, Calendar, MapPin, Layers } from 'lucide-react';
+import { Phone, MessageCircle, FileText, Menu as MenuIcon, X, Sparkles, Crown, ChevronRight, Home, Utensils, Award, Calendar, MapPin, Layers, Star } from 'lucide-react';
 import { trackClickToCall, trackPageView } from '../utils/googleAnalytics.js';
 
 export type PageView =
@@ -46,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'portfolio', label: 'ผลงานจัดเลี้ยง', icon: <Award className="w-3.5 h-3.5" /> },
     { id: 'heritage', label: 'ตำนาน 35+ ปี', icon: <Crown className="w-3.5 h-3.5" /> },
     { id: 'contact', label: 'คิวงาน & ติดต่อ', icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'review', label: 'รีวิว 5 ดาว', icon: <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> },
   ];
 
   const handlePageClick = (pageId: PageView) => {
